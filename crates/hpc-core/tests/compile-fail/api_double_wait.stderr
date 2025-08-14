@@ -1,0 +1,11 @@
+error[E0382]: use of moved value: `ev`
+ --> tests/compile-fail/api_double_wait.rs
+  |
+  |     let (inflight, ev) = q.enqueue_kernel(&k, ready);
+  |                    -- move occurs because `ev` has type `EventToken<'_>`, which does not implement the `Copy` trait
+...
+  |     let ready_again = q.wait(ev, inflight);
+  |                              -- value moved here
+...
+  |     let _illegal = q.wait(ev, inflight2);
+  |                           ^^ value used here after move

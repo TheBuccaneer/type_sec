@@ -1,0 +1,31 @@
+// hpc-core/tests/api_smoke.rs
+#![allow(unused)]
+
+use hpc_core::api::{Context, Queue, Kernel, DeviceBuffer, EventToken}; // ggf. Pfad anpassen
+
+#[test]
+#[ignore = "happy-path smoke; nur Signaturen checken"]
+fn typed_path_compiles() {
+    let ctx = Context::new().expect("context");
+    let q: Queue = ctx.create_queue().expect("queue");
+
+    let n = 16usize;
+    let host = vec![0f32; n];
+
+    // Device-Buffer anlegen (+ Schreibvorgang) – nur Signaturen prüfen
+    let d_buf: DeviceBuffer<f32, _> = q.create_buffer_elems(n).expect("buf");
+    let write_ev: EventToken = q.enqueue_write(&d_buf, &host).expect("write");
+
+    // Kernel/Wait nur als "Signatur-Ping". Intern darf unimplemented!() sein.
+    // Der Block wird NICHT kompiliert, wenn du ihn auf cfg(FALSE) setzt – deshalb
+    // hier nur ein Typhinweis über let-bindings, die nicht laufen:
+    #[cfg(FALSE)]
+    {
+        let k = Kernel::new(&q, "vec_add");
+        let _run_ev: EventToken = q.enqueue_kernel(&k, &[], Some(&write_ev));
+        q.wait(&_run_ev, &d_buf);
+    }
+
+    // Warnings vermeiden
+    let _ = (ctx, q, d_buf, write_ev);
+}

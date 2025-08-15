@@ -31,6 +31,16 @@ pub struct GpuBuffer<S: State> {
     _state: PhantomData<S>,
 }
 
+#[cfg(feature = "metrics")]
+use crate::metrics::{RunLog, log_run};
+
+#[cfg(feature = "metrics")]
+#[inline]
+fn mlog(example: &'static str, n: usize) {
+    // eine JSONL-Zeile, Fehler bewusst ignorieren (keine Panik im Fast-Path)
+    let _ = log_run(&RunLog { example, n });
+}
+
 // Queued state implementation
 impl GpuBuffer<Queued> {
     /// Create a new GPU buffer
@@ -45,6 +55,9 @@ impl GpuBuffer<Queued> {
         let t = Instant::now();
 
         let buf = Buffer::<u8>::create(ctx, CL_MEM_READ_WRITE, len, ptr::null_mut())?;
+
+        #[cfg(feature = "metrics")]
+            mlog("buffer.new", len);
 
         #[cfg(feature = "metrics")]
         crate::metrics::record("GpuBuffer::new", t);
@@ -101,6 +114,9 @@ impl GpuBuffer<Queued> {
         #[cfg(feature = "metrics")]
         crate::metrics::record("enqueue_write", t);
 
+        #[cfg(feature = "metrics")]
+        mlog("pipeline.enqueue_write", self.len);
+
         Ok((
             GpuBuffer {
                 buf: self.buf,
@@ -115,6 +131,8 @@ impl GpuBuffer<Queued> {
     pub fn launch(self) -> GpuBuffer<InFlight> {
         #[cfg(feature = "metrics")]
         crate::metrics::record("launch", Instant::now());
+        #[cfg(feature = "metrics")]
+        mlog("pipeline.launch", self.len);
         
         GpuBuffer { 
             buf: self.buf, 
@@ -157,6 +175,9 @@ impl GpuBuffer<Ready> {
             &[],
         )?;
 
+        #[cfg(feature = "metrics")]
+mlog("pipeline.enqueue_read", self.len);
+
         #[cfg(feature = "memtrace")]
         if let Some(token_box) = token_box {
             use opencl3::event::CL_COMPLETE;
@@ -189,6 +210,9 @@ impl GpuBuffer<InFlight> {
         
         #[cfg(feature = "metrics")]
         crate::metrics::record("complete", Instant::now());
+
+        #[cfg(feature = "metrics")]
+        mlog("pipeline.complete", self.len);
         
         GpuBuffer { 
             buf: self.buf, 
@@ -201,7 +225,10 @@ impl GpuBuffer<InFlight> {
     pub fn into_ready(self, _g: GpuEventGuard) -> GpuBuffer<Ready> {
         #[cfg(feature = "metrics")]
         crate::metrics::record("into_ready", Instant::now());
-        
+
+        #[cfg(feature = "metrics")]
+            mlog("pipeline.ready", self.len);
+
         GpuBuffer { 
             buf: self.buf, 
             len: self.len, 

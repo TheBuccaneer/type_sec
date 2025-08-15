@@ -265,14 +265,14 @@ impl<S: State> GpuBuffer<S> {
     pub fn is_empty(&self) -> bool { self.len == 0 }
 }
 
-#[cfg(feature = "api-dev")]
+
 impl GpuBuffer<Empty> {
     pub fn dev_alloc_bytes(_bytes: usize) -> Self {
         unimplemented!("buffer::GpuBuffer<Empty>::dev_alloc_bytes")
     }
 }
 
-#[cfg(feature = "api-dev")]
+
 impl<S: State> GpuBuffer<S> {
     #[inline] pub fn dev_len_bytes(&self) -> usize { self.len_bytes() }
 }

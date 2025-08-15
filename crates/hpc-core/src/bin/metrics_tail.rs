@@ -3,22 +3,6 @@ use clap::Parser;
 use anyhow::{Result, Context, anyhow};
 use serde_json::Value;
 
-/// Windows-robust: bei `PermissionDenied` kurz retryen
-fn read_to_string_retry(path: &PathBuf) -> io::Result<String> {
-    let mut last = None;
-    for _ in 0..20 {
-        match fs::read_to_string(path) {
-            Ok(s) => return Ok(s),
-            Err(e) if e.kind() == io::ErrorKind::PermissionDenied => {
-                last = Some(e);
-                thread::sleep(Duration::from_millis(15));
-            }
-            Err(e) => return Err(e),
-        }
-    }
-    Err(last.unwrap_or_else(|| io::Error::new(io::ErrorKind::Other, "unknown error")))
-}
-
 #[derive(Parser, Debug)]
 #[command(name="metrics_tail", about="Tailt die letzten JSONL-Zeilen aus run.jsonl")]
 struct Opt {

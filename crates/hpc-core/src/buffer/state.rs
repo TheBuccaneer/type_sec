@@ -27,5 +27,5 @@ pub struct InFlight;
 impl sealed::Sealed for InFlight {}
 impl State for InFlight {}
 
-/// (Optional) Alias, falls irgendwo noch `Queued` verwendet wird.
+#[deprecated(since = "0.1.0", note = "Queued integrated in Ready")]
 pub type Queued = Ready;

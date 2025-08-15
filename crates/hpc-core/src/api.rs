@@ -48,6 +48,8 @@ pub struct EventToken<'ctx> {
     _q: PhantomData<&'ctx ()>,
 }
 
+
+
 // --- Signaturen (nur Skeleton) ------------------------------------------------
 impl Context {
     #[cfg(feature = "api-dev")]
@@ -62,6 +64,12 @@ impl Context {
 
     #[cfg(not(feature = "api-dev"))]
     pub fn queue(&self) -> Queue<'_> { unimplemented!() }
+
+
+    pub fn create_queue(&self) -> Queue<'_> {
+        Queue { _ctx: self }
+    }
+    
 }
 
 impl<'ctx> Queue<'ctx> {

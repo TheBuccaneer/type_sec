@@ -1,8 +1,28 @@
+//! metrics_tail.rs — CLI utility to “tail” the most recent JSONL lines from
+//! results/<YYYY-MM-DD>/run.jsonl. Supports line count (-n), pretty-printing,
+//! example-based filtering, and optional on-the-fly schema validation.
+//!
+//! Why so many `#[cfg(feature = "metrics")]`?
+//! - This tool and its dependencies (`clap`, `chrono`, `serde_json`, etc.) are
+//!   only needed when working with metrics. Gating them keeps the default build
+//!   slim and fast.
+//! - Some Cargo/test setups also compile binaries during `cargo test`. With the
+//!   feature gate, the code is effectively disabled unless `--features metrics`
+//!   is set — avoiding unused-import warnings or “main not found” surprises.
+//! - Results in reproducible builds across platforms: no metrics I/O code is
+//!   compiled unless explicitly requested by enabling the feature.
+
+
+#[cfg(feature = "metrics")]
 use std::{collections::VecDeque, fs, io::{self, BufRead}, path::PathBuf, thread, time::Duration};
+#[cfg(feature = "metrics")]
 use clap::Parser;
+#[cfg(feature = "metrics")]
 use anyhow::{Result, Context, anyhow};
+#[cfg(feature = "metrics")]
 use serde_json::Value;
 
+#[cfg(feature = "metrics")]
 #[derive(Parser, Debug)]
 #[command(name="metrics_tail", about="Tailt die letzten JSONL-Zeilen aus run.jsonl")]
 struct Opt {
@@ -27,12 +47,14 @@ struct Opt {
     validate: bool,
 }
 
+#[cfg(feature = "metrics")]
 fn default_results_file() -> PathBuf {
     use chrono::Local;
     let date = Local::now().format("%Y-%m-%d").to_string();
     PathBuf::from("results").join(date).join("run.jsonl")
 }
 
+#[cfg(feature = "metrics")]
 fn main() -> Result<()> {
     let opt = Opt::parse();
     let path = opt.file.unwrap_or_else(default_results_file);
@@ -77,3 +99,7 @@ fn main() -> Result<()> {
 
     Ok(())
 }
+
+
+#[cfg(not(feature = "metrics"))]
+fn main() {}

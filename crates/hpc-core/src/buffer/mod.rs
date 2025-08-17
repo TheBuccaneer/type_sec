@@ -5,7 +5,6 @@ mod guard;
 
 pub use guard::GpuEventGuard;
 pub mod state;
-#[allow(unused_imports)]
 pub use state::{State, Empty, Ready, InFlight, Queued};
 
 use opencl3::{
@@ -68,9 +67,16 @@ impl GpuBuffer<Queued> {
             _state: PhantomData 
         })
     }
+   
+}
 
-    /// Enqueue write operation from host to device
-    pub fn enqueue_write(
+// Ready state implementation
+impl GpuBuffer<Ready> {
+
+    /// S1: Host→Device write is only available when the buffer is `Ready`.
+/// Pre: `host.len() == self.len`.
+/// Post: enqueues a device write; the buffer remains `Ready` (no state change here).
+     pub fn enqueue_write(
         mut self,
         queue: &CommandQueue,
         host: &[u8],
@@ -126,25 +132,12 @@ impl GpuBuffer<Queued> {
             GpuEventGuard::new(evt),
         ))
     }
+    
+    
 
-    /// Launch buffer operation
-    pub fn launch(self) -> GpuBuffer<InFlight> {
-        #[cfg(feature = "metrics")]
-        crate::metrics::record("launch", Instant::now());
-        #[cfg(feature = "metrics")]
-        mlog("pipeline.launch", self.len);
-        
-        GpuBuffer { 
-            buf: self.buf, 
-            len: self.len, 
-            _state: PhantomData 
-        }
-    }
-}
-
-// Ready state implementation
-impl GpuBuffer<Ready> {
-    /// Enqueue read operation from device to host
+/// S1: Device→Host read is only available when the buffer is `Ready`.
+/// Pre: `host_out.len() == self.len`.
+/// Post: enqueues a device read; the buffer remains `Ready` (no state change here).
     pub fn enqueue_read(
         self,
         queue: &CommandQueue,
@@ -200,17 +193,32 @@ mlog("pipeline.enqueue_read", self.len);
             GpuEventGuard::new(evt),
         ))
     }
+
+     /// Launch buffer operation
+    pub fn launch(self) -> GpuBuffer<InFlight> {
+        #[cfg(feature = "metrics")]
+        crate::metrics::record("launch", Instant::now());
+        #[cfg(feature = "metrics")]
+        mlog("pipeline.launch", self.len);
+        
+        GpuBuffer { 
+            buf: self.buf, 
+            len: self.len, 
+            _state: PhantomData 
+        }
+    }
 }
 
 // InFlight state implementation
 impl GpuBuffer<InFlight> {
-    /// Complete operation and transition to Ready
-    pub fn complete(self, evt: Event) -> GpuBuffer<Ready> {
+    /// S3: The only legal transition out of `InFlight`.
+/// Consumes `self` and the completion event, waits for it, and returns `Ready`.
+/// Double-wait is prevented by taking `self` by value. Host I/O remains unavailable until this returns.
+    pub fn wait(self, evt: Event) -> GpuBuffer<Ready> {
         let _g = GpuEventGuard::new(evt);
         
         #[cfg(feature = "metrics")]
         crate::metrics::record("complete", Instant::now());
-
         #[cfg(feature = "metrics")]
         mlog("pipeline.complete", self.len);
         
@@ -221,21 +229,31 @@ impl GpuBuffer<InFlight> {
         }
     }
 
-    /// Transition to Ready with guard
-    pub fn into_ready(self, _g: GpuEventGuard) -> GpuBuffer<Ready> {
+/// DEPRECATED: use `wait(self, evt)` instead.
+/// Temporary shim for legacy tests/benches; will be removed once all call sites are updated.
+    #[deprecated(note = "use `wait(self, evt)` instead")]
+    pub fn into_ready(self, g: GpuEventGuard) -> GpuBuffer<Ready> {
+        // consume the guard -> ensures evt.wait() runs in Drop
+        drop(g);
+
         #[cfg(feature = "metrics")]
         crate::metrics::record("into_ready", Instant::now());
-
         #[cfg(feature = "metrics")]
-            mlog("pipeline.ready", self.len);
+        mlog("pipeline.ready", self.len);
 
-        GpuBuffer { 
-            buf: self.buf, 
-            len: self.len, 
-            _state: PhantomData 
+        GpuBuffer {
+            buf: self.buf,
+            len: self.len,
+            _state: PhantomData,
         }
     }
 }
+
+
+
+
+
+
 
 // Common methods for all states
 impl<S: State> GpuBuffer<S> {
@@ -276,3 +294,5 @@ impl GpuBuffer<Empty> {
 impl<S: State> GpuBuffer<S> {
     #[inline] pub fn dev_len_bytes(&self) -> usize { self.len_bytes() }
 }
+
+

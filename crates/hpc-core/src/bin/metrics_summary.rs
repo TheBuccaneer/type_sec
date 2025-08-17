@@ -1,8 +1,25 @@
+//! metrics_summary.rs — CLI utility that summarizes results/<YYYY-MM-DD>/run.jsonl:
+//! total lines, last timestamp, unique run_ids, and simple per-example aggregates.
+//! Optionally validates each line against the current JSON schema.
+//!
+//! Why so many `#[cfg(feature = "metrics")]`?
+//! - Imports, CLI parsing, and helper routines are only meaningful in the metrics
+//!   context. Feature-gating avoids pulling extra dependencies into normal library
+//!   or test builds.
+//! - If a CI or local `cargo test` ends up compiling binaries, the code remains
+//!   inactive (and warning-free) unless `--features metrics` is enabled.
+//! - Net effect: lean default builds; full functionality when explicitly requested.
+//! 
+#[cfg(feature = "metrics")]
 use std::{collections::HashMap, fs, io::{self, BufRead}, path::PathBuf, thread, time::Duration};
+#[cfg(feature = "metrics")]
 use clap::Parser;
+#[cfg(feature = "metrics")]
 use anyhow::{Context, Result};
+#[cfg(feature = "metrics")]
 use serde_json::Value;
 
+#[cfg(feature = "metrics")]
 #[derive(Parser, Debug)]
 #[command(name="metrics_summary", about="Kleine Zusammenfassung aus run.jsonl")]
 struct Opt {
@@ -15,12 +32,14 @@ struct Opt {
     validate: bool,
 }
 
+#[cfg(feature = "metrics")]
 fn default_results_file() -> PathBuf {
     use chrono::Local;
     let date = Local::now().format("%Y-%m-%d").to_string();
     PathBuf::from("results").join(date).join("run.jsonl")
 }
 
+#[cfg(feature = "metrics")]
 fn open_retry(path: &PathBuf) -> io::Result<fs::File> {
     for _ in 0..20 {
         match fs::File::open(path) {
@@ -35,6 +54,7 @@ fn open_retry(path: &PathBuf) -> io::Result<fs::File> {
     Err(io::Error::new(io::ErrorKind::PermissionDenied, "retry timeout"))
 }
 
+#[cfg(feature = "metrics")]
 #[derive(Default)]
 struct Agg {
     count: u64,
@@ -42,6 +62,7 @@ struct Agg {
     bytes: u128,
 }
 
+#[cfg(feature = "metrics")]
 fn main() -> Result<()> {
     let opt = Opt::parse();
     let path = opt.file.unwrap_or_else(default_results_file);
@@ -109,3 +130,6 @@ fn main() -> Result<()> {
 
     Ok(())
 }
+
+#[cfg(not(feature = "metrics"))]
+fn main() {}

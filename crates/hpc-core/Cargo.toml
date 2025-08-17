@@ -46,7 +46,7 @@ metrics = []
 memtrace = []
 api-dev = [] 
 
-# Beispiele: nur die, die wir wirklich wollen
+
 [[example]]
 name = "bandwidth_optimized"
 path = "examples/bandwidth_optimized.rs"

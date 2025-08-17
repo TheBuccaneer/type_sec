@@ -1,6 +1,7 @@
 use std::marker::PhantomData;
 
 // Dummy buffer type without OpenCL dependency 
+#[allow(dead_code)]
 struct DummyBuffer(u64);
 
 // Generic typestate buffer struct

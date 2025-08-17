@@ -11,5 +11,5 @@ error[E0308]: mismatched types
 note: method defined here
  --> src/api.rs
   |
-  |     pub fn enqueue_kernel<T>(
-  |            ^^^^^^^^^^^^^^
+  | pub fn enqueue_kernel<T>(
+  |        ^^^^^^^^^^^^^^

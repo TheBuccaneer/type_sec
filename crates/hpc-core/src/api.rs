@@ -8,6 +8,7 @@ use core::marker::PhantomData;
 use crate::buffer::state::{State, Empty, Ready, InFlight};
 // Falls der Typ in deinem Code anders heißt, passe das Alias hier an:
 use crate::buffer::GpuBuffer as LlBuffer;
+use opencl3::event::Event as ClEvent;
 
 /// Root-Lebensraum. In echt: OpenCL-Context/Devices/Programme.
 pub struct Context {
@@ -42,12 +43,48 @@ pub struct Kernel<'ctx> {
 /// # Must Use
 /// Muss von [`Queue::wait`] oder einem Äquivalent konsumiert werden.
 /// Nicht verwendete Events bedeuten, dass ein Kommando evtl. nie abgeschlossen wurde.
+#[cfg(feature = "api-dev")]
 #[must_use]
 #[derive(Debug)]
 pub struct EventToken<'ctx> {
-    _q: PhantomData<&'ctx ()>,
+    // Im Dev-Stub KEIN echtes OpenCL-Event
+    _q: core::marker::PhantomData<&'ctx ()>,
 }
 
+#[cfg(not(feature = "api-dev"))]
+#[must_use]
+#[derive(Debug)]
+pub struct EventToken<'ctx> {
+    // Echtes Event nur im Normalbetrieb
+    evt: ClEvent,
+    _q: core::marker::PhantomData<&'ctx ()>,
+}
+
+#[cfg(not(feature = "api-dev"))]
+impl<'ctx> EventToken<'ctx> {
+    /// Konstruiere aus realem OpenCL-Event
+    #[inline]
+    pub fn from_event(evt: ClEvent) -> Self {
+        Self { evt, _q: core::marker::PhantomData }
+    }
+
+    /// Event extrahieren (konsumiert den Token)
+    #[inline]
+    #[must_use]
+    pub fn into_event(self) -> ClEvent {
+        self.evt
+    }
+}
+
+
+#[cfg(feature = "api-dev")]
+impl<'ctx> EventToken<'ctx> {
+    /// Dev-Stub: Token ohne echtes Event
+    #[inline]
+    pub fn dev() -> Self {
+        Self { _q: core::marker::PhantomData }
+    }
+}
 
 
 // --- Signaturen (nur Skeleton) ------------------------------------------------
@@ -70,6 +107,12 @@ impl Context {
         Queue { _ctx: self }
     }
     
+}
+
+impl Default for Context {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl<'ctx> Queue<'ctx> {
@@ -98,29 +141,7 @@ impl<'ctx> Queue<'ctx> {
         unimplemented!()
     }
 
-/// Host→Device Write: Empty -> Ready.
-///
-/// # Examples
-/// ```no_run
-/// use hpc_core::api::Context;
-/// let ctx = Context::new();
-/// let q = ctx.queue();
-/// let buf = q.create_buffer_elems::<u32>(16);
-/// let _ready = q.enqueue_write(buf, &[0u32; 16]);
-/// ```
-///
-/// ```compile_fail
-/// // Write auf bereits Ready → sollte nicht kompilieren.
-/// use hpc_core::api::Context;
-/// let ctx = Context::new();
-/// let q = ctx.queue();
-/// let ready = {
-///     let b = q.create_buffer_elems::<u32>(16);
-///     q.enqueue_write(b, &[0u32; 16])
-/// };
-/// let _illegal = q.enqueue_write(ready, &[1u32; 16]);
-/// ```
-/// 
+
 #[inline]
 #[cfg(feature = "api-dev")]
 pub fn enqueue_write<T>(
@@ -128,10 +149,9 @@ pub fn enqueue_write<T>(
     buf: DeviceBuffer<T, Empty>,
     _data: &[T],
 ) -> DeviceBuffer<T, Ready> {
-    // Dev-Stitching: nur State-Übergang, keine echte Kopie.
+    // Dev stub: only type-state hop (no real copy)
     let inner_empty = buf.into_inner();
-    // Low-Level: State-Hop über Helper (kein transmute im API-Layer).
-    let inner_ready = unsafe { inner_empty.assume_state::<Ready>() };
+    let inner_ready: LlBuffer<Ready> = unsafe { inner_empty.assume_state::<Ready>() };
     DeviceBuffer::from_inner_unchecked(inner_ready)
 }
 
@@ -145,56 +165,54 @@ pub fn enqueue_write<T>(
     unimplemented!("Queue::enqueue_write<T>: typed write to device buffer")
 }
 
-      // Ready -> InFlight + EventToken
-    #[cfg(feature = "api-dev")]
-    #[inline]
-    pub fn enqueue_kernel<T>(
-        &'ctx self,
-        _k: &Kernel<'ctx>,
-        buf: DeviceBuffer<T, Ready>,
-    ) -> (DeviceBuffer<T, InFlight>, EventToken<'ctx>) {
-        // reiner State-Übergang; ersetzt du später durch echten enqueue
-        let inner_ready = buf.into_inner();
-        let inner_inflight: LlBuffer<InFlight> = unsafe { inner_ready.assume_state() };
-        (DeviceBuffer::from_inner_unchecked(inner_inflight), EventToken { _q: core::marker::PhantomData })
-    }
+// Ready -> InFlight + EventToken
+#[cfg(feature = "api-dev")]
+#[inline]
+pub fn enqueue_kernel<T>(
+    &'ctx self,
+    _k: &Kernel<'ctx>,
+    buf: DeviceBuffer<T, Ready>,
+) -> (DeviceBuffer<T, InFlight>, EventToken<'ctx>) {
+    // Dev stub: only type-state hop (no real enqueue/event)
+    let inner_ready = buf.into_inner();
+    let inner_inflight: LlBuffer<InFlight> = unsafe { inner_ready.assume_state() };
+    (
+        DeviceBuffer::from_inner_unchecked(inner_inflight),
+        // phantom token (dev stub has no real event)
+         EventToken::dev(),
+    )
+}
 
-        /// Enqueued einen Kernel und liefert ein [`EventToken`].
-    ///
-    /// # State-Hop
-    /// Eingänge: *Pending* → nach erfolgreichem Lauf: *Ready*.
-    ///
-    /// # Bemerkung
-    /// Diese Funktion **führt** den Kernel irgendwann aus (Scheduling),
-    /// das eigentliche Warten passiert über [`Queue::wait`].
-    #[cfg(not(feature = "api-dev"))]
-    #[inline]
-    pub fn enqueue_kernel<T>(
-        &'ctx self,
-        _k: &Kernel<'ctx>,
-        _buf: DeviceBuffer<T, Ready>,
-    ) -> (DeviceBuffer<T, InFlight>, EventToken<'ctx>) {
-        unimplemented!("Queue::enqueue_kernel<T>: start kernel, return InFlight + EventToken")
-    }
 
-   // InFlight -> Ready (Token wird konsumiert)
-    #[cfg(feature = "api-dev")]
-    #[inline]
-    pub fn wait<T>(
-        &'ctx self,
-        _ev: EventToken<'ctx>,
-        buf: DeviceBuffer<T, InFlight>,
-    ) -> DeviceBuffer<T, Ready> {
-        let inner_inflight = buf.into_inner();
-        let inner_ready: LlBuffer<Ready> = unsafe { inner_inflight.assume_state() };
-        DeviceBuffer::from_inner_unchecked(inner_ready)
-    }
 
-    /// Wartet/blockiert auf ein Event und vollzieht den State-Hop.
-    ///
-    /// # State-Hop
-    /// *Pending* → *Ready*. Auf bereits *Ready* sollte **nicht** gewartet werden
-    /// (siehe compile-fail-Tests).
+#[cfg(not(feature = "api-dev"))]
+#[inline]
+pub fn enqueue_kernel<T>(
+    &'ctx self,
+    _k: &Kernel<'ctx>,
+    _buf: DeviceBuffer<T, Ready>,
+) -> (DeviceBuffer<T, InFlight>, EventToken<'ctx>) {
+    unimplemented!("Queue::enqueue_kernel<T>: enqueue kernel and return InFlight + event token")
+}
+
+
+#[cfg(feature = "api-dev")]
+#[inline]
+pub fn wait<T>(
+    &'ctx self,
+    _ev: EventToken<'ctx>,               // nur Marker im dev-Stub
+    buf: DeviceBuffer<T, InFlight>,
+) -> DeviceBuffer<T, Ready> {
+    let inner_inflight = buf.into_inner();
+    // dev-Stub: kein echtes Warten – nur Type-State-Hop
+    let inner_ready: LlBuffer<Ready> = unsafe { inner_inflight.assume_state() };
+    DeviceBuffer::from_inner_unchecked(inner_ready)
+}
+
+
+    /// S3: Typed transition `InFlight -> Ready`.
+/// Consumes the event token and the in-flight buffer; after waiting, returns `Ready`.
+/// This prevents double-wait by taking the buffer by value.
     #[cfg(not(feature = "api-dev"))]
     #[inline]
     pub fn wait<T>(

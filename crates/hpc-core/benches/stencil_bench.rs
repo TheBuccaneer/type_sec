@@ -109,7 +109,7 @@ fn bench_stencil(c: &mut Criterion) {
                         .unwrap();
                     evt.wait().unwrap();
 
-                    let ready_dst = dst_if.complete(evt);
+                    let ready_dst = dst_if.wait(evt);
                     ping = ready_dst;
                 }
             },

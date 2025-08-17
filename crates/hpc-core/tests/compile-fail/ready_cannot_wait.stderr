@@ -1,5 +1,8 @@
-error[E0599]: no method named `wait` found for struct `GpuBuffer` in the current scope
+error[E0599]: no method named `wait` found for struct `GpuBuffer<hpc_core::Ready>` in the current scope
  --> tests/compile-fail/ready_cannot_wait.rs
   |
   |     let _bad = buf.wait();
   |                    ^^^^ method not found in `GpuBuffer<hpc_core::Ready>`
+  |
+  = note: the method was found for
+          - `GpuBuffer<InFlight>`

@@ -1,7 +1,7 @@
 use std::marker::PhantomData;
 
 #[cfg(feature = "metrics")]
-use hpc_core::metrics::{log_run, RunLog};
+use hpc_core::metrics::{RunLog, log_run};
 
 // --- Zustandsmarker ---
 struct Queued;
@@ -22,12 +22,18 @@ struct Buf<S> {
 impl Buf<Queued> {
     fn new(data: Vec<i32>) -> Self {
         log_metric("pipeline.queue", data.len());
-        Self { inner: Buffer { data }, _s: PhantomData }
+        Self {
+            inner: Buffer { data },
+            _s: PhantomData,
+        }
     }
 
     fn launch(self) -> Buf<InFlight> {
         log_metric("pipeline.launch", self.inner.data.len());
-        Buf { inner: self.inner, _s: PhantomData }
+        Buf {
+            inner: self.inner,
+            _s: PhantomData,
+        }
     }
 }
 
@@ -36,7 +42,10 @@ impl Buf<InFlight> {
         // (simuliere Arbeit)
         let _ = self.inner.data.iter().map(|x| x + 1).sum::<i32>();
         log_metric("pipeline.wait", self.inner.data.len());
-        Buf { inner: self.inner, _s: PhantomData }
+        Buf {
+            inner: self.inner,
+            _s: PhantomData,
+        }
     }
 }
 

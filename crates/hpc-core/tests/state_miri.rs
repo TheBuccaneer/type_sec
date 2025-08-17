@@ -1,13 +1,13 @@
 use std::marker::PhantomData;
 
-// Dummy buffer type without OpenCL dependency 
+// Dummy buffer type without OpenCL dependency
 #[allow(dead_code)]
 struct DummyBuffer(u64);
 
 // Generic typestate buffer struct
 struct DummyGpuBuffer<S> {
-    buf:    DummyBuffer,
-    len:    usize,
+    buf: DummyBuffer,
+    len: usize,
     _state: PhantomData<S>,
 }
 
@@ -32,22 +32,21 @@ impl State for Queued {}
 impl State for InFlight {}
 impl State for Ready {}
 
-//  4. Test: typestate transitions using only dummy types 
+//  4. Test: typestate transitions using only dummy types
 #[test]
 fn typestate_transitions_dummy_only() {
-
     let dummy = DummyBuffer(12345);
 
     let queued = DummyGpuBuffer::<Queued> {
-        buf:    dummy,
-        len:    42,
+        buf: dummy,
+        len: 42,
         _state: PhantomData,
     };
 
     //Transition to InFlight state by moving the buffer
     let inflight: DummyGpuBuffer<InFlight> = DummyGpuBuffer {
-        buf:    queued.buf,
-        len:    queued.len,
+        buf: queued.buf,
+        len: queued.len,
         _state: PhantomData,
     };
 
@@ -62,8 +61,8 @@ fn typestate_transitions_dummy_only() {
 
     // After the guard is dropped, transition to Ready state
     let _ready: DummyGpuBuffer<Ready> = DummyGpuBuffer {
-        buf:    inflight.buf,
-        len:    inflight.len,
+        buf: inflight.buf,
+        len: inflight.len,
         _state: PhantomData,
     };
 

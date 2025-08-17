@@ -3,9 +3,9 @@
 
 #![cfg(feature = "metrics")]
 
-use std::{fs, thread::sleep, time::Duration};
-use serde_json::Value;
 use hpc_core::metrics::{RunLog, log_run_to};
+use serde_json::Value;
+use std::{fs, thread::sleep, time::Duration};
 
 #[cfg_attr(windows, ignore)]
 #[test]
@@ -14,11 +14,23 @@ fn metrics_determinism_guard() {
     let base = std::env::temp_dir().join("hpc-core-test-det-guard");
 
     // Zwei identische Writes (gleiches Input), minimale Pause für andere ts
-    let p1 = log_run_to(&RunLog { example: "vec_add", n: 256 }, &base)
-        .expect("first write ok");
+    let p1 = log_run_to(
+        &RunLog {
+            example: "vec_add",
+            n: 256,
+        },
+        &base,
+    )
+    .expect("first write ok");
     sleep(Duration::from_millis(2));
-    let p2 = log_run_to(&RunLog { example: "vec_add", n: 256 }, &base)
-        .expect("second write ok");
+    let p2 = log_run_to(
+        &RunLog {
+            example: "vec_add",
+            n: 256,
+        },
+        &base,
+    )
+    .expect("second write ok");
 
     // Beide Writes landen in derselben Datei (run.jsonl)
     assert_eq!(p1, p2, "writes should append to the same run.jsonl");
@@ -26,29 +38,46 @@ fn metrics_determinism_guard() {
     // Letzte zwei **nicht-leeren** Zeilen lesen
     let s = fs::read_to_string(&p1).expect("read run.jsonl");
     let mut lines = s.lines().rev().filter(|l| !l.trim().is_empty());
-    let last   = lines.next().expect("has last line");
+    let last = lines.next().expect("has last line");
     let before = lines.next().expect("has previous line");
 
-    let v_last:   Value = serde_json::from_str(last).expect("parse last");
+    let v_last: Value = serde_json::from_str(last).expect("parse last");
     let v_before: Value = serde_json::from_str(before).expect("parse prev");
 
     // Erlaubte Abweichung: nur der Timestamp
-    for key in ["example","n","allocs","alloc_bytes","schema_version","pid"] {
-        assert_eq!(v_last[ key ], v_before[ key ], "field `{key}` drifted");
+    for key in [
+        "example",
+        "n",
+        "allocs",
+        "alloc_bytes",
+        "schema_version",
+        "pid",
+    ] {
+        assert_eq!(v_last[key], v_before[key], "field `{key}` drifted");
     }
 
     // Timestamp muss sich unterscheiden (neue Messung)
     assert_ne!(v_last["ts"], v_before["ts"], "expected `ts` to differ");
 
     // Sanity: `ts` sieht aus wie RFC3339 (einfacher Check)
-    let ts_ok = v_last["ts"].as_str().map(|s| s.contains('T')).unwrap_or(false);
+    let ts_ok = v_last["ts"]
+        .as_str()
+        .map(|s| s.contains('T'))
+        .unwrap_or(false);
     assert!(ts_ok, "`ts` should look like RFC3339 (contain 'T')");
 
-    for key in ["example","n","allocs","alloc_bytes","schema_version","pid","run_id"] {
-    assert_eq!(v_last[key], v_before[key], "field `{key}` drifted");
+    for key in [
+        "example",
+        "n",
+        "allocs",
+        "alloc_bytes",
+        "schema_version",
+        "pid",
+        "run_id",
+    ] {
+        assert_eq!(v_last[key], v_before[key], "field `{key}` drifted");
+    }
 }
-}
-
 
 use regex::Regex;
 
@@ -57,18 +86,32 @@ use regex::Regex;
 fn run_id_is_stable_and_well_formed() {
     let base = std::env::temp_dir().join("hpc-core-test-run-id");
 
-    let p1 = log_run_to(&RunLog { example: "vec_add", n: 16 }, &base).unwrap();
+    let p1 = log_run_to(
+        &RunLog {
+            example: "vec_add",
+            n: 16,
+        },
+        &base,
+    )
+    .unwrap();
     sleep(Duration::from_millis(2));
-    let p2 = log_run_to(&RunLog { example: "vec_add", n: 16 }, &base).unwrap();
+    let p2 = log_run_to(
+        &RunLog {
+            example: "vec_add",
+            n: 16,
+        },
+        &base,
+    )
+    .unwrap();
 
     assert_eq!(p1, p2, "expected same JSONL file");
 
     let s = fs::read_to_string(&p1).unwrap();
     let mut lines = s.lines().rev().filter(|l| !l.trim().is_empty());
-    let last   = lines.next().unwrap();
+    let last = lines.next().unwrap();
     let before = lines.next().unwrap();
 
-    let v_last:   Value = serde_json::from_str(last).unwrap();
+    let v_last: Value = serde_json::from_str(last).unwrap();
     let v_before: Value = serde_json::from_str(before).unwrap();
 
     let r1 = v_last["run_id"].as_str().expect("run_id present");

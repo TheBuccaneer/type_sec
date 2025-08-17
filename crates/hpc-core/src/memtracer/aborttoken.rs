@@ -1,8 +1,8 @@
 #![cfg(feature = "memtrace")]
 
+use super::{AUTO_TRACE, Dir, LOG, Phase, Record};
 use once_cell::sync::Lazy;
 use std::sync::Mutex;
-use super::{LOG, Record, Dir, Phase, AUTO_TRACE};
 
 /// Abort event information
 pub struct AbortEvent {
@@ -15,21 +15,20 @@ pub struct AbortEvent {
 }
 
 /// Current abort token storage
-pub static CURRENT_ABORT: Lazy<Mutex<Option<String>>> = 
-    Lazy::new(|| Mutex::new(None));
+pub static CURRENT_ABORT: Lazy<Mutex<Option<String>>> = Lazy::new(|| Mutex::new(None));
 
 /// Log an abort event
 pub fn log_abort(ev: &AbortEvent) {
     if !AUTO_TRACE.load(std::sync::atomic::Ordering::Relaxed) {
         return;
     }
-    
+
     let mut log = LOG.lock().unwrap();
     let prev_end = log.last().map(|r| r.t_end_us).unwrap_or(0);
-    let idle = if ev.t_start_us > prev_end { 
-        ev.t_start_us - prev_end 
-    } else { 
-        0 
+    let idle = if ev.t_start_us > prev_end {
+        ev.t_start_us - prev_end
+    } else {
+        0
     };
     let abort_tok = CURRENT_ABORT.lock().unwrap().clone();
 
@@ -37,7 +36,7 @@ pub fn log_abort(ev: &AbortEvent) {
         t_start_us: ev.t_start_us,
         t_end_us: ev.t_end_us,
         bytes: 0,
-        dir: Dir::Kernel,  // Placeholder
+        dir: Dir::Kernel, // Placeholder
         idle_us: idle,
         abort_token: abort_tok,
         phase: Phase::Abort,

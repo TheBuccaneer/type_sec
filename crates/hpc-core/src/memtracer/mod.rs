@@ -2,23 +2,21 @@
 
 //! Memory transfer tracing utilities
 
-mod copytoken;
 mod aborttoken;
+mod copytoken;
 
-pub use copytoken::{CopyToken, start, log_transfer};
 pub use aborttoken::{
-    AbortEvent, log_abort, 
-    set_abort_token, clear_abort_token, AbortTokenGuard,
-    CURRENT_ABORT,
+    AbortEvent, AbortTokenGuard, CURRENT_ABORT, clear_abort_token, log_abort, set_abort_token,
 };
+pub use copytoken::{CopyToken, log_transfer, start};
 
 use once_cell::sync::Lazy;
 use std::{
     fs::File,
     io::Write,
     sync::{
-        atomic::{AtomicBool, Ordering},
         Mutex,
+        atomic::{AtomicBool, Ordering},
     },
     time::Instant,
 };
@@ -119,8 +117,7 @@ pub struct Record {
 }
 
 /// Global log storage
-pub static LOG: Lazy<Mutex<Vec<Record>>> = 
-    Lazy::new(|| Mutex::new(Vec::with_capacity(4096)));
+pub static LOG: Lazy<Mutex<Vec<Record>>> = Lazy::new(|| Mutex::new(Vec::with_capacity(4096)));
 
 /// Flush logs to CSV files
 pub fn flush_csv() {
@@ -133,7 +130,7 @@ pub fn flush_csv() {
     // Normal events
     let mut f = File::create("memtrace.csv").expect("Cannot create memtrace.csv");
     writeln!(f, "t_start_us,t_end_us,bytes,dir,idle_us,abort_token,phase").unwrap();
-    
+
     for r in log.iter().filter(|r| !matches!(r.phase, Phase::Abort)) {
         writeln!(
             f,
@@ -145,21 +142,23 @@ pub fn flush_csv() {
             r.idle_us,
             r.abort_token.as_deref().unwrap_or(""),
             r.phase.as_str()
-        ).unwrap();
+        )
+        .unwrap();
     }
 
     // Abort events (if any)
-    let abort_events: Vec<_> = log.iter()
+    let abort_events: Vec<_> = log
+        .iter()
         .filter(|r| matches!(r.phase, Phase::Abort))
         .collect();
-    
+
     if !abort_events.is_empty() {
-        let mut fa = File::create("memtrace_abort.csv")
-            .expect("Cannot create memtrace_abort.csv");
+        let mut fa = File::create("memtrace_abort.csv").expect("Cannot create memtrace_abort.csv");
         writeln!(
             fa,
             "t_start_us,t_end_us,tx_id,cause,retries,conflict_sz,idle_us,abort_token"
-        ).unwrap();
+        )
+        .unwrap();
 
         for r in abort_events.iter() {
             writeln!(
@@ -173,13 +172,19 @@ pub fn flush_csv() {
                 r.conflict_sz.unwrap_or(0),
                 r.idle_us,
                 r.abort_token.as_deref().unwrap_or("")
-            ).unwrap();
+            )
+            .unwrap();
         }
-        println!("✓ memtrace_abort.csv written ({} aborts)", abort_events.len());
+        println!(
+            "✓ memtrace_abort.csv written ({} aborts)",
+            abort_events.len()
+        );
     }
-    
-    println!("✓ memtrace.csv written ({} events)", 
-             log.len() - abort_events.len());
+
+    println!(
+        "✓ memtrace.csv written ({} events)",
+        log.len() - abort_events.len()
+    );
 }
 
 /// Reset all logs
@@ -199,12 +204,12 @@ impl TracingScope {
         let prev = AUTO_TRACE.swap(enable, Ordering::Relaxed);
         TracingScope { prev }
     }
-    
+
     #[inline]
     pub fn enabled() -> Self {
         Self::new(true)
     }
-    
+
     #[inline]
     pub fn disabled() -> Self {
         Self::new(false)

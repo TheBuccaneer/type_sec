@@ -38,7 +38,6 @@ pub struct InFlight;
 impl sealed::Sealed for InFlight {}
 impl State for InFlight {}
 
-
 /// API-stability shim: `Queued` is an alias of `Ready`.
 /// New code should prefer `Ready`. Kept to avoid deprecation noise.
 pub type Queued = Ready;

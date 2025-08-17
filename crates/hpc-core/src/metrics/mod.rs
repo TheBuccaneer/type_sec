@@ -8,10 +8,8 @@ pub use run_id::current_run_id;
 
 pub mod schema;
 
-
-
 use chrono::Local;
-use fs2::FileExt;               // für lock_exclusive / unlock
+use fs2::FileExt; // für lock_exclusive / unlock
 use once_cell::sync::OnceCell;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
@@ -268,7 +266,8 @@ pub fn log_run_to<P: AsRef<Path>>(r: &RunLog, base: P) -> io::Result<PathBuf> {
         }
     });
 
-    let mut s = serde_json::to_string(&line).map_err(|e| io::Error::new(io::ErrorKind::Other, e))?;
+    let mut s =
+        serde_json::to_string(&line).map_err(|e| io::Error::new(io::ErrorKind::Other, e))?;
     s.push('\n');
 
     file.write_all(s.as_bytes())?;
@@ -299,8 +298,16 @@ pub fn summary() {
     eprintln!("── metrics summary ──");
     for (name, mut v) in map {
         v.sort_unstable();
-        let mean = if v.is_empty() { 0 } else { v.iter().sum::<u128>() / (v.len() as u128) };
-        let p95 = if v.is_empty() { 0 } else { v[((v.len() * 95) / 100).saturating_sub(1)] };
+        let mean = if v.is_empty() {
+            0
+        } else {
+            v.iter().sum::<u128>() / (v.len() as u128)
+        };
+        let p95 = if v.is_empty() {
+            0
+        } else {
+            v[((v.len() * 95) / 100).saturating_sub(1)]
+        };
         eprintln!("{:<18} mean={:>5} µs   p95={:>5} µs", name, mean, p95);
 
         if name == "enqueue_write" {
@@ -315,5 +322,9 @@ pub fn summary() {
     // Allokations-Zähler
     let allocs = ALLOCS.load(Ordering::Relaxed);
     let bytes = ALLOC_BYTES.load(Ordering::Relaxed);
-    eprintln!("GPU allocations: {}   ({} MiB)", allocs, bytes / 1024 / 1024);
+    eprintln!(
+        "GPU allocations: {}   ({} MiB)",
+        allocs,
+        bytes / 1024 / 1024
+    );
 }

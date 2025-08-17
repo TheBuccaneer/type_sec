@@ -12,19 +12,28 @@
 //! - Results in reproducible builds across platforms: no metrics I/O code is
 //!   compiled unless explicitly requested by enabling the feature.
 
-
 #[cfg(feature = "metrics")]
-use std::{collections::VecDeque, fs, io::{self, BufRead}, path::PathBuf, thread, time::Duration};
+use anyhow::{Context, Result, anyhow};
 #[cfg(feature = "metrics")]
 use clap::Parser;
 #[cfg(feature = "metrics")]
-use anyhow::{Result, Context, anyhow};
-#[cfg(feature = "metrics")]
 use serde_json::Value;
+#[cfg(feature = "metrics")]
+use std::{
+    collections::VecDeque,
+    fs,
+    io::{self, BufRead},
+    path::PathBuf,
+    thread,
+    time::Duration,
+};
 
 #[cfg(feature = "metrics")]
 #[derive(Parser, Debug)]
-#[command(name="metrics_tail", about="Tailt die letzten JSONL-Zeilen aus run.jsonl")]
+#[command(
+    name = "metrics_tail",
+    about = "Tailt die letzten JSONL-Zeilen aus run.jsonl"
+)]
 struct Opt {
     /// Pfad zur JSONL-Datei (Standard: results/<YYYY-MM-DD>/run.jsonl)
     #[arg(short, long)]
@@ -61,7 +70,8 @@ fn main() -> Result<()> {
 
     // Schnelles Tail: nicht die ganze Datei halten
     let file = fs::File::open(&path)
-        .or_else(|_| { // Windows-Retry beim Open
+        .or_else(|_| {
+            // Windows-Retry beim Open
             thread::sleep(Duration::from_millis(20));
             fs::File::open(&path)
         })
@@ -71,24 +81,31 @@ fn main() -> Result<()> {
     let mut buf: VecDeque<String> = VecDeque::with_capacity(opt.lines + 1);
     for line in reader.lines() {
         let l = line?;
-        if l.trim().is_empty() { continue; }
+        if l.trim().is_empty() {
+            continue;
+        }
         if let Some(ex) = &opt.example {
             // billiger Vorfilter (bevor JSON parse)
-            if !l.contains("\"example\"") { continue; }
-            if !l.contains(ex) { continue; }
+            if !l.contains("\"example\"") {
+                continue;
+            }
+            if !l.contains(ex) {
+                continue;
+            }
         }
-        if buf.len() == opt.lines { buf.pop_front(); }
+        if buf.len() == opt.lines {
+            buf.pop_front();
+        }
         buf.push_back(l);
     }
 
     for l in buf {
-        let v: Value = serde_json::from_str(&l)
-            .with_context(|| "invalid JSON line")?;
+        let v: Value = serde_json::from_str(&l).with_context(|| "invalid JSON line")?;
 
         if opt.validate {
-    hpc_core::metrics::schema::validate_value(&v)
-        .map_err(|e| anyhow!("schema validation failed: {e}"))?;
-}
+            hpc_core::metrics::schema::validate_value(&v)
+                .map_err(|e| anyhow!("schema validation failed: {e}"))?;
+        }
 
         if opt.pretty {
             println!("{}", serde_json::to_string_pretty(&v)?);
@@ -99,7 +116,6 @@ fn main() -> Result<()> {
 
     Ok(())
 }
-
 
 #[cfg(not(feature = "metrics"))]
 fn main() {}

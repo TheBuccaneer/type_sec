@@ -4,8 +4,8 @@
 
 #![allow(dead_code, unused_imports)]
 
+use crate::buffer::state::{Empty, InFlight, Ready, State};
 use core::marker::PhantomData;
-use crate::buffer::state::{State, Empty, Ready, InFlight};
 // Falls der Typ in deinem Code anders heißt, passe das Alias hier an:
 use crate::buffer::GpuBuffer as LlBuffer;
 use opencl3::event::Event as ClEvent;
@@ -22,7 +22,7 @@ pub struct Queue<'ctx> {
 }
 
 /// Ein typisierter GPU-Buffer im Host-API-Layer.
-/// 
+///
 /// # Must Use
 /// Nicht stumm verwerfen – ein nicht verwendeter Buffer kann auf ein Leck hindeuten
 /// oder einen nicht vollzogenen State-Hop.
@@ -39,7 +39,7 @@ pub struct Kernel<'ctx> {
 }
 
 /// Ein Event-Token als Resultat eines GPU-Befehls.
-/// 
+///
 /// # Must Use
 /// Muss von [`Queue::wait`] oder einem Äquivalent konsumiert werden.
 /// Nicht verwendete Events bedeuten, dass ein Kommando evtl. nie abgeschlossen wurde.
@@ -65,7 +65,10 @@ impl<'ctx> EventToken<'ctx> {
     /// Konstruiere aus realem OpenCL-Event
     #[inline]
     pub fn from_event(evt: ClEvent) -> Self {
-        Self { evt, _q: core::marker::PhantomData }
+        Self {
+            evt,
+            _q: core::marker::PhantomData,
+        }
     }
 
     /// Event extrahieren (konsumiert den Token)
@@ -76,37 +79,43 @@ impl<'ctx> EventToken<'ctx> {
     }
 }
 
-
 #[cfg(hpc_core_dev)]
 impl<'ctx> EventToken<'ctx> {
     /// Dev-Stub: Token ohne echtes Event
     #[inline]
     pub fn dev() -> Self {
-        Self { _q: core::marker::PhantomData }
+        Self {
+            _q: core::marker::PhantomData,
+        }
     }
 }
-
 
 // --- Signaturen (nur Skeleton) ------------------------------------------------
 impl Context {
     #[cfg(hpc_core_dev)]
-    pub fn new() -> Self { Self { _opaque: () } }
+    pub fn new() -> Self {
+        Self { _opaque: () }
+    }
 
     #[allow(clippy::new_without_default)]
     #[cfg(not(hpc_core_dev))]
-    pub fn new() -> Self { unimplemented!() }
+    pub fn new() -> Self {
+        unimplemented!()
+    }
 
     #[cfg(hpc_core_dev)]
-    pub fn queue(&self) -> Queue<'_> { Queue { _ctx: self } }
+    pub fn queue(&self) -> Queue<'_> {
+        Queue { _ctx: self }
+    }
 
     #[cfg(not(hpc_core_dev))]
-    pub fn queue(&self) -> Queue<'_> { unimplemented!() }
-
+    pub fn queue(&self) -> Queue<'_> {
+        unimplemented!()
+    }
 
     pub fn create_queue(&self) -> Queue<'_> {
         Queue { _ctx: self }
     }
-    
 }
 
 impl Default for Context {
@@ -116,16 +125,11 @@ impl Default for Context {
 }
 
 impl<'ctx> Queue<'ctx> {
-
     /// Device → Host (blocking):
     /// Liest den Inhalt eines `DeviceBuffer<T, Ready>` in `out` und blockiert,
     /// bis der Transfer abgeschlossen ist. Der Buffer bleibt `Ready`.
     #[inline]
-    pub fn read_blocking<T>(
-        &'ctx self,
-        _buf: &DeviceBuffer<T, Ready>,
-        _out: &mut [T],
-    ) {
+    pub fn read_blocking<T>(&'ctx self, _buf: &DeviceBuffer<T, Ready>, _out: &mut [T]) {
         // später: low-level clEnqueueReadBuffer + clFinish/Wait
         // Größenprüfung: out.len() == buf.len_elems()
         unimplemented!("Queue::read_blocking<T>: typed blocking read from device")
@@ -141,78 +145,73 @@ impl<'ctx> Queue<'ctx> {
         unimplemented!()
     }
 
+    #[inline]
+    #[cfg(hpc_core_dev)]
+    pub fn enqueue_write<T>(
+        &'ctx self,
+        buf: DeviceBuffer<T, Empty>,
+        _data: &[T],
+    ) -> DeviceBuffer<T, Ready> {
+        // Dev stub: only type-state hop (no real copy)
+        let inner_empty = buf.into_inner();
+        let inner_ready: LlBuffer<Ready> = unsafe { inner_empty.assume_state::<Ready>() };
+        DeviceBuffer::from_inner_unchecked(inner_ready)
+    }
 
-#[inline]
-#[cfg(hpc_core_dev)]
-pub fn enqueue_write<T>(
-    &'ctx self,
-    buf: DeviceBuffer<T, Empty>,
-    _data: &[T],
-) -> DeviceBuffer<T, Ready> {
-    // Dev stub: only type-state hop (no real copy)
-    let inner_empty = buf.into_inner();
-    let inner_ready: LlBuffer<Ready> = unsafe { inner_empty.assume_state::<Ready>() };
-    DeviceBuffer::from_inner_unchecked(inner_ready)
-}
+    #[inline]
+    #[cfg(not(hpc_core_dev))]
+    pub fn enqueue_write<T>(
+        &'ctx self,
+        _buf: DeviceBuffer<T, Empty>,
+        _data: &[T],
+    ) -> DeviceBuffer<T, Ready> {
+        unimplemented!("Queue::enqueue_write<T>: typed write to device buffer")
+    }
 
-#[inline]
-#[cfg(not(hpc_core_dev))]
-pub fn enqueue_write<T>(
-    &'ctx self,
-    _buf: DeviceBuffer<T, Empty>,
-    _data: &[T],
-) -> DeviceBuffer<T, Ready> {
-    unimplemented!("Queue::enqueue_write<T>: typed write to device buffer")
-}
+    // Ready -> InFlight + EventToken
+    #[cfg(hpc_core_dev)]
+    #[inline]
+    pub fn enqueue_kernel<T>(
+        &'ctx self,
+        _k: &Kernel<'ctx>,
+        buf: DeviceBuffer<T, Ready>,
+    ) -> (DeviceBuffer<T, InFlight>, EventToken<'ctx>) {
+        // Dev stub: only type-state hop (no real enqueue/event)
+        let inner_ready = buf.into_inner();
+        let inner_inflight: LlBuffer<InFlight> = unsafe { inner_ready.assume_state() };
+        (
+            DeviceBuffer::from_inner_unchecked(inner_inflight),
+            // phantom token (dev stub has no real event)
+            EventToken::dev(),
+        )
+    }
 
-// Ready -> InFlight + EventToken
-#[cfg(hpc_core_dev)]
-#[inline]
-pub fn enqueue_kernel<T>(
-    &'ctx self,
-    _k: &Kernel<'ctx>,
-    buf: DeviceBuffer<T, Ready>,
-) -> (DeviceBuffer<T, InFlight>, EventToken<'ctx>) {
-    // Dev stub: only type-state hop (no real enqueue/event)
-    let inner_ready = buf.into_inner();
-    let inner_inflight: LlBuffer<InFlight> = unsafe { inner_ready.assume_state() };
-    (
-        DeviceBuffer::from_inner_unchecked(inner_inflight),
-        // phantom token (dev stub has no real event)
-         EventToken::dev(),
-    )
-}
+    #[cfg(not(hpc_core_dev))]
+    #[inline]
+    pub fn enqueue_kernel<T>(
+        &'ctx self,
+        _k: &Kernel<'ctx>,
+        _buf: DeviceBuffer<T, Ready>,
+    ) -> (DeviceBuffer<T, InFlight>, EventToken<'ctx>) {
+        unimplemented!("Queue::enqueue_kernel<T>: enqueue kernel and return InFlight + event token")
+    }
 
-
-
-#[cfg(not(hpc_core_dev))]
-#[inline]
-pub fn enqueue_kernel<T>(
-    &'ctx self,
-    _k: &Kernel<'ctx>,
-    _buf: DeviceBuffer<T, Ready>,
-) -> (DeviceBuffer<T, InFlight>, EventToken<'ctx>) {
-    unimplemented!("Queue::enqueue_kernel<T>: enqueue kernel and return InFlight + event token")
-}
-
-
-#[cfg(hpc_core_dev)]
-#[inline]
-pub fn wait<T>(
-    &'ctx self,
-    _ev: EventToken<'ctx>,               // nur Marker im dev-Stub
-    buf: DeviceBuffer<T, InFlight>,
-) -> DeviceBuffer<T, Ready> {
-    let inner_inflight = buf.into_inner();
-    // dev-Stub: kein echtes Warten – nur Type-State-Hop
-    let inner_ready: LlBuffer<Ready> = unsafe { inner_inflight.assume_state() };
-    DeviceBuffer::from_inner_unchecked(inner_ready)
-}
-
+    #[cfg(hpc_core_dev)]
+    #[inline]
+    pub fn wait<T>(
+        &'ctx self,
+        _ev: EventToken<'ctx>, // nur Marker im dev-Stub
+        buf: DeviceBuffer<T, InFlight>,
+    ) -> DeviceBuffer<T, Ready> {
+        let inner_inflight = buf.into_inner();
+        // dev-Stub: kein echtes Warten – nur Type-State-Hop
+        let inner_ready: LlBuffer<Ready> = unsafe { inner_inflight.assume_state() };
+        DeviceBuffer::from_inner_unchecked(inner_ready)
+    }
 
     /// S3: Typed transition `InFlight -> Ready`.
-/// Consumes the event token and the in-flight buffer; after waiting, returns `Ready`.
-/// This prevents double-wait by taking the buffer by value.
+    /// Consumes the event token and the in-flight buffer; after waiting, returns `Ready`.
+    /// This prevents double-wait by taking the buffer by value.
     #[cfg(not(hpc_core_dev))]
     #[inline]
     pub fn wait<T>(
@@ -228,10 +227,12 @@ impl<'ctx> Kernel<'ctx> {
     // dev: simpler Platzhalter
     #[cfg(hpc_core_dev)]
     pub fn new(_q: &'ctx Queue<'ctx>, _name: &str) -> Self {
-        Self { _q: core::marker::PhantomData }
+        Self {
+            _q: core::marker::PhantomData,
+        }
     }
 
-        /// Erstellt ein Kernel-Handle für die gegebene Queue und Kernel-Bezeichnung.
+    /// Erstellt ein Kernel-Handle für die gegebene Queue und Kernel-Bezeichnung.
     ///
     /// # Zweck
     /// *Nur Handle, kein Dispatch.* Der eigentliche Start passiert über
@@ -241,9 +242,10 @@ impl<'ctx> Kernel<'ctx> {
     /// Vorbereitung -> ausführbar mit `enqueue_kernel`.
     #[inline]
     #[cfg(not(hpc_core_dev))]
-    pub fn new(_q: &'ctx Queue<'ctx>, _name: &str) -> Self { unimplemented!() }
+    pub fn new(_q: &'ctx Queue<'ctx>, _name: &str) -> Self {
+        unimplemented!()
+    }
 }
-
 
 impl<T, S: State> core::fmt::Debug for DeviceBuffer<T, S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
@@ -257,7 +259,11 @@ impl<T, S: State> DeviceBuffer<T, S> {
     /// Interne Konstruktion aus Low-Level-Buffer + Elementlänge.
     /// (Sichtbar im Crate; die High-Level-APIs stellen das später sicher her.)
     pub(crate) fn from_inner(inner: LlBuffer<S>, len_elems: usize) -> Self {
-        Self { inner, len_elems, _ty: PhantomData }
+        Self {
+            inner,
+            len_elems,
+            _ty: PhantomData,
+        }
     }
 
     /// Gibt den Low-Level-Buffer wieder zurück (z. B. für interne Delegation).
@@ -266,23 +272,32 @@ impl<T, S: State> DeviceBuffer<T, S> {
     }
 
     /// Anzahl Elemente (nicht Bytes).
-    #[inline] pub fn len_elems(&self) -> usize { self.len_elems }
+    #[inline]
+    pub fn len_elems(&self) -> usize {
+        self.len_elems
+    }
 
     /// Byte-Länge, abgeleitet aus `T`.
-    #[inline] pub fn len_bytes(&self) -> usize { self.len_elems * core::mem::size_of::<T>() }
+    #[inline]
+    pub fn len_bytes(&self) -> usize {
+        self.len_elems * core::mem::size_of::<T>()
+    }
 
     pub(crate) fn from_inner_unchecked(inner: LlBuffer<S>) -> Self {
-    let bytes = inner.len_bytes();
-    let sz = core::mem::size_of::<T>();
-    debug_assert!(
-        bytes % sz == 0,
-        "DeviceBuffer<{}>: bytes ({}) nicht durch size_of T ({}) teilbar",
-        core::any::type_name::<T>(),
-        bytes,
-        sz
-    );
-    let len_elems = bytes / sz;
-    Self { inner, len_elems, _ty: PhantomData }
-}
-
+        let bytes = inner.len_bytes();
+        let sz = core::mem::size_of::<T>();
+        debug_assert!(
+            bytes % sz == 0,
+            "DeviceBuffer<{}>: bytes ({}) nicht durch size_of T ({}) teilbar",
+            core::any::type_name::<T>(),
+            bytes,
+            sz
+        );
+        let len_elems = bytes / sz;
+        Self {
+            inner,
+            len_elems,
+            _ty: PhantomData,
+        }
+    }
 }

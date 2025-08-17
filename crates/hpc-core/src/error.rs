@@ -5,13 +5,13 @@ use thiserror::Error;
 pub enum ClError {
     #[error("OpenCL error code {0}")]
     Api(i32),
-    
+
     #[error("Buffer size mismatch: expected {expected}, got {actual}")]
     BufferSizeMismatch { expected: usize, actual: usize },
-    
+
     #[error("Invalid state transition")]
     InvalidState,
-    
+
     #[error("Memory allocation failed: {0}")]
     AllocationFailed(String),
 }

@@ -9,19 +9,29 @@
 //! - If a CI or local `cargo test` ends up compiling binaries, the code remains
 //!   inactive (and warning-free) unless `--features metrics` is enabled.
 //! - Net effect: lean default builds; full functionality when explicitly requested.
-//! 
-#[cfg(feature = "metrics")]
-use std::{collections::HashMap, fs, io::{self, BufRead}, path::PathBuf, thread, time::Duration};
-#[cfg(feature = "metrics")]
-use clap::Parser;
+//!
 #[cfg(feature = "metrics")]
 use anyhow::{Context, Result};
 #[cfg(feature = "metrics")]
+use clap::Parser;
+#[cfg(feature = "metrics")]
 use serde_json::Value;
+#[cfg(feature = "metrics")]
+use std::{
+    collections::HashMap,
+    fs,
+    io::{self, BufRead},
+    path::PathBuf,
+    thread,
+    time::Duration,
+};
 
 #[cfg(feature = "metrics")]
 #[derive(Parser, Debug)]
-#[command(name="metrics_summary", about="Kleine Zusammenfassung aus run.jsonl")]
+#[command(
+    name = "metrics_summary",
+    about = "Kleine Zusammenfassung aus run.jsonl"
+)]
 struct Opt {
     /// Pfad zur JSONL-Datei (Standard: results/<YYYY-MM-DD>/run.jsonl)
     #[arg(short, long)]
@@ -51,7 +61,10 @@ fn open_retry(path: &PathBuf) -> io::Result<fs::File> {
             Err(e) => return Err(e),
         }
     }
-    Err(io::Error::new(io::ErrorKind::PermissionDenied, "retry timeout"))
+    Err(io::Error::new(
+        io::ErrorKind::PermissionDenied,
+        "retry timeout",
+    ))
 }
 
 #[cfg(feature = "metrics")]
@@ -77,7 +90,9 @@ fn main() -> Result<()> {
 
     for line in reader.lines() {
         let l = line?;
-        if l.trim().is_empty() { continue; }
+        if l.trim().is_empty() {
+            continue;
+        }
         let v: Value = match serde_json::from_str(&l) {
             Ok(v) => v,
             Err(_) => continue, // kaputte Zeile überspringen
@@ -99,29 +114,43 @@ fn main() -> Result<()> {
             run_ids.insert(rid.to_string());
         }
 
-        let ex = v.get("example").and_then(|x| x.as_str()).unwrap_or("<unknown>").to_string();
+        let ex = v
+            .get("example")
+            .and_then(|x| x.as_str())
+            .unwrap_or("<unknown>")
+            .to_string();
         let allocs = v.get("allocs").and_then(|x| x.as_u64()).unwrap_or(0) as u128;
-        let bytes  = v.get("alloc_bytes").and_then(|x| x.as_u64()).unwrap_or(0) as u128;
+        let bytes = v.get("alloc_bytes").and_then(|x| x.as_u64()).unwrap_or(0) as u128;
 
         let e = per_example.entry(ex).or_default();
         e.count += 1;
         e.allocs += allocs;
-        e.bytes  += bytes;
+        e.bytes += bytes;
     }
 
     println!("== metrics summary ==");
     println!("file: {}", path.display());
     println!("lines: {}", total);
     println!("unique run_id(s): {}", run_ids.len());
-    if let Some(ts) = last_ts { println!("last ts: {ts}"); }
+    if let Some(ts) = last_ts {
+        println!("last ts: {ts}");
+    }
 
     println!("\nper example:");
     let mut keys: Vec<_> = per_example.keys().cloned().collect();
     keys.sort();
     for k in keys {
         let a = &per_example[&k];
-        let avg_allocs = if a.count > 0 { a.allocs as f64 / a.count as f64 } else { 0.0 };
-        let avg_bytes  = if a.count > 0 { a.bytes  as f64 / a.count as f64 } else { 0.0 };
+        let avg_allocs = if a.count > 0 {
+            a.allocs as f64 / a.count as f64
+        } else {
+            0.0
+        };
+        let avg_bytes = if a.count > 0 {
+            a.bytes as f64 / a.count as f64
+        } else {
+            0.0
+        };
         println!(
             "  - {:<16} count={:<6} avg_allocs={:<10.2} avg_bytes={:<12.2}",
             k, a.count, avg_allocs, avg_bytes

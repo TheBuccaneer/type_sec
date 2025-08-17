@@ -1,21 +1,20 @@
 //! GPU Buffer management with type-state pattern
 
-
 mod guard;
 
 pub use guard::GpuEventGuard;
 pub mod state;
-pub use state::{State, Empty, Ready, InFlight, Queued};
+pub use state::{InFlight, Queued, Ready, State};
 
+use crate::error::{ClError, Result};
 use opencl3::{
-    context::Context,
-    memory::{Buffer, CL_MEM_READ_WRITE},
     command_queue::CommandQueue,
+    context::Context,
     event::Event,
+    memory::{Buffer, CL_MEM_READ_WRITE},
     types::CL_NON_BLOCKING,
 };
 use std::{marker::PhantomData, ptr};
-use crate::error::{ClError, Result};
 
 #[cfg(feature = "metrics")]
 use std::time::Instant;
@@ -56,27 +55,25 @@ impl GpuBuffer<Queued> {
         let buf = Buffer::<u8>::create(ctx, CL_MEM_READ_WRITE, len, ptr::null_mut())?;
 
         #[cfg(feature = "metrics")]
-            mlog("buffer.new", len);
+        mlog("buffer.new", len);
 
         #[cfg(feature = "metrics")]
         crate::metrics::record("GpuBuffer::new", t);
 
-        Ok(Self { 
-            buf, 
+        Ok(Self {
+            buf,
             len,
-            _state: PhantomData 
+            _state: PhantomData,
         })
     }
-   
 }
 
 // Ready state implementation
 impl GpuBuffer<Ready> {
-
     /// S1: Host→Device write is only available when the buffer is `Ready`.
-/// Pre: `host.len() == self.len`.
-/// Post: enqueues a device write; the buffer remains `Ready` (no state change here).
-     pub fn enqueue_write(
+    /// Pre: `host.len() == self.len`.
+    /// Post: enqueues a device write; the buffer remains `Ready` (no state change here).
+    pub fn enqueue_write(
         mut self,
         queue: &CommandQueue,
         host: &[u8],
@@ -94,18 +91,15 @@ impl GpuBuffer<Ready> {
 
         #[cfg(feature = "memtrace")]
         let token_box = if crate::memtracer::is_auto_trace_enabled() {
-            Some(Box::new(crate::memtracer::start(crate::memtracer::Dir::H2D, host.len())))
+            Some(Box::new(crate::memtracer::start(
+                crate::memtracer::Dir::H2D,
+                host.len(),
+            )))
         } else {
             None
         };
 
-        let evt = queue.enqueue_write_buffer(
-            &mut self.buf,
-            CL_NON_BLOCKING,
-            0,
-            host,
-            &[],
-        )?;
+        let evt = queue.enqueue_write_buffer(&mut self.buf, CL_NON_BLOCKING, 0, host, &[])?;
 
         #[cfg(feature = "memtrace")]
         if let Some(token_box) = token_box {
@@ -132,12 +126,10 @@ impl GpuBuffer<Ready> {
             GpuEventGuard::new(evt),
         ))
     }
-    
-    
 
-/// S1: Device→Host read is only available when the buffer is `Ready`.
-/// Pre: `host_out.len() == self.len`.
-/// Post: enqueues a device read; the buffer remains `Ready` (no state change here).
+    /// S1: Device→Host read is only available when the buffer is `Ready`.
+    /// Pre: `host_out.len() == self.len`.
+    /// Post: enqueues a device read; the buffer remains `Ready` (no state change here).
     pub fn enqueue_read(
         self,
         queue: &CommandQueue,
@@ -155,21 +147,18 @@ impl GpuBuffer<Ready> {
 
         #[cfg(feature = "memtrace")]
         let token_box = if crate::memtracer::is_auto_trace_enabled() {
-            Some(Box::new(crate::memtracer::start(crate::memtracer::Dir::D2H, host_out.len())))
+            Some(Box::new(crate::memtracer::start(
+                crate::memtracer::Dir::D2H,
+                host_out.len(),
+            )))
         } else {
             None
         };
 
-        let evt = queue.enqueue_read_buffer(
-            &self.buf,
-            CL_NON_BLOCKING,
-            0,
-            host_out,
-            &[],
-        )?;
+        let evt = queue.enqueue_read_buffer(&self.buf, CL_NON_BLOCKING, 0, host_out, &[])?;
 
         #[cfg(feature = "metrics")]
-mlog("pipeline.enqueue_read", self.len);
+        mlog("pipeline.enqueue_read", self.len);
 
         #[cfg(feature = "memtrace")]
         if let Some(token_box) = token_box {
@@ -194,17 +183,17 @@ mlog("pipeline.enqueue_read", self.len);
         ))
     }
 
-     /// Launch buffer operation
+    /// Launch buffer operation
     pub fn launch(self) -> GpuBuffer<InFlight> {
         #[cfg(feature = "metrics")]
         crate::metrics::record("launch", Instant::now());
         #[cfg(feature = "metrics")]
         mlog("pipeline.launch", self.len);
-        
-        GpuBuffer { 
-            buf: self.buf, 
-            len: self.len, 
-            _state: PhantomData 
+
+        GpuBuffer {
+            buf: self.buf,
+            len: self.len,
+            _state: PhantomData,
         }
     }
 }
@@ -212,68 +201,71 @@ mlog("pipeline.enqueue_read", self.len);
 // InFlight state implementation
 impl GpuBuffer<InFlight> {
     /// S3: The only legal transition out of `InFlight`.
-/// Consumes `self` and the completion event, waits for it, and returns `Ready`.
-/// Double-wait is prevented by taking `self` by value. Host I/O remains unavailable until this returns.
+    /// Consumes `self` and the completion event, waits for it, and returns `Ready`.
+    /// Double-wait is prevented by taking `self` by value. Host I/O remains unavailable until this returns.
     pub fn wait(self, evt: Event) -> GpuBuffer<Ready> {
         let _g = GpuEventGuard::new(evt);
-        
+
         #[cfg(feature = "metrics")]
         crate::metrics::record("complete", Instant::now());
         #[cfg(feature = "metrics")]
         mlog("pipeline.complete", self.len);
-        
-        GpuBuffer { 
-            buf: self.buf, 
-            len: self.len, 
-            _state: PhantomData 
+
+        GpuBuffer {
+            buf: self.buf,
+            len: self.len,
+            _state: PhantomData,
         }
     }
 }
 
-
-
-
-
-
-
 // Common methods for all states
 impl<S: State> GpuBuffer<S> {
-
     #[allow(dead_code)]
     #[inline]
     pub(crate) unsafe fn assume_state<Target: state::State>(self) -> GpuBuffer<Target> {
-        unsafe {core::mem::transmute(self)}
+        unsafe { core::mem::transmute(self) }
     }
 
+    #[inline]
+    pub fn raw(&self) -> &Buffer<u8> {
+        &self.buf
+    }
 
     #[inline]
-    pub fn raw(&self) -> &Buffer<u8> { &self.buf }
-
-    #[inline]
-    pub fn raw_mut(&mut self) -> &mut Buffer<u8> { &mut self.buf }
+    pub fn raw_mut(&mut self) -> &mut Buffer<u8> {
+        &mut self.buf
+    }
 
     /// Anzahl der Bytes im Gerätepuffer (kanonisch)
     #[inline]
-    pub fn len_bytes(&self) -> usize { self.len }
+    pub fn len_bytes(&self) -> usize {
+        self.len
+    }
 
     /// Alias für Rückwärtskompatibilität
     #[inline]
-    pub fn len(&self) -> usize { self.len_bytes() }
+    pub fn len(&self) -> usize {
+        self.len_bytes()
+    }
 
     #[inline]
-    pub fn is_empty(&self) -> bool { self.len == 0 }
-}
-
-
-impl GpuBuffer<Empty> {
-    pub fn dev_alloc_bytes(_bytes: usize) -> Self {
-        unimplemented!("buffer::GpuBuffer<Empty>::dev_alloc_bytes")
+    pub fn is_empty(&self) -> bool {
+        self.len == 0
     }
 }
 
-
-impl<S: State> GpuBuffer<S> {
-    #[inline] pub fn dev_len_bytes(&self) -> usize { self.len_bytes() }
+#[cfg(not(feature = "bloat-probe"))]
+impl GpuBuffer<state::Empty> {
+    pub fn dev_alloc_bytes(_bytes: usize) -> Self {
+        // deine bisherige Variante (ggf. unimplemented!())
+        unimplemented!("buffer::GpuBuffer<Empty>::dev_alloc_bytes");
+    }
 }
 
-
+impl<S: State> GpuBuffer<S> {
+    #[inline]
+    pub fn dev_len_bytes(&self) -> usize {
+        self.len_bytes()
+    }
+}

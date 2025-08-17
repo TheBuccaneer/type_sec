@@ -6,7 +6,11 @@ fn api_compile_fail_and_pass() {
     let cf_dir = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
         .join("tests")
         .join("compile-fail");
-    assert!(cf_dir.is_dir(), "compile-fail directory not found: {:?}", cf_dir);
+    assert!(
+        cf_dir.is_dir(),
+        "compile-fail directory not found: {:?}",
+        cf_dir
+    );
     let cf_pattern = format!("{}/{}", cf_dir.to_string_lossy().replace('\\', "/"), "*.rs");
 
     // compile-pass: absoluter, Windows-sicherer Glob

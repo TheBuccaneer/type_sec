@@ -36,14 +36,13 @@ name = "metrics_summary"
 path = "src/bin/metrics_summary.rs"
 required-features = ["metrics"]
 
-[[bench]]
-name = "stencil_bench"
-harness = false
+
 
 [features]
 default = []
 metrics = []
 memtrace = []
+bloat-probe = []
 
 
 [[example]]
@@ -54,3 +53,16 @@ path = "examples/bandwidth_optimized.rs"
 name = "write_metrics"
 path = "examples/write_metrics.rs"
 required-features = ["metrics"]
+
+
+[[bench]]
+name = "ocl_mem"
+harness = false
+
+[[bench]]
+name = "ocl_vecadd"
+harness = false
+
+[[bench]]
+name = "ocl_events"
+harness = false

@@ -5,9 +5,11 @@ fn parse_n() -> usize {
     let mut args = std::env::args();
     let mut n: usize = 1024;
     while let Some(arg) = args.next() {
-        if arg == "--n" && let Some(v) = args.next() {
+        if arg == "--n"
+            && let Some(v) = args.next()
+        {
             n = v.parse().unwrap_or(n);
-}
+        }
     }
     n
 }
@@ -20,8 +22,11 @@ fn main() {
     println!("{{\"event\":\"run\",\"example\":\"vec_add\",\"n\":{}}}", n);
 
     #[cfg(feature = "metrics")]
-{
-    let run = hpc_core::metrics::RunLog { example: "vec_add", n };
-    hpc_core::metrics::log_run(&run);
-}
+    {
+        let run = hpc_core::metrics::RunLog {
+            example: "vec_add",
+            n,
+        };
+        hpc_core::metrics::log_run(&run);
+    }
 }

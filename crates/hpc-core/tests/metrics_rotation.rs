@@ -1,7 +1,7 @@
 #![cfg(feature = "metrics")]
 
-use std::{fs, path::PathBuf};
 use hpc_core::metrics::{RunLog, log_run_to};
+use std::{fs, path::PathBuf};
 
 #[cfg_attr(windows, ignore)]
 #[test]
@@ -12,8 +12,15 @@ fn rotates_when_file_too_large() {
 
     // mehrfach schreiben, um Rotation zu erzwingen
     for _ in 0..20_000 {
-    let _ = log_run_to(&RunLog { example: "vec_add", n: 42 }, &base).unwrap();
-}
+        let _ = log_run_to(
+            &RunLog {
+                example: "vec_add",
+                n: 42,
+            },
+            &base,
+        )
+        .unwrap();
+    }
 
     // alle JSONL-Dateien einsammeln
     let files: Vec<PathBuf> = fs::read_dir(&base)

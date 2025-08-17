@@ -1,11 +1,10 @@
 // examples/abort_token.rs
 
-
 use std::thread::sleep;
 use std::time::Duration;
 
 #[cfg(feature = "memtrace")]
-use hpc_core::memtracer::{self, Dir, AbortTokenGuard};
+use hpc_core::memtracer::{self, AbortTokenGuard, Dir};
 
 fn main() {
     #[cfg(feature = "memtrace")]
@@ -40,24 +39,22 @@ fn main() {
     }
 
     #[cfg(feature = "memtrace")]
-{
-    let s = memtracer::now_us();
-    let ev = memtracer::AbortEvent {
-        tx_id: 1,
-        cause: "test_conflict".into(),
-        retries: 2,
-        conflict_sz: 64,
-        t_start_us: s,
-        t_end_us: s + 100,
-    };
-    memtracer::log_abort(&ev);
-}
+    {
+        let s = memtracer::now_us();
+        let ev = memtracer::AbortEvent {
+            tx_id: 1,
+            cause: "test_conflict".into(),
+            retries: 2,
+            conflict_sz: 64,
+            t_start_us: s,
+            t_end_us: s + 100,
+        };
+        memtracer::log_abort(&ev);
+    }
 
     // 5) Flush ins CSV
     #[cfg(feature = "memtrace")]
     memtracer::flush_csv();
 
     println!("memtrace.csv geschrieben – bitte Datei prüfen.");
-
-
 }

@@ -1,9 +1,9 @@
 use hpc_core::{GpuBuffer, Queued, Ready};
 use opencl3::{
-    platform::get_platforms,
-    device::{Device, CL_DEVICE_TYPE_GPU},
-    context::Context,
     command_queue::CommandQueue,
+    context::Context,
+    device::{CL_DEVICE_TYPE_GPU, Device},
+    platform::get_platforms,
 };
 
 #[test]
@@ -21,6 +21,6 @@ fn opencl_typestate_transitions_work() {
         .enqueue_write(&queue, &host_data)
         .unwrap();
 
-        #[allow(deprecated)]
+    #[allow(deprecated)]
     let _ready: GpuBuffer<Ready> = inflight.wait(guard.into_event());
 }

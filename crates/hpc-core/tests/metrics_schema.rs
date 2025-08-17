@@ -1,9 +1,9 @@
 #![cfg(feature = "metrics")]
 
-use std::fs;
-use serde_json::json;
-use hpc_core::metrics::{RunLog, log_run_to};
 use hpc_core::metrics::schema;
+use hpc_core::metrics::{RunLog, log_run_to};
+use serde_json::json;
+use std::fs;
 
 /*
 #[test]
@@ -22,21 +22,46 @@ fn schema_v1_accepts_current_writer_output() {
 }
     */
 
-    #[cfg_attr(windows, ignore)]
-    #[test]
+#[cfg_attr(windows, ignore)]
+#[test]
 fn schema_v1_accepts_current_writer_output() {
     // Einzigartiges Temp-Verzeichnis pro Lauf (PID + Zeitstempel)
     let nonce = std::time::SystemTime::now()
-        .duration_since(std::time::UNIX_EPOCH).unwrap()
+        .duration_since(std::time::UNIX_EPOCH)
+        .unwrap()
         .as_nanos();
-    let base = std::env::temp_dir()
-        .join(format!("hpc-core-test-schema-ok-{}-{}", std::process::id(), nonce));
+    let base = std::env::temp_dir().join(format!(
+        "hpc-core-test-schema-ok-{}-{}",
+        std::process::id(),
+        nonce
+    ));
 
     fs::create_dir_all(&base).unwrap();
 
-    let p = log_run_to(&RunLog { example: "vec_add", n: 1 }, &base).unwrap();
-    let _ = log_run_to(&RunLog { example: "vec_add", n: 2 }, &base).unwrap();
-    let _ = log_run_to(&RunLog { example: "vec_add", n: 3 }, &base).unwrap();
+    let p = log_run_to(
+        &RunLog {
+            example: "vec_add",
+            n: 1,
+        },
+        &base,
+    )
+    .unwrap();
+    let _ = log_run_to(
+        &RunLog {
+            example: "vec_add",
+            n: 2,
+        },
+        &base,
+    )
+    .unwrap();
+    let _ = log_run_to(
+        &RunLog {
+            example: "vec_add",
+            n: 3,
+        },
+        &base,
+    )
+    .unwrap();
 
     // ganze Datei prüfen
     hpc_core::metrics::schema::validate_jsonl_file(&p).unwrap();
@@ -60,7 +85,10 @@ fn schema_v1_rejects_missing_required_field() {
     v.as_object_mut().unwrap().remove("pid");
 
     let err = hpc_core::metrics::schema::validate_value(&v).unwrap_err();
-    assert!(err.contains("pid"), "expected error mentioning pid, got: {err}");
+    assert!(
+        err.contains("pid"),
+        "expected error mentioning pid, got: {err}"
+    );
 }
 
 #[test]
@@ -77,7 +105,9 @@ fn schema_v1_allows_unknown_fields() {
     });
 
     // neues Feld hinzufügen (zukunftige Erweiterung)
-    v.as_object_mut().unwrap().insert("new_future_field".into(), json!("ok"));
+    v.as_object_mut()
+        .unwrap()
+        .insert("new_future_field".into(), json!("ok"));
     // darf valide bleiben
     hpc_core::metrics::schema::validate_value(&v).unwrap();
 }

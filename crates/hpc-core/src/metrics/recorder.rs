@@ -1,10 +1,7 @@
 #![cfg(feature = "metrics")]
 
 use once_cell::sync::Lazy;
-use std::{
-    sync::Mutex,
-    time::Instant,
-};
+use std::{sync::Mutex, time::Instant};
 
 /// Global timing records
 pub static TIMES: Lazy<Mutex<Vec<(&'static str, u128)>>> =

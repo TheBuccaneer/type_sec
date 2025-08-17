@@ -79,4 +79,12 @@ URL: Khronos PDF.
 
 [R5] **GPUVerify** – Verifier für Race-/Divergence-Freedom (Paper/Repo).  
 URLs: OOPSLA 2012 (PDF), GitHub-Repo.
-~
+
+
+
+## Design Rationale (kurz)
+Warum Typzustände statt Runtime-Checks?
+1) **Früher Abbruch:** Fehlgebrauch wird bereits beim Kompilieren sichtbar (keine Heisen-Bugs zur Laufzeit).
+2) **Lineare Fähigkeiten:** Das Event wird als **linearer Token** modelliert; „double wait“/„forgot to wait“ sind typsystematisch ausgeschlossen.
+3) **API-Leitplanken statt Konventionen:** Nur erlaubte Übergänge sind überhaupt aufrufbar (`Ready → InFlight + EventToken`, `wait(EventToken, InFlight) → Ready`).
+4) **Kostenfrei im Hot-Path:** Der Overhead liegt im Typchecker, nicht im Kernel-Pfad.

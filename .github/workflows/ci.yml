@@ -1,0 +1,22 @@
+name: hpc-core CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Cache cargo
+        uses: Swatinem/rust-cache@v2
+
+      # Tests: wir nutzen den Dev-Stub (kein echtes OpenCL nötig)
+      - name: Test (trybuild + unit tests)
+        run: cargo test -p hpc-core --features api-dev --tests -- --nocapture
+
+      # Lints: nur lib + tests streng (Examples/Benches bleiben außen vor)
+      - name: Clippy (lib + tests, deny warnings)
+        run: cargo clippy -p hpc-core --features api-dev --lib --tests -- -D warnings

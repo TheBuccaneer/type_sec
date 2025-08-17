@@ -74,7 +74,7 @@ fn main() -> Result<(), ClError> {
     queue.finish()?;
 
 
-    queue.enqueue_read_buffer(&mut dst_buf, CL_BLOCKING, 0, cast_slice_mut(&mut dst), &[])?;
+    queue.enqueue_read_buffer(&dst_buf, CL_BLOCKING, 0, cast_slice_mut(&mut dst), &[])?;
     queue.finish()?;
 
     // verification

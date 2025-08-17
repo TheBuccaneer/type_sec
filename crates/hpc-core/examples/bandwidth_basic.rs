@@ -1,6 +1,6 @@
 // examples/bandwidth_basic.rs
 // 2025 - simple memory bandwidth test with opencl3
-
+#![allow(clippy::needless_range_loop)]
 
 use bytemuck::{cast_slice, cast_slice_mut};
 use opencl3::{

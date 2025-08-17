@@ -10,6 +10,8 @@ fn main() {
     if let Some(s) = sha   { println!("cargo:rustc-env=GIT_SHA={}", s); }
     if let Some(s) = br    { println!("cargo:rustc-env=GIT_BRANCH={}", s); }
     if let Some(s) = dirty { println!("cargo:rustc-env=GIT_DIRTY={}", s); }
+
+    println!("cargo:rustc-check-cfg=cfg(hpc_core_dev)");
 }
 
 fn cmd_str(cmd: &[&str]) -> Option<String> {

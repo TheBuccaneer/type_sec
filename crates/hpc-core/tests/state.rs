@@ -22,5 +22,5 @@ fn opencl_typestate_transitions_work() {
         .unwrap();
 
         #[allow(deprecated)]
-    let _ready: GpuBuffer<Ready> = inflight.into_ready(guard);
+    let _ready: GpuBuffer<Ready> = inflight.wait(guard.into_event());
 }

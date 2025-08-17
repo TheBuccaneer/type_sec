@@ -228,25 +228,6 @@ impl GpuBuffer<InFlight> {
             _state: PhantomData 
         }
     }
-
-/// DEPRECATED: use `wait(self, evt)` instead.
-/// Temporary shim for legacy tests/benches; will be removed once all call sites are updated.
-    #[deprecated(note = "use `wait(self, evt)` instead")]
-    pub fn into_ready(self, g: GpuEventGuard) -> GpuBuffer<Ready> {
-        // consume the guard -> ensures evt.wait() runs in Drop
-        drop(g);
-
-        #[cfg(feature = "metrics")]
-        crate::metrics::record("into_ready", Instant::now());
-        #[cfg(feature = "metrics")]
-        mlog("pipeline.ready", self.len);
-
-        GpuBuffer {
-            buf: self.buf,
-            len: self.len,
-            _state: PhantomData,
-        }
-    }
 }
 
 

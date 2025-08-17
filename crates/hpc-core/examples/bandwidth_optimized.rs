@@ -1,6 +1,7 @@
 // examples/bandwidth_optimized.rs  
 // 2025 - optimized bandwith-Test mit Out-of-Order Queue
 // same structure as basic
+#![allow(clippy::needless_range_loop)]
 
 use bytemuck::{cast_slice, cast_slice_mut};
 use opencl3::{

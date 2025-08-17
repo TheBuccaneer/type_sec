@@ -4,6 +4,8 @@
 // 2D Jacobi-Stencil mit Safe-RustCL-Wrapper (GpuBuffer),
 // exakt 3 MemTrace-Einträge: H2D, Kernel, D2H.
 
+#![allow(clippy::needless_range_loop)]
+
 use bytemuck::{cast_slice, cast_slice_mut};
 use hpc_core::{ClError, GpuBuffer, Queued, Ready};
 
@@ -56,9 +58,9 @@ fn main() -> Result<(), ClError> {
     let _scope = TracingScope::new(false);
     
     let (si, gi) = src_dev.enqueue_write(&queue, cast_slice(&h_src))?;
-    src_ready = si.into_ready(gi);
+    src_ready = si.wait(gi.into_event());
     let (di, gd) = dst_dev.enqueue_write(&queue, cast_slice(&h_dst))?;
-    dst_ready = di.into_ready(gd);
+    dst_ready = di.wait(gd.into_event());
     
     #[cfg(feature = "memtrace")]
     drop(_scope); // Re-aktiviere Auto-Tracing
@@ -91,7 +93,7 @@ fn main() -> Result<(), ClError> {
 
     // 6) Device→Host (D2H) - Auto-Tracing funktioniert normal
     let (ri, gr) = dst_ready.enqueue_read(&queue, cast_slice_mut(&mut h_dst))?;
-    let _        = ri.into_ready(gr);
+    let _        = ri.wait(gr.into_event());
 
     // 7) Reports
     #[cfg(feature = "memtrace")]

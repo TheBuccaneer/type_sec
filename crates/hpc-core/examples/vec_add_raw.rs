@@ -40,7 +40,7 @@ fn main() -> Result<(), ClError> {
         Buffer::create(&context, CL_MEM_READ_WRITE, n, std::ptr::null_mut())?;
     let mut b_dev: Buffer<f32>  =
         Buffer::create(&context, CL_MEM_READ_WRITE, n, std::ptr::null_mut())?;
-    let mut out_dev: Buffer<f32> =
+    let out_dev: Buffer<f32> =
         Buffer::create(&context, CL_MEM_READ_WRITE, n, std::ptr::null_mut())?;
 
     // 4. Host→Device – Kopie A (separates Token)
@@ -80,7 +80,7 @@ fn main() -> Result<(), ClError> {
     // 7. Device→Host – ein Token
     #[cfg(feature = "memtrace")]
     let tok_d2h = trace_start(Dir::D2H, size_bytes);
-    queue.enqueue_read_buffer(&mut out_dev, CL_BLOCKING, 0, cast_slice_mut(&mut h_out), &[])?;
+    queue.enqueue_read_buffer(&out_dev, CL_BLOCKING, 0, cast_slice_mut(&mut h_out), &[])?;
     #[cfg(feature = "memtrace")]
     tok_d2h.finish();
 

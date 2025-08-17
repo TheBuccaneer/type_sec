@@ -1,6 +1,14 @@
-//! HPC-Core: High-Performance Computing utilities for OpenCL
-//! 
-//! This crate provides safe wrappers and utilities for GPU computing.
+#![doc = include_str!("../README.md")]
+
+/// Vollständige Spezifikation (S1–S3) direkt in der Doku.
+/// Quelle: `crates/hpc-core/SPEC.md`.
+#[doc = include_str!("../SPEC.md")]
+pub mod spec {}
+
+
+// HPC-Core: High-Performance Computing utilities for OpenCL
+// 
+// This crate provides safe wrappers and utilities for GPU computing.
 
 // Core modules (always available)
 mod error;

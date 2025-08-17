@@ -1,6 +1,9 @@
 // examples/bandwidth_wrapper_fixed.rs
 // 2025 - Fair bandwith with wrapper test
 
+#![allow(clippy::needless_range_loop)]
+
+
 use bytemuck::{cast_slice, cast_slice_mut};
 use hpc_core::{ClError, GpuBuffer, Queued, Ready};
 use opencl3::{
@@ -73,7 +76,7 @@ fn main() -> Result<(), ClError> {
             iter_buffers.push(GpuBuffer::new(&context, chunk_bytes)?);
         }
         
-        // ✅ Timer startet nach der Allokation
+        // Timer startet nach der Allokation
         let start = Instant::now();
         
         // Parallel H2D für alle Chunks
@@ -107,7 +110,7 @@ fn main() -> Result<(), ClError> {
         let chunk_data = &host_data[start_idx..end_idx];
         
         let (in_flight, guard) = gpu_buf.enqueue_write(&queue, cast_slice(chunk_data))?;
-        let ready = in_flight.into_ready(guard);
+        let ready = in_flight.wait(guard.into_event());
         prepared_buffers.push(ready);
     }
     
@@ -125,7 +128,7 @@ fn main() -> Result<(), ClError> {
                 let chunk_data = &host_data[start_idx..end_idx];
                 
                 let (in_flight, guard) = gpu_buf.enqueue_write(&queue, cast_slice(chunk_data))?;
-                let ready = in_flight.into_ready(guard);
+                let ready = in_flight.wait(guard.into_event());
                 iter_ready_buffers.push(ready);
             }
         } else {
@@ -133,7 +136,7 @@ fn main() -> Result<(), ClError> {
             prepared_buffers = Vec::new(); // Move out
         }
         
-        // ✅ Timer startet bei reinen D2H-Transfers
+        // Timer startet bei reinen D2H-Transfers
         let start = Instant::now();
         
         for (i, ready_buf) in iter_ready_buffers.into_iter().enumerate() {
@@ -181,7 +184,7 @@ fn main() -> Result<(), ClError> {
         // Jede Iteration braucht einen frischen Buffer (wegen Move-Semantik)
         let big_buffer = GpuBuffer::new(&context, total_floats * 4)?;
         let (in_flight, guard) = big_buffer.enqueue_write(&queue, cast_slice(&host_data))?;
-        let ready_for_d2h = in_flight.into_ready(guard);
+        let ready_for_d2h = in_flight.wait(guard.into_event());
         
         let start = Instant::now();
         let (in_flight, guard) = ready_for_d2h.enqueue_read(&queue, cast_slice_mut(&mut result_data))?;

@@ -47,10 +47,10 @@ impl Buf<Ready> {
 }
 
 // --- kleiner Helper: nur loggen wenn Feature aktiv ---
-fn log_metric(example: &'static str, n: usize) {
+fn log_metric(_example: &'static str, _n: usize) {
     #[cfg(feature = "metrics")]
     {
-        let _ = log_run(&RunLog { example, n });
+        let _ = log_run(&RunLog { example, _n });
     }
 }
 

@@ -43,7 +43,7 @@ pub struct Kernel<'ctx> {
 /// # Must Use
 /// Muss von [`Queue::wait`] oder einem Äquivalent konsumiert werden.
 /// Nicht verwendete Events bedeuten, dass ein Kommando evtl. nie abgeschlossen wurde.
-#[cfg(feature = "api-dev")]
+#[cfg(hpc_core_dev)]
 #[must_use]
 #[derive(Debug)]
 pub struct EventToken<'ctx> {
@@ -51,7 +51,7 @@ pub struct EventToken<'ctx> {
     _q: core::marker::PhantomData<&'ctx ()>,
 }
 
-#[cfg(not(feature = "api-dev"))]
+#[cfg(not(hpc_core_dev))]
 #[must_use]
 #[derive(Debug)]
 pub struct EventToken<'ctx> {
@@ -60,7 +60,7 @@ pub struct EventToken<'ctx> {
     _q: core::marker::PhantomData<&'ctx ()>,
 }
 
-#[cfg(not(feature = "api-dev"))]
+#[cfg(not(hpc_core_dev))]
 impl<'ctx> EventToken<'ctx> {
     /// Konstruiere aus realem OpenCL-Event
     #[inline]
@@ -77,7 +77,7 @@ impl<'ctx> EventToken<'ctx> {
 }
 
 
-#[cfg(feature = "api-dev")]
+#[cfg(hpc_core_dev)]
 impl<'ctx> EventToken<'ctx> {
     /// Dev-Stub: Token ohne echtes Event
     #[inline]
@@ -89,17 +89,17 @@ impl<'ctx> EventToken<'ctx> {
 
 // --- Signaturen (nur Skeleton) ------------------------------------------------
 impl Context {
-    #[cfg(feature = "api-dev")]
+    #[cfg(hpc_core_dev)]
     pub fn new() -> Self { Self { _opaque: () } }
 
     #[allow(clippy::new_without_default)]
-    #[cfg(not(feature = "api-dev"))]
+    #[cfg(not(hpc_core_dev))]
     pub fn new() -> Self { unimplemented!() }
 
-    #[cfg(feature = "api-dev")]
+    #[cfg(hpc_core_dev)]
     pub fn queue(&self) -> Queue<'_> { Queue { _ctx: self } }
 
-    #[cfg(not(feature = "api-dev"))]
+    #[cfg(not(hpc_core_dev))]
     pub fn queue(&self) -> Queue<'_> { unimplemented!() }
 
 
@@ -143,7 +143,7 @@ impl<'ctx> Queue<'ctx> {
 
 
 #[inline]
-#[cfg(feature = "api-dev")]
+#[cfg(hpc_core_dev)]
 pub fn enqueue_write<T>(
     &'ctx self,
     buf: DeviceBuffer<T, Empty>,
@@ -156,7 +156,7 @@ pub fn enqueue_write<T>(
 }
 
 #[inline]
-#[cfg(not(feature = "api-dev"))]
+#[cfg(not(hpc_core_dev))]
 pub fn enqueue_write<T>(
     &'ctx self,
     _buf: DeviceBuffer<T, Empty>,
@@ -166,7 +166,7 @@ pub fn enqueue_write<T>(
 }
 
 // Ready -> InFlight + EventToken
-#[cfg(feature = "api-dev")]
+#[cfg(hpc_core_dev)]
 #[inline]
 pub fn enqueue_kernel<T>(
     &'ctx self,
@@ -185,7 +185,7 @@ pub fn enqueue_kernel<T>(
 
 
 
-#[cfg(not(feature = "api-dev"))]
+#[cfg(not(hpc_core_dev))]
 #[inline]
 pub fn enqueue_kernel<T>(
     &'ctx self,
@@ -196,7 +196,7 @@ pub fn enqueue_kernel<T>(
 }
 
 
-#[cfg(feature = "api-dev")]
+#[cfg(hpc_core_dev)]
 #[inline]
 pub fn wait<T>(
     &'ctx self,
@@ -213,7 +213,7 @@ pub fn wait<T>(
     /// S3: Typed transition `InFlight -> Ready`.
 /// Consumes the event token and the in-flight buffer; after waiting, returns `Ready`.
 /// This prevents double-wait by taking the buffer by value.
-    #[cfg(not(feature = "api-dev"))]
+    #[cfg(not(hpc_core_dev))]
     #[inline]
     pub fn wait<T>(
         &'ctx self,
@@ -226,7 +226,7 @@ pub fn wait<T>(
 
 impl<'ctx> Kernel<'ctx> {
     // dev: simpler Platzhalter
-    #[cfg(feature = "api-dev")]
+    #[cfg(hpc_core_dev)]
     pub fn new(_q: &'ctx Queue<'ctx>, _name: &str) -> Self {
         Self { _q: core::marker::PhantomData }
     }
@@ -240,7 +240,7 @@ impl<'ctx> Kernel<'ctx> {
     /// # State-Hop
     /// Vorbereitung -> ausführbar mit `enqueue_kernel`.
     #[inline]
-    #[cfg(not(feature = "api-dev"))]
+    #[cfg(not(hpc_core_dev))]
     pub fn new(_q: &'ctx Queue<'ctx>, _name: &str) -> Self { unimplemented!() }
 }
 

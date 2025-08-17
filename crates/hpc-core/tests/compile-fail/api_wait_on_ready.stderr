@@ -19,5 +19,5 @@ error[E0308]: mismatched types
 note: method defined here
  --> src/api.rs
   |
-  | pub fn wait<T>(
-  |        ^^^^
+  |     pub fn wait<T>(
+  |            ^^^^

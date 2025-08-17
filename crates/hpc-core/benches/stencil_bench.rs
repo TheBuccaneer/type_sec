@@ -50,7 +50,7 @@ fn bench_stencil(c: &mut Criterion) {
             |(ctx, queue, kern, mut src_buf)| {
                 
                 for _ in 0..N_ITERS {
-                    let mut dst_buf = Buffer::<f32>::create(&ctx, CL_MEM_READ_WRITE, NX*NY, ptr::null_mut()).unwrap();
+                    let dst_buf = Buffer::<f32>::create(&ctx, CL_MEM_READ_WRITE, NX*NY, ptr::null_mut()).unwrap();
                     
                     kern.set_arg(0, &src_buf).unwrap();
                     kern.set_arg(1, &dst_buf).unwrap();
@@ -89,7 +89,7 @@ fn bench_stencil(c: &mut Criterion) {
                 let init = vec![1.0_f32; NX * NY];
                 let (ping_buf, g) = GpuBuffer::<Queued>::new(&context, N_BYTES).unwrap()
                     .enqueue_write(&queue, cast_slice(&init)).unwrap();
-                let ping_ready: GpuBuffer<Ready> = ping_buf.into_ready(g);
+                let ping_ready: GpuBuffer<Ready> = ping_buf.wait(g.into_event());
 
                 (context, queue, kern, ping_ready)
             },

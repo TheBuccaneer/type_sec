@@ -44,7 +44,6 @@ harness = false
 default = []
 metrics = []
 memtrace = []
-api-dev = [] 
 
 
 [[example]]

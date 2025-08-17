@@ -15,8 +15,19 @@ jobs:
 
       # Tests: wir nutzen den Dev-Stub (kein echtes OpenCL nötig)
       - name: Test (trybuild + unit tests)
-        run: cargo test -p hpc-core --features api-dev --tests -- --nocapture
+        run: cargo test -p hpc-core --tests -- --nocapture
+        env:
+          RUSTFLAGS: "--cfg hpc_core_dev"
 
       # Lints: nur lib + tests streng (Examples/Benches bleiben außen vor)
       - name: Clippy (lib + tests, deny warnings)
-        run: cargo clippy -p hpc-core --features api-dev --lib --tests -- -D warnings
+        run: cargo clippy -p hpc-core --lib --tests -- -D warnings
+        env:
+          RUSTFLAGS: "--cfg hpc_core_dev"
+
+
+      # optional: Doku baut
+      - name: Cargo doc (sanity)
+        run: cargo doc -p hpc-core
+        env:
+          RUSTFLAGS: "--cfg hpc_core_dev"

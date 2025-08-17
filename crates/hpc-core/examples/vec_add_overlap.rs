@@ -69,7 +69,7 @@ fn main() -> Result<(), ClError> {
     // 4) Device-Buffers anlegen
     let mut a_dev   = Buffer::<f32>::create(&context, CL_MEM_READ_WRITE, n, std::ptr::null_mut())?;
     let mut b_dev   = Buffer::<f32>::create(&context, CL_MEM_READ_WRITE, n, std::ptr::null_mut())?;
-    let mut out_dev = Buffer::<f32>::create(&context, CL_MEM_READ_WRITE, n, std::ptr::null_mut())?;
+    let out_dev = Buffer::<f32>::create(&context, CL_MEM_READ_WRITE, n, std::ptr::null_mut())?;
     kernel.set_arg(0, &a_dev)?;
     kernel.set_arg(1, &b_dev)?;
     kernel.set_arg(2, &out_dev)?;
@@ -95,7 +95,7 @@ fn main() -> Result<(), ClError> {
 
     // 7) D2H: Ergebnis-Download
     let tok_d2h = trace_start(Dir::D2H, size_b);
-    queue_xfer.enqueue_read_buffer(&mut out_dev, CL_BLOCKING, 0, cast_slice_mut(&mut h_out), &[evt_b.get()])?;
+    queue_xfer.enqueue_read_buffer(&out_dev, CL_BLOCKING, 0, cast_slice_mut(&mut h_out), &[evt_b.get()])?;
     queue_xfer.finish()?;
     tok_d2h.finish();
 

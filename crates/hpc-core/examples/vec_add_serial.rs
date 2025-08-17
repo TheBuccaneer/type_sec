@@ -37,7 +37,7 @@ fn main() -> Result<(), ClError> {
     /* ---------- 3. Device-Puffer -------------------------------- */
     let mut a_dev: Buffer<f32>  = Buffer::create(&context, CL_MEM_READ_WRITE, n, std::ptr::null_mut())?;
     let mut b_dev: Buffer<f32>  = Buffer::create(&context, CL_MEM_READ_WRITE, n, std::ptr::null_mut())?;
-    let mut out_dev: Buffer<f32> = Buffer::create(&context, CL_MEM_READ_WRITE, n, std::ptr::null_mut())?;
+    let out_dev: Buffer<f32> = Buffer::create(&context, CL_MEM_READ_WRITE, n, std::ptr::null_mut())?;
 
     /* ---------- 4. Host→Device – Kopie A (seriell) -------------- */
     #[cfg(feature="memtrace")]
@@ -80,7 +80,7 @@ fn main() -> Result<(), ClError> {
     #[cfg(feature="memtrace")]
     let tok_d = trace_start(Dir::D2H, size_bytes);
 
-    queue.enqueue_read_buffer(&mut out_dev, CL_BLOCKING, 0, cast_slice_mut(&mut h_out), &[])?; // blockiert bis Kopie fertig
+    queue.enqueue_read_buffer( &out_dev, CL_BLOCKING, 0, cast_slice_mut(&mut h_out), &[])?; // blockiert bis Kopie fertig
 
     #[cfg(feature="memtrace")]
     tok_d.finish();

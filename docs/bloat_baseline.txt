@@ -1,0 +1,23 @@
+ File  .text     Size Crate Name
+ 1.1%   8.0%  19.1KiB   std std::backtrace_rs::symbolize::gimli::Cache::with_global
+ 0.7%   5.1%  12.3KiB   std std::backtrace_rs::symbolize::gimli::Context::new
+ 0.6%   4.0%   9.6KiB   std gimli::read::dwarf::Unit<R>::new
+ 0.5%   3.8%   9.1KiB   std core::cell::once::OnceCell<T>::try_init
+ 0.4%   2.9%   7.0KiB   std miniz_oxide::inflate::core::decompress
+ 0.3%   1.9%   4.6KiB   std gimli::read::unit::parse_attribute
+ 0.3%   1.9%   4.5KiB   std addr2line::function::Function<R>::parse_children
+ 0.2%   1.6%   3.8KiB   std core::cell::once::OnceCell<T>::try_init
+ 0.2%   1.6%   3.7KiB   std gimli::read::rnglists::RngListIter<R>::next
+ 0.2%   1.4%   3.5KiB   std std::sys::pal::unix::stack_overflow::thread_info::set_current_info
+ 0.2%   1.4%   3.3KiB   std std::backtrace_rs::symbolize::gimli::elf::<impl std::backtrace_rs::symbolize::gimli::Mapping>::new_debug
+ 0.2%   1.2%   2.8KiB   std <&T as core::fmt::Display>::fmt
+ 0.2%   1.1%   2.6KiB   std core::slice::sort::stable::quicksort::quicksort
+ 0.2%   1.1%   2.6KiB   std rustc_demangle::try_demangle
+ 0.2%   1.1%   2.6KiB   std core::slice::sort::stable::quicksort::quicksort
+ 0.2%   1.1%   2.6KiB   std gimli::read::line::parse_attribute
+ 0.1%   1.1%   2.5KiB   std core::slice::sort::stable::quicksort::quicksort
+ 0.1%   1.0%   2.5KiB   std core::slice::sort::stable::quicksort::quicksort
+ 0.1%   1.0%   2.4KiB   std core::slice::sort::stable::quicksort::quicksort
+ 0.1%   1.0%   2.4KiB   std std::panicking::rust_panic_with_hook
+ 7.8%  55.7% 133.3KiB       And 364 smaller methods. Use -n N to show more.
+14.0% 100.0% 239.3KiB       .text section size, the file size is 1.7MiB

@@ -20,6 +20,6 @@ fn main() {
     // 2. Kernel → neuer Event (ev2)
     let (inflight2, _ev2) = q.enqueue_kernel(&k, ready_again);
 
-    // ❌ compile-fail: `ev` wurde bereits bewegt (use of moved value)
+    // compile-fail: `ev` wurde bereits bewegt (use of moved value)
     let _illegal = q.wait(ev, inflight2);
 }

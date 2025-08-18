@@ -12,6 +12,6 @@ fn main() {
 
     let ready_again = q.wait(ev, inflight);
 
-    // ❌ compile-fail: `ev` wurde schon in `wait` verbraucht (use of moved value)
+    // compile-fail: `ev` wurde schon in `wait` verbraucht (use of moved value)
     let _still_ready = q.wait(ev, ready_again);
 }

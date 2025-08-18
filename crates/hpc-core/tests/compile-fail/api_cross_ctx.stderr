@@ -1,0 +1,13 @@
+error[E0107]: struct takes 2 generic arguments but 4 generic arguments were supplied
+ --> tests/compile-fail/api_cross_ctx.rs
+  |
+  |     let buf: DeviceBuffer<_, _, u32, _> = q1.create_buffer_elems(4);
+  |              ^^^^^^^^^^^^     -------- help: remove the unnecessary generic arguments
+  |              |
+  |              expected 2 generic arguments
+  |
+note: struct defined here, with 2 generic parameters: `T`, `S`
+ --> src/api.rs
+  |
+  | pub struct DeviceBuffer<'id, 'ctx, T, S: State> {
+  |            ^^^^^^^^^^^^            -  -

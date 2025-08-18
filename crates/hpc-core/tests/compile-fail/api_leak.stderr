@@ -1,0 +1,12 @@
+error[E0505]: cannot move out of `ctx` because it is borrowed
+ --> tests/compile-fail/api_leak.rs
+  |
+  |     let ctx = Context::new();
+  |         --- binding `ctx` declared here
+  |     let q = Queue::new(&ctx);
+  |                        ---- borrow of `ctx` occurs here
+...
+  |     drop(ctx);
+  |          ^^^ move out of `ctx` occurs here
+  |     let _ = buf_inflight; // Buffer überlebt den Context nicht
+  |             ------------ borrow later used here

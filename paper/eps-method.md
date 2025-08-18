@@ -5,6 +5,8 @@
 **PSC (Protocol-Safety Coverage).**
 Wir erfassen 12 Host-Sync-Fehlmuster. Ziel: **PSC ≥ 75 %**.
 PSC = (# durch EPS abgedeckte Muster) / 12
+Von 12 identifizierten OpenCL-Host-Fehlmustern (Double-wait, Missed wait, InFlight-Read, Order, Cross-Context, Leak, Invalid Size/ABI, Misc) werden 8/12 bereits **compile-time** ausgeschlossen.  
+→ PSC = 66,7 %
 
 **Threats to Validity.**
 - Compiler-Message-Stabilität (gemildert durch `rust-toolchain.toml`)

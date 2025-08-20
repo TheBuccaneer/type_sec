@@ -2,67 +2,40 @@
 name = "hpc-core"
 version = "0.1.0"
 edition = "2024"
+authors = ["Tihomir Thomas Bicanic"]
+description = "High-performance type-safe Rust API for OpenCL (Type-States, Metrics, Memtracer)"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/TheBuccaneer/hpc-core"
 
 [dependencies]
-opencl3   = "0.7"
-thiserror = "1"
-bytemuck  = "1.14"
-serde     = { version = "1", features = ["derive"] }
+# OpenCL-Bindings
+opencl3 = "0.7"
+thiserror = "1.0"
 
-# bleiben vorerst „normal“, wenn du nicht featurisieren willst:
-serde_json = "1"
-chrono     = { version = "0.4", default-features = false, features = ["clock", "std"] }
-time       = { version = "0.3", features = ["formatting", "macros"] }
-once_cell  = "1"
-fastrand   = "2"
-fs2        = "0.4"
-hostname   = "0.3"
-jsonschema = "0.17"
-clap       = { version = "4", features = ["derive"] }
-anyhow     = "1"
+# Hilfen für Zero-Cost Casts (z.B. &[T] <-> &[u8])
+bytemuck = { version = "1.15", features = ["derive"] }
+
+# Für Logs / JSONL im Memtracer
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
 
 [dev-dependencies]
-criterion  = { version = "0.5", features = ["html_reports"] }
-trybuild   = "1.0"
-regex      = "1"
-
-[[bin]]
-name = "metrics_tail"
-path = "src/bin/metrics_tail.rs"
-required-features = ["metrics"]
-
-[[bin]]
-name = "metrics_summary"
-path = "src/bin/metrics_summary.rs"
-required-features = ["metrics"]
-
-
+# Für Compile-Fail-Belege
+trybuild = "1.0"
+criterion = "0.5"
 
 [features]
-default = []
-metrics = []
+# Entwicklungsmodus (schaltet ggf. unimplemented! frei)
+hpc_core_dev = []
 memtrace = []
-bloat-probe = []
+metrics = []
 
 
-[[example]]
-name = "bandwidth_optimized"
-path = "examples/bandwidth_optimized.rs"
-
-[[example]]
-name = "write_metrics"
-path = "examples/write_metrics.rs"
-required-features = ["metrics"]
+[lib]
+name = "hpc_core"
+path = "src/lib.rs"
 
 
 [[bench]]
-name = "ocl_mem"
-harness = false
-
-[[bench]]
-name = "ocl_vecadd"
-harness = false
-
-[[bench]]
-name = "ocl_events"
+name = "memcpy_api_criterion"
 harness = false

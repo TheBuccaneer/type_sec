@@ -1,0 +1,88 @@
+use super::GpuBuffer;
+use crate::buffer::state::{Ready, InFlight};
+use crate::error::{Result, Error};
+use opencl3::{command_queue::CommandQueue};
+use opencl3::types::{CL_BLOCKING, CL_NON_BLOCKING};
+use std::marker::PhantomData;
+use opencl3::event::Event;
+use std::ffi::c_void;
+
+
+impl GpuBuffer<Ready> {
+    pub fn enqueue_read(
+        &self,
+        queue: &CommandQueue,
+        host: &mut [u8],
+    ) -> Result<()> {
+        if host.len() != self.len_bytes {
+            return Err(Error::BufferSizeMismatch {
+                expected: self.len_bytes,
+                actual: host.len(),
+            });
+        }
+
+            queue.enqueue_read_buffer(&self.buf, CL_BLOCKING, 0, host, &[])?;
+
+        Ok(())
+    }
+
+    pub fn overwrite_byte(&mut self, queue: &CommandQueue, host: &[u8]) -> Result<()> {
+        if host.len() != self.len_bytes {
+            return Err(Error::BufferSizeMismatch {
+                expected: self.len_bytes,
+                actual: host.len(),
+            });
+        }
+
+            queue.enqueue_write_buffer(&mut self.buf, CL_NON_BLOCKING, 0, host, &[])?;
+
+        Ok(())
+    }
+
+    pub fn overwrite(&mut self, queue: &CommandQueue, host: &[u8]) -> Result<()> {
+        if host.len() != self.len_bytes {
+            return Err(Error::BufferSizeMismatch {
+                expected: self.len_bytes,
+                actual: host.len(),
+            });
+        }
+
+            queue.enqueue_write_buffer(&mut self.buf, CL_NON_BLOCKING, 0, host, &[])?;
+
+        Ok(())
+    }
+
+    pub fn enqueue_kernel(
+        self,
+        queue: &CommandQueue,
+        kernel: &opencl3::kernel::Kernel,
+        global_work_size: usize,
+    ) -> Result<(GpuBuffer<InFlight>, Event)> {
+        
+        let kernel_ptr = kernel.get() as *mut c_void;
+
+        let evt = 
+            queue.enqueue_nd_range_kernel(
+                kernel_ptr,
+                1,              // 1D NDRange (später anpassen)
+                std::ptr::null(),
+                &global_work_size as *const usize,
+                std::ptr::null(),
+                &[],
+            )?;
+
+        Ok((
+            GpuBuffer {
+                buf: self.buf,
+                len_bytes: self.len_bytes,
+                _state: PhantomData::<InFlight>,
+            },
+            evt,
+        ))
+    }
+}
+
+
+
+    
+

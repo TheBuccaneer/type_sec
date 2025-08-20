@@ -1,341 +1,250 @@
-//! Minimaler, auskommentierter Skeleton der künftigen Safe-API.
-//! Greift nur auf die Zustandsmarker aus `buffer::state` zurück und
-//! kollidiert nicht mit dem bestehenden `buffer`-Code.
+use crate::buffer::{GpuBuffer, state::{State, Empty, Ready, InFlight}};
+use std::marker::PhantomData;
+use std::ptr;
+use opencl3::kernel::Kernel as CLKernel;
+use opencl3::program::Program as CLProgram;
+use opencl3::{context::Context as CLContext, types::cl_device_id, device::CL_DEVICE_TYPE_GPU};
+use opencl3::{types::cl_context_properties};
+use opencl3::device::get_all_devices;
+use opencl3::platform::get_platforms;
+use opencl3::command_queue::CommandQueue as CLQueue;
+use super::EventToken;
 
-#![allow(dead_code, unused_imports)]
+pub use crate::error::{Error, Result};
+// Alias öffentlich ins Root reexportieren
 
-use crate::buffer::state::{Empty, InFlight, Ready, State};
-use core::marker::PhantomData;
-// Falls der Typ in deinem Code anders heißt, passe das Alias hier an:
-use crate::buffer::GpuBuffer as LlBuffer;
-use opencl3::event::Event as ClEvent;
-
-/// Root-Lebensraum. In echt: OpenCL-Context/Devices/Programme.
-pub struct Context<'id> {
-    _opaque: (),
-    _id: core::marker::PhantomData<&'id ()>,
+/// High-Level typisierter Buffer. Delegiert an den GPUBuffer
+#[derive(Debug)]
+pub struct DeviceBuffer<'ctx, T, S: State> {
+    pub inner: GpuBuffer<S>,
+    pub len: usize, //Anzahl Elemente
+    pub _marker: std::marker::PhantomData<&'ctx T>,
 }
 
-/// Befehlswarteschlange, an `Context` gebunden.
-/// Lifetime erzwingt: Queue lebt nicht länger als der Context.
-pub struct Queue<'id, 'ctx> {
-    _ctx: &'ctx Context<'id>,
-}
 
-/// Ein typisierter GPU-Buffer im Host-API-Layer.
-///
-/// # Must Use
-/// Nicht stumm verwerfen – ein nicht verwendeter Buffer kann auf ein Leck hindeuten
-/// oder einen nicht vollzogenen State-Hop.
-#[must_use]
-pub struct DeviceBuffer<'id, 'ctx, T, S: State> {
-    inner: LlBuffer<S>,
-    len_elems: usize,
-    _ty: PhantomData<T>,
-    _ctx: PhantomData<&'ctx Context<'id>>,
-}
-
-/// Kernel-Handle, an Queue/Context gebunden.
-pub struct Kernel<'id, 'ctx> {
-    _q: PhantomData<&'ctx Queue<'id, 'ctx>>,
-}
-
-/// Ein Event-Token als Resultat eines GPU-Befehls.
-///
-/// # Must Use
-/// Muss von [`Queue::wait`] oder einem Äquivalent konsumiert werden.
-/// Nicht verwendete Events bedeuten, dass ein Kommando evtl. nie abgeschlossen wurde.
-#[cfg(hpc_core_dev)]
 #[must_use]
 #[derive(Debug)]
-pub struct EventToken<'ctx> {
-    // Im Dev-Stub KEIN echtes OpenCL-Event
-    _q: core::marker::PhantomData<&'ctx ()>,
+pub struct Context {
+    inner: CLContext,
+    device: cl_device_id,
 }
 
-#[cfg(not(hpc_core_dev))]
 #[must_use]
 #[derive(Debug)]
-pub struct EventToken<'ctx> {
-    // Echtes Event nur im Normalbetrieb
-    evt: ClEvent,
-    _q: core::marker::PhantomData<&'ctx ()>,
+pub struct Queue {
+    inner: CLQueue,
 }
 
-#[cfg(not(hpc_core_dev))]
-impl<'ctx> EventToken<'ctx> {
-    /// Konstruiere aus realem OpenCL-Event
-    #[inline]
-    pub fn from_event(evt: ClEvent) -> Self {
+#[must_use]
+#[derive(Debug)]
+pub struct Kernel<'q> {
+    inner: CLKernel,
+    program: CLProgram,
+    _marker: std::marker::PhantomData<&'q ()>, // Kernel hängt an Context/Queue
+}
+
+
+//#####################OPEN CL PUBLIC################################
+
+
+
+
+/*
+Erstellt einen neuen Buffer auf Nutzerebene!
+ */
+pub fn create_buffer<T>(ctx: &Context, n_elems: usize) -> Result<DeviceBuffer<'static, T, Empty>> {
+    let inner: GpuBuffer<Empty> = GpuBuffer::<Empty>::create_uninit_elems::<T>(ctx.raw(), n_elems)?;
+    Ok(DeviceBuffer::from_inner(inner, n_elems))
+}
+
+/*
+Hilfsfunktion, die intern einfach das neue Objekt weitergibt */
+impl<'ctx, T, S: State> DeviceBuffer<'ctx, T, S> {
+    pub(crate) fn from_inner(inner: GpuBuffer<S>, len_elems: usize) -> Self {
         Self {
-            evt,
-            _q: core::marker::PhantomData,
-        }
-    }
-
-    /// Event extrahieren (konsumiert den Token)
-    #[inline]
-    #[must_use]
-    pub fn into_event(self) -> ClEvent {
-        self.evt
-    }
-}
-
-#[cfg(hpc_core_dev)]
-impl<'ctx> EventToken<'ctx> {
-    /// Dev-Stub: Token ohne echtes Event
-    #[inline]
-    pub fn dev() -> Self {
-        Self {
-            _q: core::marker::PhantomData,
+            inner,               // der u8-Buffer
+            len: len_elems,      // Element-Länge für Nutzer
+            _marker: PhantomData,
         }
     }
 }
 
-// --- Signaturen (nur Skeleton) ------------------------------------------------
-impl<'id> Context<'id> {
-    #[cfg(hpc_core_dev)]
-    pub fn new() -> Self {
-        Self { 
-            _opaque: (),
-            _id: core::marker::PhantomData,
+impl Context {
+    /// Baue einen OpenCL-Context für das erste gefundene GPU-Device + passende Queue.
+    /*
+    possible error: Assumption: 1 platform with 1 device -> NVIDIA
+    */
+    pub fn new_first_gpu() -> Result<(Self, Queue)> {
+        let _platforms = get_platforms()?; // aktuell ungenutzt, später ggf. filtern
+        let devices: Vec<cl_device_id> = get_all_devices(CL_DEVICE_TYPE_GPU)?;
+        let props: &[cl_context_properties] = &[];
+        let ctx = CLContext::from_devices(&devices, props, None, ptr::null_mut())?;
+        let q = CLQueue::create(&ctx, devices[0], 0)?;
+        Ok((Self { inner: ctx, device: devices[0] }, Queue { inner: q }))
+    }
+
+    /// Low‑Level‑Zugriff (nur wenn unbedingt nötig)
+    pub fn raw(&self) -> &CLContext {
+        &self.inner
+    }
+
+    pub fn device_id(&self) -> cl_device_id {
+        self.device
+    }
+}
+
+
+impl<'q> Kernel<'q> {
+    pub fn from_source(ctx: &Context, src: &str, name: &str) -> Result<Self> {
+        let program = CLProgram::create_and_build_from_source(ctx.raw(), src, "")?;
+        let inner = CLKernel::create(&program, name)?;
+        Ok(Self { inner, program, _marker: std::marker::PhantomData })
+    }
+
+    pub fn raw(&self) -> &CLKernel {
+        &self.inner
+    }
+}
+
+
+
+//####################################INTERN#############################################
+
+impl<'ctx, T> DeviceBuffer<'ctx, T, Empty> {
+    pub fn enqueue_write(
+        self,
+        queue: &Queue,
+        data: &[T],
+    ) -> Result<DeviceBuffer<'ctx, T, Ready>>
+    where
+        T: bytemuck::Pod,
+    {
+        if data.len() != self.len {
+            return Err(Error::BufferSizeMismatch {
+                expected: self.len,
+                actual: data.len(),
+            });
         }
-    }
 
-    #[allow(clippy::new_without_default)]
-    #[cfg(not(hpc_core_dev))]
-    pub fn new() -> Self {
-        unimplemented!()
-    }
+        // Cast &[T] → &[u8]
+        let bytes: &[u8] = bytemuck::cast_slice(data);
 
-    #[cfg(hpc_core_dev)]
-    pub fn queue(&self) -> Queue<'id, '_> {
-        Queue { _ctx: self }
-    }
-
-    #[cfg(not(hpc_core_dev))]
-    pub fn queue(&self) -> Queue<'id, '_> {
-        unimplemented!()
-    }
-
-    pub fn create_queue(&self) -> Queue<'id, '_> {
-        Queue { _ctx: self }
+        let (inner_ready, _evt) = self.inner.enqueue_write(queue.raw(), bytes)?;
+        Ok(DeviceBuffer::from_inner(inner_ready, self.len))
     }
 }
 
-impl<'id> Default for Context<'id> {
-    fn default() -> Self {
-        Self::new()
+
+impl<'ctx, T> DeviceBuffer<'ctx, T, Ready> {
+ pub fn enqueue_read(&self, queue: &Queue, out: &mut [T]) -> Result<()>
+    where
+        T: bytemuck::Pod,
+    {
+        if out.len() != self.len {
+            return Err(Error::BufferSizeMismatch {
+                expected: self.len,
+                actual: out.len(),
+            });
+        }
+
+        let bytes: &mut [u8] = bytemuck::cast_slice_mut(out);
+
+            queue.raw().enqueue_read_buffer(&self.inner.buf, 
+                                            opencl3::types::CL_BLOCKING, 
+                                            0, 
+                                            bytes, 
+                                            &[])?;
+        
+
+        Ok(())
+    }
+
+    pub fn overwrite(
+        &mut self,
+        queue: &Queue,
+        data: &[T],
+    ) -> Result<()>
+    where
+        T: bytemuck::Pod,
+    {
+        if data.len() != self.len {
+            return Err(Error::BufferSizeMismatch {
+                expected: self.len,
+                actual: data.len(),
+            });
+        }
+
+        let bytes: &[u8] = bytemuck::cast_slice(data);
+
+            queue.raw().enqueue_write_buffer(
+                &mut self.inner.buf,
+                opencl3::types::CL_BLOCKING, // Blockierend für Einfachheit
+                0,
+                bytes,
+                &[],
+            )?;
+
+        Ok(())
+    }
+
+
+    pub fn overwrite_byte(&mut self, queue: &Queue, data: &[u8]) -> Result<()> {
+        if data.len() != self.len * std::mem::size_of::<T>() {
+            return Err(Error::BufferSizeMismatch {
+                expected: self.len * std::mem::size_of::<T>(),
+                actual: data.len(),
+            });
+        }
+        self.inner.overwrite_byte(queue.raw(), data)
+    }
+
+     pub fn enqueue_kernel<'q>(
+        self,
+        queue: &'q Queue,
+        kernel: &Kernel<'q>,
+        global_work_size: usize,
+    ) -> Result<(DeviceBuffer<'ctx, T, InFlight>, EventToken<'q>)> {
+        let (inner_inflight, evt) =
+            self.inner.enqueue_kernel(queue.raw(), kernel.raw(), global_work_size)?;
+
+        Ok((
+            DeviceBuffer {
+                inner: inner_inflight,
+                len: self.len,
+                _marker: PhantomData,
+            },
+            //TO_DO - IMPLEMENT ID
+            EventToken::new(evt), // dein Token-Wrapper
+        ))
     }
 }
 
-impl<'id, 'ctx> Queue<'id, 'ctx> {
-    /// Device → Host (blocking):
-    /// Liest den Inhalt eines `DeviceBuffer<'id, 'ctx, T, Ready>` in `out` und blockiert,
-    /// bis der Transfer abgeschlossen ist. Der Buffer bleibt `Ready`.
-    #[inline]
-    pub fn read_blocking<T>(&'ctx self, _buf: &DeviceBuffer<'id, 'ctx, T, Ready>, _out: &mut [T]) 
-    where
-        'ctx: 'id,
-    {
-        // später: low-level clEnqueueReadBuffer + clFinish/Wait
-        // Größenprüfung: out.len() == buf.len_elems()
-        unimplemented!("Queue::read_blocking<T>: typed blocking read from device")
+impl Queue {
+    pub fn raw(&self) -> &CLQueue {
+        &self.inner
     }
 
-    pub fn new(ctx: &'ctx Context<'id>) -> Self {
-        Queue { _ctx: ctx }
-    }
-
-    #[inline]
-    pub fn create_buffer_elems<T>(&'ctx self, _n: usize) -> DeviceBuffer<'id, 'ctx, T, Empty> 
-    where
-        'ctx: 'id,
-    {
-        unimplemented!("Queue::create_buffer_elems: allocate n * size_of::<T>() bytes and wrap")
-    }
-
-    /// Lege einen noch leeren Gerätepuffer an.
-    pub fn create_buffer<T>(&'ctx self) -> DeviceBuffer<'id, 'ctx, T, Empty> 
-    where
-        'ctx: 'id,
-    {
-        unimplemented!()
-    }
-
-    #[inline]
-    #[cfg(hpc_core_dev)]
-    pub fn enqueue_write<T>(
-        &'ctx self,
-        buf: DeviceBuffer<'id, 'ctx, T, Empty>,
-        _data: &[T],
-    ) -> DeviceBuffer<'id, 'ctx, T, Ready> 
-    where
-        'ctx: 'id,
-    {
-        // Dev stub: only type-state hop (no real copy)
-        let inner_empty = buf.into_inner();
-        let inner_ready: LlBuffer<Ready> = unsafe { inner_empty.assume_state::<Ready>() };
-        DeviceBuffer::from_inner_unchecked(inner_ready)
-    }
-
-    #[inline]
-    #[cfg(not(hpc_core_dev))]
-    pub fn enqueue_write<T>(
-        &'ctx self,
-        _buf: DeviceBuffer<'id, 'ctx, T, Empty>,
-        _data: &[T],
-    ) -> DeviceBuffer<'id, 'ctx, T, Ready> 
-    where
-        'ctx: 'id,
-    {
-        unimplemented!("Queue::enqueue_write<T>: typed write to device buffer")
-    }
-
-    // Ready -> InFlight + EventToken
-    #[cfg(hpc_core_dev)]
-    #[inline]
-    pub fn enqueue_kernel<T>(
-        &'ctx self,
-        _k: &Kernel<'id, 'ctx>,
-        buf: DeviceBuffer<'id, 'ctx, T, Ready>,
-    ) -> (DeviceBuffer<'id, 'ctx, T, InFlight>, EventToken<'ctx>) 
-    where
-        'ctx: 'id,
-    {
-        // Dev stub: only type-state hop (no real enqueue/event)
-        let inner_ready = buf.into_inner();
-        let inner_inflight: LlBuffer<InFlight> = unsafe { inner_ready.assume_state() };
-        (
-            DeviceBuffer::from_inner_unchecked(inner_inflight),
-            // phantom token (dev stub has no real event)
-            EventToken::dev(),
-        )
-    }
-
-    #[cfg(not(hpc_core_dev))]
-    #[inline]
-    pub fn enqueue_kernel<T>(
-        &'ctx self,
-        _k: &Kernel<'id, 'ctx>,
-        _buf: DeviceBuffer<'id, 'ctx, T, Ready>,
-    ) -> (DeviceBuffer<'id, 'ctx, T, InFlight>, EventToken<'ctx>) 
-    where
-        'ctx: 'id,
-    {
-        unimplemented!("Queue::enqueue_kernel<T>: enqueue kernel and return InFlight + event token")
-    }
-
-    #[cfg(hpc_core_dev)]
-    #[inline]
-    pub fn wait<T>(
+    // ✅ Das hinzufügen:
+    pub fn wait<T, S: State>(
         &self,
-        _ev: EventToken<'ctx>, // nur Marker im dev-Stub
-        buf: DeviceBuffer<'id, 'ctx, T, InFlight>,
-    ) -> DeviceBuffer<'id, 'ctx, T, Ready> {
-        let inner_inflight = buf.into_inner();
-        // dev-Stub: kein echtes Warten – nur Type-State-Hop
-        let inner_ready: LlBuffer<Ready> = unsafe { inner_inflight.assume_state() };
-        DeviceBuffer::from_inner_unchecked(inner_ready)
-    }
-
-    /// S3: Typed transition `InFlight -> Ready`.
-    /// Consumes the event token and the in-flight buffer; after waiting, returns `Ready`.
-    /// This prevents double-wait by taking the buffer by value.
-    #[cfg(not(hpc_core_dev))]
-    #[inline]
-    pub fn wait<T>(
-        &self,
-        _ev: EventToken<'ctx>,
-        _buf: DeviceBuffer<'id, 'ctx, T, InFlight>,
-    ) -> DeviceBuffer<'id, 'ctx, T, Ready> {
-        unimplemented!("Queue::wait<T>: block on event, transition InFlight->Ready")
-    }
-
-    /// Nur für Compile-Fail-Tests gedacht: liefert ein Dummy-Kernel.
-    pub fn create_dummy_kernel(&self) -> Kernel<'id, 'ctx> {
-        // Wird in den Tests nicht wirklich benutzt → darf unimplemented! sein.
-        Kernel { _q: core::marker::PhantomData }
-    }
-}
-
-impl<'id, 'ctx> Kernel<'id, 'ctx> {
-    // dev: simpler Platzhalter
-    #[cfg(hpc_core_dev)]
-    pub fn new(_q: &'ctx Queue<'id, 'ctx>, _name: &str) -> Self {
-        Self {
-            _q: core::marker::PhantomData,
-        }
-    }
-
-    /// Erstellt ein Kernel-Handle für die gegebene Queue und Kernel-Bezeichnung.
-    ///
-    /// # Zweck
-    /// *Nur Handle, kein Dispatch.* Der eigentliche Start passiert über
-    /// [`Queue::enqueue_kernel`].
-    ///
-    /// # State-Hop
-    /// Vorbereitung -> ausführbar mit `enqueue_kernel`.
-    #[inline]
-    #[cfg(not(hpc_core_dev))]
-    pub fn new(_q: &'ctx Queue<'id, 'ctx>, _name: &str) -> Self {
-        unimplemented!()
-    }
-}
-
-impl<'id, 'ctx, T, S: State> core::fmt::Debug for DeviceBuffer<'id, 'ctx, T, S> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        f.debug_struct("DeviceBuffer")
-            .field("len_elems", &self.len_elems)
-            .finish_non_exhaustive()
-    }
-}
-
-impl<'id, 'ctx, T, S: State> DeviceBuffer<'id, 'ctx, T, S> {
-    /// Interne Konstruktion aus Low-Level-Buffer + Elementlänge.
-    /// (Sichtbar im Crate; die High-Level-APIs stellen das später sicher her.)
-    pub(crate) fn from_inner(inner: LlBuffer<S>, len_elems: usize) -> Self {
-        Self {
-            inner,
-            len_elems,
-            _ty: PhantomData,
-            _ctx: PhantomData,
-        }
-    }
-
-    /// Gibt den Low-Level-Buffer wieder zurück (z. B. für interne Delegation).
-    pub(crate) fn into_inner(self) -> LlBuffer<S> {
-        self.inner
-    }
-
-    /// Anzahl Elemente (nicht Bytes).
-    #[inline]
-    pub fn len_elems(&self) -> usize {
-        self.len_elems
-    }
-
-    /// Byte-Länge, abgeleitet aus `T`.
-    #[inline]
-    pub fn len_bytes(&self) -> usize {
-        self.len_elems * core::mem::size_of::<T>()
-    }
-
-    pub(crate) fn from_inner_unchecked(inner: LlBuffer<S>) -> Self {
-        let bytes = inner.len_bytes();
-        let sz = core::mem::size_of::<T>();
-        debug_assert!(
-            bytes % sz == 0,
-            "DeviceBuffer<'id, 'ctx, {}>: bytes ({}) nicht durch size_of T ({}) teilbar",
-            core::any::type_name::<T>(),
-            bytes,
-            sz
-        );
-        let len_elems = bytes / sz;
-        Self {
-            inner,
-            len_elems,
-            _ty: PhantomData,
-            _ctx: PhantomData,
+        event_token: EventToken,  // Dein EventToken aus ready.rs
+        buf: DeviceBuffer<'_, T, InFlight>,
+    ) -> DeviceBuffer<'_, T, Ready> {
+        // Event aus Token extrahieren und warten
+        let event = event_token.into_event();  // Oder wie auch immer dein Token funktioniert
+        
+        // Auf Event warten
+        event.wait().expect("Failed to wait for event");
+        
+        // Buffer-State von InFlight -> Ready
+        DeviceBuffer {
+            inner: GpuBuffer {
+                buf: buf.inner.buf,
+                len_bytes: buf.inner.len_bytes,
+                _state: PhantomData::<Ready>,
+            },
+            len: buf.len,
+            _marker: PhantomData,
         }
     }
 }

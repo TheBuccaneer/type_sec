@@ -1,4 +1,0 @@
-Optional (manuell, Root erforderlich):
-  sudo cpupower frequency-set -g performance
-  echo 0 | sudo tee /sys/devices/system/cpu/intel_pstate/no_turbo
-Nach den Benches ggf. rückgängig machen.

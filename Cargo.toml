@@ -1,5 +1,5 @@
 [workspace]
-members = [ "crates/bug_injection",
+members = [
     "crates/hpc-core"]
 resolver = "2" 
 

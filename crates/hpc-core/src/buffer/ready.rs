@@ -6,6 +6,7 @@ use opencl3::types::{CL_BLOCKING, CL_NON_BLOCKING};
 use std::marker::PhantomData;
 use opencl3::event::Event;
 use std::ffi::c_void;
+use opencl3::types::cl_bool;
 
 
 impl GpuBuffer<Ready> {
@@ -13,7 +14,8 @@ impl GpuBuffer<Ready> {
         &self,
         queue: &CommandQueue,
         host: &mut [u8],
-    ) -> Result<()> {
+        blocking: cl_bool, 
+    ) -> Result<Event> {
         if host.len() != self.len_bytes {
             return Err(Error::BufferSizeMismatch {
                 expected: self.len_bytes,
@@ -21,12 +23,24 @@ impl GpuBuffer<Ready> {
             });
         }
 
-            queue.enqueue_read_buffer(&self.buf, CL_BLOCKING, 0, host, &[])?;
+         let evt = queue.enqueue_read_buffer(&self.buf, blocking, 0, host, &[])?;
+
+        Ok(evt)
+    }
+
+    pub fn overwrite_byte(&mut self, queue: &CommandQueue, host: &[u8], blocking: cl_bool,) -> Result<()> {
+        if host.len() != self.len_bytes {
+            return Err(Error::BufferSizeMismatch {
+                expected: self.len_bytes,
+                actual: host.len(),               
+            });
+        }
+            queue.enqueue_write_buffer(&mut self.buf, blocking, 0, host, &[])?;
 
         Ok(())
     }
 
-    pub fn overwrite_byte(&mut self, queue: &CommandQueue, host: &[u8]) -> Result<()> {
+    pub fn overwrite(&mut self, queue: &CommandQueue, host: &[u8], blocking: cl_bool,) -> Result<()> {
         if host.len() != self.len_bytes {
             return Err(Error::BufferSizeMismatch {
                 expected: self.len_bytes,
@@ -34,20 +48,7 @@ impl GpuBuffer<Ready> {
             });
         }
 
-            queue.enqueue_write_buffer(&mut self.buf, CL_NON_BLOCKING, 0, host, &[])?;
-
-        Ok(())
-    }
-
-    pub fn overwrite(&mut self, queue: &CommandQueue, host: &[u8]) -> Result<()> {
-        if host.len() != self.len_bytes {
-            return Err(Error::BufferSizeMismatch {
-                expected: self.len_bytes,
-                actual: host.len(),
-            });
-        }
-
-            queue.enqueue_write_buffer(&mut self.buf, CL_NON_BLOCKING, 0, host, &[])?;
+            queue.enqueue_write_buffer(&mut self.buf, blocking, 0, host, &[])?;
 
         Ok(())
     }

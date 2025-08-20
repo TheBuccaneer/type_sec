@@ -4,7 +4,7 @@ use std::ptr;
 use opencl3::kernel::Kernel as CLKernel;
 use opencl3::program::Program as CLProgram;
 use opencl3::{context::Context as CLContext, types::cl_device_id, device::CL_DEVICE_TYPE_GPU};
-use opencl3::{types::cl_context_properties};
+use opencl3::{types::cl_context_properties, types::CL_BLOCKING, types::CL_NON_BLOCKING};
 use opencl3::device::get_all_devices;
 use opencl3::platform::get_platforms;
 use opencl3::command_queue::CommandQueue as CLQueue;
@@ -137,7 +137,9 @@ impl<'ctx, T> DeviceBuffer<'ctx, T, Empty> {
 
 
 impl<'ctx, T> DeviceBuffer<'ctx, T, Ready> {
- pub fn enqueue_read(&self, queue: &Queue, out: &mut [T]) -> Result<()>
+    //############################READING FUNCTIONS
+
+ pub fn enqueue_read_blocking(&self, queue: &Queue, out: &mut [T]) -> Result<()>
     where
         T: bytemuck::Pod,
     {
@@ -150,53 +152,83 @@ impl<'ctx, T> DeviceBuffer<'ctx, T, Ready> {
 
         let bytes: &mut [u8] = bytemuck::cast_slice_mut(out);
 
-            queue.raw().enqueue_read_buffer(&self.inner.buf, 
-                                            opencl3::types::CL_BLOCKING, 
-                                            0, 
-                                            bytes, 
-                                            &[])?;
+        self.inner.enqueue_read(queue.raw(), bytes, opencl3::types::CL_BLOCKING)?;
         
 
         Ok(())
     }
 
-    pub fn overwrite(
+   pub fn enqueue_read_non_blocking<'q>(
+    self,
+    queue: &'q Queue,
+    out: &mut [T],
+) -> Result<(DeviceBuffer<'ctx, T, InFlight>, EventToken<'q>)>
+where
+    T: bytemuck::Pod,
+{
+    if out.len() != self.len {
+        return Err(Error::BufferSizeMismatch {
+            expected: self.len,
+            actual: out.len(),
+        });
+    }
+
+    let bytes: &mut [u8] = bytemuck::cast_slice_mut(out);
+
+    let evt = self.inner.enqueue_read(queue.raw(), bytes, opencl3::types::CL_NON_BLOCKING)?;
+    Ok((
+        DeviceBuffer::from_inner(
+            GpuBuffer { buf: self.inner.buf, len_bytes: self.inner.len_bytes, _state: PhantomData::<InFlight> },
+            self.len,
+        ),
+        EventToken::new(evt),
+    ))
+}
+    
+
+    pub fn overwrite_blocking(
         &mut self,
         queue: &Queue,
         data: &[T],
-    ) -> Result<()>
-    where
-        T: bytemuck::Pod,
+    ) -> Result<()> 
+    where T: bytemuck::Pod,
     {
-        if data.len() != self.len {
-            return Err(Error::BufferSizeMismatch {
-                expected: self.len,
-                actual: data.len(),
-            });
-        }
-
-        let bytes: &[u8] = bytemuck::cast_slice(data);
-
-            queue.raw().enqueue_write_buffer(
-                &mut self.inner.buf,
-                opencl3::types::CL_BLOCKING, // Blockierend für Einfachheit
-                0,
-                bytes,
-                &[],
-            )?;
-
+        let bytes = bytemuck::cast_slice(data);
+        let _evt = self.inner.overwrite(queue.raw(), bytes, CL_BLOCKING)?;
         Ok(())
     }
 
+    pub fn overwrite_non_blocking(
+        &mut self,
+        queue: &Queue,
+        data: &[T],
+    ) -> Result<()> 
+    where T: bytemuck::Pod,
+    {
+        let bytes = bytemuck::cast_slice(data);
+        let _evt = self.inner.overwrite(queue.raw(), bytes, CL_NON_BLOCKING)?;
+        Ok(())
+    }
 
-    pub fn overwrite_byte(&mut self, queue: &Queue, data: &[u8]) -> Result<()> {
+    pub fn overwrite_byte_non_blocking(&mut self, queue: &Queue, data: &[u8]) -> Result<()> {
         if data.len() != self.len * std::mem::size_of::<T>() {
             return Err(Error::BufferSizeMismatch {
                 expected: self.len * std::mem::size_of::<T>(),
                 actual: data.len(),
             });
         }
-        self.inner.overwrite_byte(queue.raw(), data)
+        self.inner.overwrite_byte(queue.raw(), data, CL_NON_BLOCKING)
+    }
+
+
+    pub fn overwrite_byte_blocking(&mut self, queue: &Queue, data: &[u8]) -> Result<()> {
+        if data.len() != self.len * std::mem::size_of::<T>() {
+            return Err(Error::BufferSizeMismatch {
+                expected: self.len * std::mem::size_of::<T>(),
+                actual: data.len(),
+            });
+        }
+        self.inner.overwrite_byte(queue.raw(), data, CL_BLOCKING)
     }
 
      pub fn enqueue_kernel<'q>(

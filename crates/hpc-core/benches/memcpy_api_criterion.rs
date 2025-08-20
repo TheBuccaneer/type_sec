@@ -33,8 +33,8 @@ fn memcpy_bench(c: &mut Criterion) {
 
         group.bench_function(format!("copy_bytes_{}", nbytes), |b| {
             b.iter(|| {
-                buf.overwrite_byte(&queue, black_box(&src)).unwrap();
-                buf.enqueue_read(&queue, black_box(&mut dst)).unwrap();
+                buf.overwrite_non_blocking(&queue, black_box(&src)).unwrap();
+                buf.enqueue_read_blocking(&queue, black_box(&mut dst)).unwrap();
             });
         });
     }

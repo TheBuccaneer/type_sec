@@ -1,0 +1,4 @@
+drückt die Performance nicht. Sie sorgt nur für Compile-Time-Sicherheit.
+Das werden die Benchmarks (ocl_mem, ocl_vecadd, ocl_events) schwarz auf weiß belegen.
+
+Willst du, dass ich dir mal eine konkrete kleine cargo bloat / cargo asm Probe im Projekt vorbereite, damit du sofort siehst, dass EventToken + State-Wrapper im Assembly verschwinden?

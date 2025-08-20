@@ -22,7 +22,7 @@ impl GpuBuffer<InFlight> {
         GpuBuffer {
             buf: self.buf,
             len_bytes: self.len_bytes,
-            _state: PhantomData,
+            _state: PhantomData::<Ready>,
         }
     }
 }

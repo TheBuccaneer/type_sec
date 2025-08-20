@@ -69,6 +69,7 @@ impl<'ctx, T, S: State> DeviceBuffer<'ctx, T, S> {
     }
 }
 
+
 impl Context {
     /// Baue einen OpenCL-Context für das erste gefundene GPU-Device + passende Queue.
     /*
@@ -222,29 +223,5 @@ impl<'ctx, T> DeviceBuffer<'ctx, T, Ready> {
 impl Queue {
     pub fn raw(&self) -> &CLQueue {
         &self.inner
-    }
-
-    // ✅ Das hinzufügen:
-    pub fn wait<T, S: State>(
-        &self,
-        event_token: EventToken,  // Dein EventToken aus ready.rs
-        buf: DeviceBuffer<'_, T, InFlight>,
-    ) -> DeviceBuffer<'_, T, Ready> {
-        // Event aus Token extrahieren und warten
-        let event = event_token.into_event();  // Oder wie auch immer dein Token funktioniert
-        
-        // Auf Event warten
-        event.wait().expect("Failed to wait for event");
-        
-        // Buffer-State von InFlight -> Ready
-        DeviceBuffer {
-            inner: GpuBuffer {
-                buf: buf.inner.buf,
-                len_bytes: buf.inner.len_bytes,
-                _state: PhantomData::<Ready>,
-            },
-            len: buf.len,
-            _marker: PhantomData,
-        }
     }
 }

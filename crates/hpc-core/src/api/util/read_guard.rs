@@ -1,8 +1,6 @@
 use crate::api::DeviceBuffer;
 use crate::buffer::state::{InFlight, Ready};
 use super::EventToken;
-use std::marker::PhantomData;
-use std::ops::{Deref, DerefMut};
 
 /// Guard that holds a mutable slice until GPU read operation completes
 #[must_use]

@@ -2,3 +2,103 @@ drückt die Performance nicht. Sie sorgt nur für Compile-Time-Sicherheit.
 Das werden die Benchmarks (ocl_mem, ocl_vecadd, ocl_events) schwarz auf weiß belegen.
 
 Willst du, dass ich dir mal eine konkrete kleine cargo bloat / cargo asm Probe im Projekt vorbereite, damit du sofort siehst, dass EventToken + State-Wrapper im Assembly verschwinden?
+
+
+Architektur & Design
+1. Lifetime Management
+
+DeviceBuffer<'ctx, T, S> hat 'ctx Lifetime, wird aber oft 'static verwendet
+Könnte vereinfacht werden oder konsistenter genutzt werden
+
+2. Error Handling
+
+Viele .map_err(Error::from)? - könnte mit From traits sauberer werden
+Buffer size mismatches haben repetitive Checks
+
+3. API Konsistenz
+
+overwrite vs overwrite_byte - unterschiedliche Namenskonventionen
+Manche Funktionen haben blocking/non_blocking suffix, andere nicht
+
+Code Quality
+4. Unnötige Imports/Dead Code
+
+use std::ops::{Deref, DerefMut}; in read_guard.rs - wird nicht genutzt
+benchmark_overwrite_non_blocking() - scheint Test-Code zu sein
+
+5. Dokumentation
+
+Viele Funktionen haben keine/wenig Dokumentation
+Type-State Pattern könnte besser erklärt werden
+
+6. Unsafe Code
+
+assume_state<Target>() Methode - könnte gefährlich sein
+FFI mit kernel.get() as *mut c_void - könnte sauberer sein
+
+Performance & Features
+7. Memory Management
+
+Keine explizite Drop-Implementierung für Ressourcen-Cleanup
+Buffer-Reuse könnte optimiert werden
+
+8. Missing Features
+
+Kein async/await Support
+Keine Buffer-Pooling
+Keine Multi-Queue Support
+
+Welche Bereiche interessieren dich am meisten? Soll ich mit den einfachen Code-Quality Fixes anfangen oder lieber architektonische Verbesserungen angehen?
+
+
+Kurz & ehrlich: Ja, der Code-Entwurf passt — mit ein paar Mini-Korrekturen, damit alles 100 % EPS-sauber ist. Hier die Go/No-Go-Liste für den Code (keine neuen Features):
+
+✅ Passt so
+
+ReadGuard (non-blocking read) hält &mut [T] bis wait() → kein vorzeitiger Zugriff möglich. Das entspricht exakt der OpenCL-Regel, dass bei CL_NON_BLOCKING der Host-Puffer nicht genutzt werden darf, bevor das Event fertig ist.
+registry.khronos.org
+CMU School of Computer Science
+
+Branding per PhantomData<&'q ()> auf dem EventToken<'q> (nicht auf GpuEventGuard) ist korrekt; so bindest du Lebensdauern ohne Referenzen.
+Rust Documentation
++1
+
+Low-Level vs. High-Level: Low-Level gibt GpuEventGuard, High-Level wrappt zu EventToken<'q>. Das spiegelt eure Spez-Schichtung und „einziger Pfad aus InFlight = wait(token, …)“.
+
+🟡 Bitte noch fixen/vereinheitlichen (klein & mechanisch)
+
+Nur diese Ctors zulassen
+In event_token.rs keinen generischen new(..) mehr anbieten (verwechselt man sonst). Stattdessen:
+
+pub(crate) fn from_guard(guard: GpuEventGuard) -> Self { ... }
+pub(crate) fn from_event(evt: Event) -> Self { Self::from_guard(GpuEventGuard::new(evt)) }
+
+
+Call-Sites dann einheitlich: EventToken::from_event(evt) bzw. EventToken::from_guard(guard). (Eure EPS-Story wird so glasklar.)
+
+into_ready nur intern
+Stelle sicher, dass DeviceBuffer<T, InFlight>::into_ready pub(crate) ist (nicht pub). Sonst umgeht man wait.
+
+Benennung der non-blocking Pfade
+Funktionen, die CL_NON_BLOCKING nutzen, konsequent *_non_blocking nennen (Write/Read/Kernel). Das senkt Fehlbedienung. (OpenCL unterscheidet semantisch scharf zwischen blocking/non-blocking.)
+registry.khronos.org
+
+GpuEventGuard::Drop (Letztsicherung)
+Optional, aber praxisfreundlich: Im Drop des Guards ein let _ = e.wait(); (best-effort), damit kein Event „offen“ bleibt, falls jemand das Token vergisst. Compile-Time erzwingt ihr das korrekte wait trotzdem über den konsumierenden EventToken. (opencl3 hat explizite wait-APIs.)
+Docs.rs
+
+wait-Fehlerbehandlung entscheiden
+Aktuell macht ihr effektiv „infallible wait“. Das ist ok (ergonomisch), aber bewusst:
+
+Entweder so lassen und im Guard/Token debug_assert!(wait.is_ok()).
+
+Oder EventToken::wait als -> Result<DeviceBuffer<T, Ready>> signieren und durchreichen.
+Beides ist legitim; wählt eine Linie und zieht sie durch. (OpenCL clWaitForEvents kann fehlschlagen.)
+registry.khronos.org
+
+From<Event> for GpuEventGuard nur als Helfer
+Kann drinbleiben (macht interne Aufrufer bequem), aber verlasst euch nach außen auf from_event/from_guard. So bleibt die API lesbar und konsistent. (Hintergrund: From<T> for U impliziert automatisch Into<U> for T.)
+Rust Documentation
++2
+Rust Documentation
++2

@@ -10,13 +10,9 @@ pub struct GpuEventGuard {
 }
 
 impl GpuEventGuard {
-    /// Create new event guard
+    #[inline]
     pub fn new(evt: Event) -> Self {
-        Self {
-            evt: Some(evt),
-            #[cfg(feature = "metrics")]
-            start_time: std::time::Instant::now(),
-        }
+        Self { evt: Some(evt) }
     }
 
     /// Consume the guard and yield the underlying Event.
@@ -32,11 +28,10 @@ impl GpuEventGuard {
 
     /// Explicitly wait for event completion (consuming).
     /// After this returns, Drop won't wait again.
-    pub fn wait(mut self) -> Result<(), opencl3::error_codes::ClError> {
-        if let Some(evt) = self.evt.take() {
-            evt.wait()
-        } else {
-            Ok(())
+    #[inline]
+    pub fn wait(mut self) {
+        if let Some(e) = self.evt.take() {
+            let _ = e.wait(); // oder e.wait()? wenn du Result propagieren willst
         }
     }
 }
@@ -48,5 +43,12 @@ impl Drop for GpuEventGuard {
             #[cfg(feature = "metrics")]
             crate::metrics::record("event_wait", self.start_time);
         }
+    }
+}
+
+impl From<Event> for GpuEventGuard {
+    #[inline]
+    fn from(evt: Event) -> Self {
+        GpuEventGuard::new(evt)
     }
 }

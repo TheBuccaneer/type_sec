@@ -1,11 +1,11 @@
+use crate::buffer::state::{Empty, Ready};
 use crate::buffer::{GpuBuffer, GpuEventGuard};
-use crate::buffer::state::{ Empty, Ready};
-use crate::error::{Result, Error};
+use crate::error::{Error, Result};
+use core::mem::size_of;
 use opencl3::command_queue::CommandQueue;
+use opencl3::memory::CL_MEM_READ_WRITE;
 use opencl3::types::CL_NON_BLOCKING;
 use opencl3::{context::Context, memory::Buffer, types::cl_mem_flags};
-use opencl3::memory::CL_MEM_READ_WRITE;
-use core::mem::size_of;
 use std::marker::PhantomData;
 
 impl GpuBuffer<Empty> {
@@ -14,13 +14,21 @@ impl GpuBuffer<Empty> {
             .checked_mul(size_of::<T>())
             .ok_or_else(|| Error::AllocationFailed("size overflow".into()))?;
 
-        let cl_buf = Buffer::<u8>::create(ctx, CL_MEM_READ_WRITE as cl_mem_flags, n_bytes, core::ptr::null_mut())
-            .map_err(Error::from)?;
+        let cl_buf = Buffer::<u8>::create(
+            ctx,
+            CL_MEM_READ_WRITE as cl_mem_flags,
+            n_bytes,
+            core::ptr::null_mut(),
+        )
+        .map_err(Error::from)?;
 
-        Ok(Self { buf: cl_buf, len_bytes: n_bytes, _state: core::marker::PhantomData })
+        Ok(Self {
+            buf: cl_buf,
+            len_bytes: n_bytes,
+            _state: core::marker::PhantomData,
+        })
     }
 }
-
 
 #[cfg(not(feature = "bloat-probe"))]
 impl GpuBuffer<Empty> {
@@ -45,8 +53,7 @@ impl GpuBuffer<Empty> {
         }
 
         // Write enqueuen
-        let evt = 
-            queue.enqueue_write_buffer(&mut self.buf, CL_NON_BLOCKING, 0, host, &[])?;
+        let evt = queue.enqueue_write_buffer(&mut self.buf, CL_NON_BLOCKING, 0, host, &[])?;
 
         Ok((
             GpuBuffer {

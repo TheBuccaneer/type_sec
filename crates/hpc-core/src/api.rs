@@ -1,14 +1,18 @@
-use crate::buffer::{GpuBuffer, state::{State, Empty, Ready, InFlight}};
+use super::EventToken;
+use crate::buffer::{
+    GpuBuffer,
+    state::{Empty, InFlight, Ready, State},
+};
+use super::ReadGuard;
+use opencl3::command_queue::CommandQueue as CLQueue;
+use opencl3::device::get_all_devices;
+use opencl3::kernel::Kernel as CLKernel;
+use opencl3::platform::get_platforms;
+use opencl3::program::Program as CLProgram;
+use opencl3::{context::Context as CLContext, device::CL_DEVICE_TYPE_GPU, types::cl_device_id};
+use opencl3::{types::CL_BLOCKING, types::CL_NON_BLOCKING, types::cl_context_properties};
 use std::marker::PhantomData;
 use std::ptr;
-use opencl3::kernel::Kernel as CLKernel;
-use opencl3::program::Program as CLProgram;
-use opencl3::{context::Context as CLContext, types::cl_device_id, device::CL_DEVICE_TYPE_GPU};
-use opencl3::{types::cl_context_properties, types::CL_BLOCKING, types::CL_NON_BLOCKING};
-use opencl3::device::get_all_devices;
-use opencl3::platform::get_platforms;
-use opencl3::command_queue::CommandQueue as CLQueue;
-use super::EventToken;
 
 pub use crate::error::{Error, Result};
 // Alias öffentlich ins Root reexportieren
@@ -20,7 +24,6 @@ pub struct DeviceBuffer<'ctx, T, S: State> {
     pub len: usize, //Anzahl Elemente
     pub _marker: std::marker::PhantomData<&'ctx T>,
 }
-
 
 #[must_use]
 #[derive(Debug)]
@@ -39,15 +42,11 @@ pub struct Queue {
 #[derive(Debug)]
 pub struct Kernel<'q> {
     inner: CLKernel,
-    program: CLProgram,
+    _program: CLProgram,
     _marker: std::marker::PhantomData<&'q ()>, // Kernel hängt an Context/Queue
 }
 
-
 //#####################OPEN CL PUBLIC################################
-
-
-
 
 /*
 Erstellt einen neuen Buffer auf Nutzerebene!
@@ -62,13 +61,12 @@ Hilfsfunktion, die intern einfach das neue Objekt weitergibt */
 impl<'ctx, T, S: State> DeviceBuffer<'ctx, T, S> {
     pub(crate) fn from_inner(inner: GpuBuffer<S>, len_elems: usize) -> Self {
         Self {
-            inner,               // der u8-Buffer
-            len: len_elems,      // Element-Länge für Nutzer
+            inner,          // der u8-Buffer
+            len: len_elems, // Element-Länge für Nutzer
             _marker: PhantomData,
         }
     }
 }
-
 
 impl Context {
     /// Baue einen OpenCL-Context für das erste gefundene GPU-Device + passende Queue.
@@ -81,7 +79,13 @@ impl Context {
         let props: &[cl_context_properties] = &[];
         let ctx = CLContext::from_devices(&devices, props, None, ptr::null_mut())?;
         let q = CLQueue::create(&ctx, devices[0], 0)?;
-        Ok((Self { inner: ctx, device: devices[0] }, Queue { inner: q }))
+        Ok((
+            Self {
+                inner: ctx,
+                device: devices[0],
+            },
+            Queue { inner: q },
+        ))
     }
 
     /// Low‑Level‑Zugriff (nur wenn unbedingt nötig)
@@ -94,12 +98,15 @@ impl Context {
     }
 }
 
-
 impl<'q> Kernel<'q> {
     pub fn from_source(ctx: &Context, src: &str, name: &str) -> Result<Self> {
         let program = CLProgram::create_and_build_from_source(ctx.raw(), src, "")?;
         let inner = CLKernel::create(&program, name)?;
-        Ok(Self { inner, program, _marker: std::marker::PhantomData })
+        Ok(Self {
+            inner,
+            program,
+            _marker: std::marker::PhantomData,
+        })
     }
 
     pub fn raw(&self) -> &CLKernel {
@@ -107,16 +114,10 @@ impl<'q> Kernel<'q> {
     }
 }
 
-
-
 //####################################INTERN#############################################
 
 impl<'ctx, T> DeviceBuffer<'ctx, T, Empty> {
-    pub fn enqueue_write(
-        self,
-        queue: &Queue,
-        data: &[T],
-    ) -> Result<DeviceBuffer<'ctx, T, Ready>>
+    pub fn enqueue_write(self, queue: &Queue, data: &[T]) -> Result<DeviceBuffer<'ctx, T, Ready>>
     where
         T: bytemuck::Pod,
     {
@@ -135,11 +136,10 @@ impl<'ctx, T> DeviceBuffer<'ctx, T, Empty> {
     }
 }
 
-
 impl<'ctx, T> DeviceBuffer<'ctx, T, Ready> {
     //############################READING FUNCTIONS
 
- pub fn enqueue_read_blocking(&self, queue: &Queue, out: &mut [T]) -> Result<()>
+    pub fn enqueue_read_blocking(&self, queue: &Queue, out: &mut [T]) -> Result<()>
     where
         T: bytemuck::Pod,
     {
@@ -152,74 +152,105 @@ impl<'ctx, T> DeviceBuffer<'ctx, T, Ready> {
 
         let bytes: &mut [u8] = bytemuck::cast_slice_mut(out);
 
-        self.inner.enqueue_read(queue.raw(), bytes, opencl3::types::CL_BLOCKING)?;
-        
+        self.inner
+            .enqueue_read(queue.raw(), bytes, opencl3::types::CL_BLOCKING)?;
 
         Ok(())
     }
 
-   pub fn enqueue_read_non_blocking<'q>(
-    self,
-    queue: &'q Queue,
-    out: &mut [T],
-) -> Result<(DeviceBuffer<'ctx, T, InFlight>, EventToken<'q>)>
-where
-    T: bytemuck::Pod,
-{
-    if out.len() != self.len {
-        return Err(Error::BufferSizeMismatch {
-            expected: self.len,
-            actual: out.len(),
-        });
+    pub fn enqueue_read_non_blocking<'q, 'a>(
+        self,
+        queue: &'q Queue,
+        out: &'a mut [T],
+    ) -> Result<(DeviceBuffer<'ctx, T, InFlight>, ReadGuard<'a, 'q, T>)>
+    where
+        T: bytemuck::Pod,
+    {
+        if out.len() != self.len {
+            return Err(Error::BufferSizeMismatch {
+                expected: self.len,
+                actual: out.len(),
+            });
+        }
+
+        let bytes: &mut [u8] = bytemuck::cast_slice_mut(out);
+
+        let (inner_inflight, evt) = self.inner.enqueue_read_consuming(
+            queue.raw(), 
+            bytes, 
+            opencl3::types::CL_NON_BLOCKING
+        )?;
+        
+        let token = EventToken::from_event(evt);
+        let guard = ReadGuard::new(out, token);
+
+        Ok((
+            DeviceBuffer::from_inner(inner_inflight, self.len),
+            guard,
+        ))
     }
 
-    let bytes: &mut [u8] = bytemuck::cast_slice_mut(out);
-
-    let evt = self.inner.enqueue_read(queue.raw(), bytes, opencl3::types::CL_NON_BLOCKING)?;
-    Ok((
-        DeviceBuffer::from_inner(
-            GpuBuffer { buf: self.inner.buf, len_bytes: self.inner.len_bytes, _state: PhantomData::<InFlight> },
-            self.len,
-        ),
-        EventToken::new(evt),
-    ))
-}
-    
-
-    pub fn overwrite_blocking(
-        &mut self,
-        queue: &Queue,
-        data: &[T],
-    ) -> Result<()> 
-    where T: bytemuck::Pod,
+    pub fn overwrite_blocking(&mut self, queue: &Queue, data: &[T]) -> Result<()>
+    where
+        T: bytemuck::Pod,
     {
         let bytes = bytemuck::cast_slice(data);
         let _evt = self.inner.overwrite(queue.raw(), bytes, CL_BLOCKING)?;
         Ok(())
     }
 
-    pub fn overwrite_non_blocking(
-        &mut self,
-        queue: &Queue,
+    pub fn overwrite_non_blocking<'q>(
+        self,
+        queue: &'q Queue,
         data: &[T],
-    ) -> Result<()> 
-    where T: bytemuck::Pod,
+    ) -> Result<(DeviceBuffer<'ctx, T, InFlight>, EventToken<'q>)>
+    where
+        T: bytemuck::Pod,
     {
         let bytes = bytemuck::cast_slice(data);
-        let _evt = self.inner.overwrite(queue.raw(), bytes, CL_NON_BLOCKING)?;
-        Ok(())
+        let (inner_inflight, evt) =
+            self.inner
+                .overwrite_consuming(queue.raw(), bytes, CL_NON_BLOCKING)?;
+        //
+
+        Ok((
+            DeviceBuffer::from_inner(inner_inflight, self.len),
+            EventToken::from_event(evt),
+        ))
     }
 
-    pub fn overwrite_byte_non_blocking(&mut self, queue: &Queue, data: &[u8]) -> Result<()> {
+    pub fn overwrite_byte_non_blocking<'q>(
+        self,
+        queue: &'q Queue,
+        data: &[u8],
+    ) -> Result<(DeviceBuffer<'ctx, T, InFlight>, EventToken<'q>)> {
         if data.len() != self.len * std::mem::size_of::<T>() {
             return Err(Error::BufferSizeMismatch {
                 expected: self.len * std::mem::size_of::<T>(),
                 actual: data.len(),
             });
         }
-        self.inner.overwrite_byte(queue.raw(), data, CL_NON_BLOCKING)
+        let (inner_inflight, evt) = self.inner.overwrite_byte_consuming(
+            queue.raw(),
+            data, // ← direkt data, ohne cast
+            CL_NON_BLOCKING,
+        )?;
+
+        Ok((
+            DeviceBuffer::from_inner(inner_inflight, self.len),
+            EventToken::from_event(evt),
+        ))
     }
 
+    pub fn benchmark_overwrite_non_blocking(&mut self, queue: &Queue, data: &[T]) -> Result<()>
+    where
+        T: bytemuck::Pod,
+    {
+        let bytes = bytemuck::cast_slice(data);
+        let _evt = self.inner.overwrite(queue.raw(), bytes, CL_NON_BLOCKING)?;
+
+        Ok(())
+    }
 
     pub fn overwrite_byte_blocking(&mut self, queue: &Queue, data: &[u8]) -> Result<()> {
         if data.len() != self.len * std::mem::size_of::<T>() {
@@ -228,17 +259,19 @@ where
                 actual: data.len(),
             });
         }
-        self.inner.overwrite_byte(queue.raw(), data, CL_BLOCKING)
+        self.inner.overwrite_byte(queue.raw(), data, CL_BLOCKING)?;
+        Ok(())
     }
 
-     pub fn enqueue_kernel<'q>(
+    pub fn enqueue_kernel<'q>(
         self,
         queue: &'q Queue,
         kernel: &Kernel<'q>,
         global_work_size: usize,
     ) -> Result<(DeviceBuffer<'ctx, T, InFlight>, EventToken<'q>)> {
         let (inner_inflight, evt) =
-            self.inner.enqueue_kernel(queue.raw(), kernel.raw(), global_work_size)?;
+            self.inner
+                .enqueue_kernel(queue.raw(), kernel.raw(), global_work_size)?;
 
         Ok((
             DeviceBuffer {
@@ -247,7 +280,7 @@ where
                 _marker: PhantomData,
             },
             //TO_DO - IMPLEMENT ID
-            EventToken::new(evt), // dein Token-Wrapper
+            EventToken::from_event(evt), // dein Token-Wrapper
         ))
     }
 }
@@ -255,5 +288,18 @@ where
 impl Queue {
     pub fn raw(&self) -> &CLQueue {
         &self.inner
+    }
+}
+
+impl<'ctx, T> DeviceBuffer<'ctx, T, InFlight> {
+    pub fn into_ready(self) -> DeviceBuffer<'ctx, T, Ready> {
+        DeviceBuffer::from_inner(
+            GpuBuffer {
+                buf: self.inner.buf,
+                len_bytes: self.inner.len_bytes,
+                _state: PhantomData::<Ready>,
+            },
+            self.len,
+        )
     }
 }

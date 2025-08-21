@@ -7,19 +7,16 @@ pub mod state;
 pub use state::{InFlight, Ready, State};
 
 mod empty;
-mod ready;
 mod inflight;
-
+mod ready;
 
 use opencl3::memory::Buffer;
-
 
 #[cfg(feature = "metrics")]
 use std::time::Instant;
 
 #[cfg(feature = "metrics")]
 use std::sync::atomic::Ordering;
-
 
 #[cfg(feature = "metrics")]
 use crate::metrics::{RunLog, log_run};
@@ -37,9 +34,6 @@ pub struct GpuBuffer<S: State> {
     pub len_bytes: usize,
     pub _state: core::marker::PhantomData<S>,
 }
-
-
-
 
 // Common methods for all states
 impl<S: State> GpuBuffer<S> {
@@ -64,11 +58,7 @@ impl<S: State> GpuBuffer<S> {
     pub fn len_bytes(&self) -> usize {
         self.len_bytes
     }
-
-
 }
-
-
 
 impl<S: State> GpuBuffer<S> {
     #[inline]

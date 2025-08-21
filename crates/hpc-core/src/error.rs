@@ -1,6 +1,5 @@
 use opencl3::error_codes::ClError;
 
-
 #[derive(Debug)]
 pub enum Error {
     OpenCl(ClError),

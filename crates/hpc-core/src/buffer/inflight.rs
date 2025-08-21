@@ -1,10 +1,8 @@
 use super::GpuBuffer;
-use crate::buffer::state::{Ready, InFlight};
-use std::{marker::PhantomData};
 use crate::buffer::GpuEventGuard;
-use opencl3::{
-    event::Event,
-};
+use crate::buffer::state::{InFlight, Ready};
+use opencl3::event::Event;
+use std::marker::PhantomData;
 
 // InFlight state implementation
 impl GpuBuffer<InFlight> {

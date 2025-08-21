@@ -4,7 +4,7 @@ use super::DeviceBuffer;
 use crate::buffer::state::{Empty, Ready};
 use crate::error::{Error, Result};
 
-use crate::api::opencl::Queue;
+use crate::api::Queue;
 
 impl<'brand, T> DeviceBuffer<'brand, T, Empty> {
     pub fn enqueue_write(

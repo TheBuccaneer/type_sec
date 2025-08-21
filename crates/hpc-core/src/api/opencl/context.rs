@@ -9,7 +9,7 @@ use opencl3::{
 };
 
 use crate::api::DeviceBuffer;
-use crate::api::opencl::Queue;
+use crate::api::Queue;
 use crate::buffer::state::Empty;
 use crate::error::Result;
 use std::marker::PhantomData;
@@ -45,7 +45,7 @@ impl<'brand> Context<'brand> {
         })
     }
 
-    pub fn create_queue(&self) -> Result<Queue<'brand>> {
+    pub fn create_queue(&'brand self) -> Result<Queue<'brand>> {
         let q = CLQueue::create(&self.inner, self.device, 0)?;
         Ok(Queue {
             inner: q,
@@ -53,7 +53,7 @@ impl<'brand> Context<'brand> {
         })
     }
 
-    pub fn create_buffer<T>(&self, n_elems: usize) -> Result<DeviceBuffer<'brand, T, Empty>> {
+    pub fn create_buffer<T>(&'brand self, n_elems: usize) -> Result<DeviceBuffer<'brand, T, Empty>> {
         // Delegiere an die bestehende create_buffer Funktion, aber mit branded DeviceBuffer
         let inner: crate::buffer::GpuBuffer<Empty> =
             crate::buffer::GpuBuffer::<Empty>::create_uninit_elems::<T>(&self.inner, n_elems)?;

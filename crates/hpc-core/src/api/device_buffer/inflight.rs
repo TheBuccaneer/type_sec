@@ -1,15 +1,15 @@
 // src/api/inflight.rs
 
-use crate::buffer::state::{InFlight, Ready};
 use super::DeviceBuffer;
+use crate::buffer::state::{InFlight, Ready};
 use std::marker::PhantomData;
 
 //=============================================================================
-// INFLIGHT STATE IMPLEMENTATIONS  
+// INFLIGHT STATE IMPLEMENTATIONS
 //=============================================================================
 
-impl<'ctx, T> DeviceBuffer<'ctx, T, InFlight> {
-    pub fn into_ready(self) -> DeviceBuffer<'ctx, T, Ready> {
+impl<'brand, T> DeviceBuffer<'brand, T, InFlight> {
+    pub fn into_ready(self) -> DeviceBuffer<'brand, T, Ready> {
         DeviceBuffer::from_inner(
             crate::buffer::GpuBuffer {
                 buf: self.inner.buf,

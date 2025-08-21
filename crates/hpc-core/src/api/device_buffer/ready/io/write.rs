@@ -1,17 +1,17 @@
 // src/api/device_buffer/ready/io/write.rs
 
-use crate::buffer::state::{Ready, InFlight};
-use crate::error::{Error, Result};
 use crate::EventToken;
 use crate::api::{DeviceBuffer, Queue};
+use crate::buffer::state::{InFlight, Ready};
+use crate::error::{Error, Result};
 use opencl3::types::{CL_BLOCKING, CL_NON_BLOCKING};
 
 //=============================================================================
 // WRITE OPERATIONS
 //=============================================================================
 
-impl<'ctx, T> DeviceBuffer<'ctx, T, Ready> {
-    pub fn overwrite_blocking(&mut self, queue: &Queue, data: &[T]) -> Result<()>
+impl<'brand, T> DeviceBuffer<'brand, T, Ready> {
+    pub fn overwrite_blocking(&mut self, queue: &Queue<'brand>, data: &[T]) -> Result<()>
     where
         T: bytemuck::Pod,
     {
@@ -20,11 +20,11 @@ impl<'ctx, T> DeviceBuffer<'ctx, T, Ready> {
         Ok(())
     }
 
-        pub fn overwrite_non_blocking<'q>(
+    pub fn overwrite_non_blocking(
         self,
-        queue: &'q Queue,
+        queue: &Queue<'brand>,
         data: &[T],
-    ) -> Result<(DeviceBuffer<'ctx, T, InFlight>, EventToken<'q>)>
+    ) -> Result<(DeviceBuffer<'brand, T, InFlight>, EventToken<'brand>)>
     where
         T: bytemuck::Pod,
     {
@@ -40,11 +40,11 @@ impl<'ctx, T> DeviceBuffer<'ctx, T, Ready> {
         ))
     }
 
-    pub fn overwrite_byte_non_blocking<'q>(
+    pub fn overwrite_byte_non_blocking(
         self,
-        queue: &'q Queue,
+        queue: &Queue<'brand>,
         data: &[u8],
-    ) -> Result<(DeviceBuffer<'ctx, T, InFlight>, EventToken<'q>)> {
+    ) -> Result<(DeviceBuffer<'brand, T, InFlight>, EventToken<'brand>)> {
         if data.len() != self.len * std::mem::size_of::<T>() {
             return Err(Error::BufferSizeMismatch {
                 expected: self.len * std::mem::size_of::<T>(),
@@ -63,7 +63,7 @@ impl<'ctx, T> DeviceBuffer<'ctx, T, Ready> {
         ))
     }
 
-    pub fn benchmark_overwrite_non_blocking(&mut self, queue: &Queue, data: &[T]) -> Result<()>
+    pub fn benchmark_overwrite_non_blocking(&mut self, queue: &Queue<'brand>, data: &[T]) -> Result<()>
     where
         T: bytemuck::Pod,
     {
@@ -73,9 +73,7 @@ impl<'ctx, T> DeviceBuffer<'ctx, T, Ready> {
         Ok(())
     }
 
-    
-
-    pub fn overwrite_byte_blocking(&mut self, queue: &Queue, data: &[u8]) -> Result<()> {
+    pub fn overwrite_byte_blocking(&mut self, queue: &Queue<'brand>, data: &[u8]) -> Result<()> {
         if data.len() != self.len * std::mem::size_of::<T>() {
             return Err(Error::BufferSizeMismatch {
                 expected: self.len * std::mem::size_of::<T>(),

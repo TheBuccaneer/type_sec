@@ -1,14 +1,17 @@
 // src/api/empty.rs
 
+use super::DeviceBuffer;
 use crate::buffer::state::{Empty, Ready};
 use crate::error::{Error, Result};
-use super::{DeviceBuffer};
 
-use crate::api::opencl::Queue; 
+use crate::api::opencl::Queue;
 
-
-impl<'ctx, T> DeviceBuffer<'ctx, T, Empty> {
-    pub fn enqueue_write(self, queue: &Queue, data: &[T]) -> Result<DeviceBuffer<'ctx, T, Ready>>
+impl<'brand, T> DeviceBuffer<'brand, T, Empty> {
+    pub fn enqueue_write(
+        self,
+        queue: &Queue<'brand>,
+        data: &[T],
+    ) -> Result<DeviceBuffer<'brand, T, Ready>>
     where
         T: bytemuck::Pod,
     {
@@ -26,5 +29,3 @@ impl<'ctx, T> DeviceBuffer<'ctx, T, Empty> {
         Ok(DeviceBuffer::from_inner(inner_ready, self.len))
     }
 }
-
-

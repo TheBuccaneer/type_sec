@@ -3,15 +3,17 @@
 use opencl3::{
     command_queue::CommandQueue as CLQueue,
     context::Context as CLContext,
-    device::{get_all_devices, CL_DEVICE_TYPE_GPU},
+    device::{CL_DEVICE_TYPE_GPU, get_all_devices},
     platform::get_platforms,
     types::{cl_context_properties, cl_device_id},
 };
 
-use crate::api::opencl::Queue; 
-use std::ptr;
-
+use crate::api::DeviceBuffer;
+use crate::api::opencl::Queue;
+use crate::buffer::state::Empty;
 use crate::error::Result;
+use std::marker::PhantomData;
+use std::ptr;
 
 //=============================================================================
 // CONTEXT
@@ -19,30 +21,44 @@ use crate::error::Result;
 
 #[must_use]
 #[derive(Debug)]
-pub struct Context {
+pub struct Context<'brand> {
     inner: CLContext,
     device: cl_device_id,
+    _brand: PhantomData<&'brand ()>,
 }
 
-
-impl Context {
+impl<'brand> Context<'brand> {
     /// Baue einen OpenCL-Context für das erste gefundene GPU-Device + passende Queue.
     /*
     possible error: Assumption: 1 platform with 1 device -> NVIDIA
     */
-    pub fn new_first_gpu() -> Result<(Self, Queue)> {
+    pub fn create_context() -> Result<Self> {
         let _platforms = get_platforms()?; // aktuell ungenutzt, später ggf. filtern
         let devices: Vec<cl_device_id> = get_all_devices(CL_DEVICE_TYPE_GPU)?;
         let props: &[cl_context_properties] = &[];
         let ctx = CLContext::from_devices(&devices, props, None, ptr::null_mut())?;
-        let q = CLQueue::create(&ctx, devices[0], 0)?;
-        Ok((
-            Self {
-                inner: ctx,
-                device: devices[0],
-            },
-            Queue { inner: q },
-        ))
+
+        Ok(Self {
+            inner: ctx,
+            device: devices[0],
+            _brand: PhantomData,
+        })
+    }
+
+    pub fn create_queue(&self) -> Result<Queue<'brand>> {
+        let q = CLQueue::create(&self.inner, self.device, 0)?;
+        Ok(Queue {
+            inner: q,
+            _brand: PhantomData,
+        })
+    }
+
+    pub fn create_buffer<T>(&self, n_elems: usize) -> Result<DeviceBuffer<'brand, T, Empty>> {
+        // Delegiere an die bestehende create_buffer Funktion, aber mit branded DeviceBuffer
+        let inner: crate::buffer::GpuBuffer<Empty> =
+            crate::buffer::GpuBuffer::<Empty>::create_uninit_elems::<T>(&self.inner, n_elems)?;
+
+        Ok(DeviceBuffer::from_inner(inner, n_elems))
     }
 
     /// Low‑Level‑Zugriff (nur wenn unbedingt nötig)

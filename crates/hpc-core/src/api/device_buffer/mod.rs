@@ -1,26 +1,26 @@
 // src/api/device_buffer/mod.rs
 
-use crate::buffer::{GpuBuffer, state::{State}};
+use crate::buffer::{GpuBuffer, state::State};
 use std::marker::PhantomData;
 
 // State-specific implementations
 mod empty;
-mod ready;
 mod inflight;
+mod ready;
 
 //=============================================================================
 // STRUCT DEFINITION
 //=============================================================================
 
 /// High-Level typisierter Buffer. Delegiert an den GPUBuffer
-/// 
+///
 /// User API: Buffers können erstellt, gelesen, geschrieben und für Kernels genutzt werden.
 /// Die interne Struktur ist versteckt - Type-State Pattern sorgt für Compile-Time Safety.
 #[derive(Debug)]
-pub struct DeviceBuffer<'ctx, T, S: State> {
-    pub(crate) inner: GpuBuffer<S>,     
-    pub(crate) len: usize,                 
-    pub(crate) _marker: PhantomData<&'ctx T>, 
+pub struct DeviceBuffer<'brand, T, S: State> {
+    pub(crate) inner: GpuBuffer<S>,
+    pub(crate) len: usize,
+    pub(crate) _marker: PhantomData<&'brand T>,
 }
 
 //=============================================================================

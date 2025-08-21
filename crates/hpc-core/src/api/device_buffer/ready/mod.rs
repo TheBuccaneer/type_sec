@@ -1,10 +1,9 @@
 // src/api/device_buffer/ready/mod.rs
 
-use crate::buffer::state::{Ready, InFlight};
-use crate::error::Result;
 use crate::EventToken;
-use crate::api::{DeviceBuffer, Queue, Kernel};
-use std::marker::PhantomData;
+use crate::api::{DeviceBuffer, Kernel, Queue};
+use crate::buffer::state::{InFlight, Ready};
+use crate::error::Result;
 
 // Import I/O implementations
 mod io;
@@ -13,23 +12,19 @@ mod io;
 // COMPUTE OPERATIONS
 //=============================================================================
 
-impl<'ctx, T> DeviceBuffer<'ctx, T, Ready> {
-    pub fn enqueue_kernel<'q>(
+impl<'brand, T> DeviceBuffer<'brand, T, Ready> {
+    pub fn enqueue_kernel(
         self,
-        queue: &'q Queue,
-        kernel: &Kernel<'q>,
+        queue: &'brand Queue,
+        kernel: &Kernel<'brand>,
         global_work_size: usize,
-    ) -> Result<(DeviceBuffer<'ctx, T, InFlight>, EventToken<'q>)> {
+    ) -> Result<(DeviceBuffer<'brand, T, InFlight>, EventToken<'brand>)> {
         let (inner_inflight, evt) =
             self.inner
                 .enqueue_kernel(queue.raw(), kernel.raw(), global_work_size)?;
 
         Ok((
-            DeviceBuffer {
-                inner: inner_inflight,
-                len: self.len,
-                _marker: PhantomData,
-            },
+            DeviceBuffer::from_inner(inner_inflight, self.len),
             EventToken::from_event(evt),
         ))
     }

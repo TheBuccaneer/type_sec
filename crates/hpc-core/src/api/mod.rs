@@ -6,12 +6,10 @@ pub use crate::error::{Error, Result};
 // Submodule
 mod device_buffer;
 mod opencl;
-mod functions;
 
 // Re-exports der Submodule
 pub use device_buffer::DeviceBuffer;
-pub use opencl::{Context, Queue, Kernel};
-pub use functions::create_buffer;
+pub use opencl::{Context, Kernel, Queue};
 
 mod util;
 pub use util::{EventToken, ReadGuard};

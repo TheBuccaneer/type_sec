@@ -1,5 +1,5 @@
 //! HPC Core Library
-//! 
+//!
 //! Provides both low-level and high-level APIs for GPU computing with OpenCL.
 
 //=============================================================================
@@ -19,14 +19,17 @@ pub mod api;
 
 // Re-export the main high-level API for easy access
 pub use api::{
+    Context,
     // Core types
-    DeviceBuffer, Context, Queue, Kernel,
-    // Utilities  
-    EventToken, ReadGuard,
-    // Functions
-    create_buffer,
+    DeviceBuffer,
     // Error handling
-    Error, Result,
+    Error,
+    // Utilities
+    EventToken,
+    Kernel,
+    Queue,
+    ReadGuard,
+    Result,
 };
 
 //=============================================================================

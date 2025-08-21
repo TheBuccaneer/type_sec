@@ -7,12 +7,12 @@ use opencl3::event::Event;
 /// High-Level EventToken.
 /// - #[must_use], nicht Copy
 /// - einzig erlaubter Pfad: wait() konsumiert Token + InFlight
-pub struct EventToken<'q> {
+pub struct EventToken<'brand> {
     inner: GpuEventGuard,
-    _brand: PhantomData<&'q ()>,
+    _brand: PhantomData<&'brand ()>,
 }
 
-impl<'q> EventToken<'q> {
+impl<'brand> EventToken<'brand> {
     /// Erzeugt ein Token direkt aus einem Guard (Low-Level).
     pub(crate) fn from_guard(guard: GpuEventGuard) -> Self {
         Self {
@@ -28,7 +28,7 @@ impl<'q> EventToken<'q> {
 
     /// Konsumierender Übergang: einzig erlaubter Pfad von InFlight → Ready.
     #[must_use]
-    pub fn wait<T>(self, buf: DeviceBuffer<T, InFlight>) -> DeviceBuffer<T, Ready> {
+    pub fn wait<T>(self, buf: DeviceBuffer<'brand, T, InFlight>) -> DeviceBuffer<'brand, T, Ready>{
         self.inner.wait();
         buf.into_ready()
     }

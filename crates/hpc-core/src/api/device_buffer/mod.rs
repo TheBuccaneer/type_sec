@@ -20,19 +20,18 @@ mod ready;
 pub struct DeviceBuffer<'brand, T, S: State> {
     pub(crate) inner: GpuBuffer<S>,
     pub(crate) len: usize,
-    pub(crate) _marker: PhantomData<&'brand T>,
+    // Zwei separate Marker:
+    pub(crate) _brand: PhantomData<fn(&'brand ()) -> &'brand ()>, // invariant für Context
+    pub(crate) _type: PhantomData<T>, // kovariant für Typ (das ist OK)
 }
 
-//=============================================================================
-// SHARED IMPLEMENTATIONS
-//=============================================================================
 impl<'ctx, T, S: State> DeviceBuffer<'ctx, T, S> {
-    /// Hilfsfunktion, die intern einfach das neue Objekt weitergibt
     pub(crate) fn from_inner(inner: GpuBuffer<S>, len_elems: usize) -> Self {
         Self {
-            inner,          // der u8-Buffer
-            len: len_elems, // Element-Länge für Nutzer
-            _marker: PhantomData,
+            inner,
+            len: len_elems,
+            _brand: PhantomData,  // ← für Context-Branding
+            _type: PhantomData,   // ← für Typ-Parameter
         }
     }
 }

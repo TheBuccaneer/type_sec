@@ -10,7 +10,7 @@ use std::marker::PhantomData;
 #[derive(Debug)]
 pub struct Queue<'brand> {
     pub(crate) inner: CLQueue,
-    pub(crate) _brand: PhantomData<&'brand ()>, // Branding Lifetime
+    pub(crate) _brand: PhantomData<fn(&'brand ()) -> &'brand ()>, // Branding Lifetime
 }
 
 impl<'brand> Queue<'brand> {

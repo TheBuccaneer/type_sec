@@ -13,9 +13,9 @@ fn main() {
     let (inflight, evt) = buf.overwrite_non_blocking(&queue, &[1u8; 16]).unwrap();
     
     // Erster Wait (legal)
-    let ready = evt.wait(inflight).unwrap();
+    let ready = evt.wait(inflight);
     
     // Zweiter Wait (illegal, evt wurde schon konsumiert)
-    let _illegal = evt.wait(ready).unwrap();
+    let _illegal = evt.wait(ready);
     //             ^^^ use of moved value `evt`
 }

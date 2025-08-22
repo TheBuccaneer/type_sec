@@ -1,19 +1,29 @@
-// crates/hpc-core/tests/compile_fail/api_cross_context.rs
+// tests/compile_fail/api_cross_context.rs
 use hpc_core::*;
 
 fn main() {
-    // Zwei verschiedene Contexts
-    let ctx1 = Context::create_context().unwrap();
-    let ctx2 = Context::create_context().unwrap();
 
+    let anchor1 = ();
+    let anchor2 = ();
+    // Zwei verschiedene Contexts
+    let ctx1 = Context::create_context_with_brand(&anchor1).unwrap();
+    let ctx2 = Context::create_context_with_brand(&anchor2).unwrap();
+
+    // Buffer und Queue für jeweiligen Context anlegen
+    let buf1 = ctx1.create_buffer::<u8>(16).unwrap();
     let queue1 = ctx1.create_queue().unwrap();
     let queue2 = ctx2.create_queue().unwrap();
 
-    // Buffer hängt an ctx1 → Ready
-    let buf1 = ctx1
-        .create_buffer::<u8>(16).unwrap()
-        .enqueue_write(&queue1, &[0u8; 16]).unwrap();
+    // Buffer beschreiben → READY-Buffer!
+    let buf1_ready = buf1.enqueue_write(&queue1, &[0u8; 16]).unwrap();
 
-    // illegal: Buffer (ctx1) mit Queue (ctx2) verwenden
-    let (_inflight, _evt) = buf1.enqueue_kernel(&queue2, &unimplemented!(), 16).unwrap();
+    // Kernel im selben Context wie Buffer
+    let kernel = Kernel::from_source(
+        &ctx1,
+        "kernel void dummy(__global uchar* buf) {}",
+        "dummy"
+    ).unwrap();
+
+    // Illegal: Buffer aus ctx1, Queue aus ctx2 verwenden!
+    buf1_ready.enqueue_kernel(&queue2, &kernel, 16).unwrap();
 }

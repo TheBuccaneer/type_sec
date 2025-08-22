@@ -29,12 +29,11 @@ fn memcpy_bench(c: &mut Criterion) {
         let mut dst: Vec<u8> = vec![0; nbytes];
 
         // Buffer einmal anlegen und initialisieren
-        
+        let buf = ctx.create_buffer::<u8>(nbytes).unwrap(); // Empty
+        let mut buf = buf.enqueue_write(&queue, &src).unwrap(); // Ready
 
         group.bench_function(format!("copy_bytes_{}", nbytes), |b| {
             b.iter(|| {
-                let buf = ctx.create_buffer::<u8>(nbytes).unwrap(); // Empty
-                let mut buf = buf.enqueue_write(&queue, &src).unwrap(); // Ready
                 buf.overwrite_blocking(&queue, black_box(&src)).unwrap();  // &mut self
                 buf.enqueue_read_blocking(&queue, black_box(&mut dst)).unwrap();
             });
@@ -57,14 +56,13 @@ fn memcpy_opencl3_bench(c: &mut Criterion) {
 
         let src: Vec<u8> = vec![1; nbytes];
         let mut dst: Vec<u8> = vec![0; src.len()];
-
+let mut buf: CLBuffer<u8> = 
+            CLBuffer::create(&ctx, CL_MEM_READ_WRITE, src.len(), ptr::null_mut()).unwrap();
 
 
         group.bench_function(format!("copy_only_{}", nbytes), |b| {
             b.iter(|| {
 
-                    let mut buf: CLBuffer<u8> = 
-            CLBuffer::create(&ctx, CL_MEM_READ_WRITE, src.len(), ptr::null_mut()).unwrap();
                     queue.enqueue_write_buffer(&mut buf, CL_BLOCKING, 0, black_box(&src), &[])
                          .unwrap();
                     queue.enqueue_read_buffer(&buf, CL_BLOCKING, 0, black_box(&mut dst), &[])

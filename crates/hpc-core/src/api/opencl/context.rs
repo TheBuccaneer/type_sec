@@ -24,7 +24,7 @@ use std::ptr;
 pub struct Context<'brand> {
     inner: CLContext,
     device: cl_device_id,
-    _brand: PhantomData<&'brand ()>,
+    _brand: PhantomData<fn(&'brand ()) -> &'brand ()>,
 }
 
 impl<'brand> Context<'brand> {

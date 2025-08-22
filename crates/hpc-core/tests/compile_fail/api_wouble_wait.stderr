@@ -1,11 +1,15 @@
-error[E0599]: no method named `unwrap` found for struct `DeviceBuffer` in the current scope
-  --> tests/compile_fail/api_wouble_wait.rs:16:36
+error[E0308]: mismatched types
+  --> tests/compile_fail/api_wouble_wait.rs:19:29
    |
-16 |     let ready = evt.wait(inflight).unwrap();
-   |                                    ^^^^^^ method not found in `DeviceBuffer<'_, u8, hpc_core::Ready>`
-
-error[E0599]: no method named `unwrap` found for struct `DeviceBuffer` in the current scope
-  --> tests/compile_fail/api_wouble_wait.rs:19:36
+19 |     let _illegal = evt.wait(ready);
+   |                        ---- ^^^^^ expected `DeviceBuffer<'_, _, InFlight>`, found `DeviceBuffer<'_, u8, Ready>`
+   |                        |
+   |                        arguments to this method are incorrect
    |
-19 |     let _illegal = evt.wait(ready).unwrap();
-   |                                    ^^^^^^ method not found in `DeviceBuffer<'_, _, hpc_core::Ready>`
+   = note: expected struct `DeviceBuffer<'_, _, InFlight>`
+              found struct `DeviceBuffer<'_, u8, hpc_core::Ready>`
+note: method defined here
+  --> src/api/util/event_token.rs
+   |
+   |     pub fn wait<T>(
+   |            ^^^^

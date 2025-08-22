@@ -69,4 +69,6 @@ impl<'brand> Context<'brand> {
     pub fn device_id(&self) -> cl_device_id {
         self.device
     }
+
 }
+

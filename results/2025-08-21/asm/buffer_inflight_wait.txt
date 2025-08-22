@@ -1,0 +1,35 @@
+.section ".text.hpc_core::buffer::inflight::<impl hpc_core::buffer::GpuBuffer<hpc_core::buffer::state::InFlight>>::wait","ax",@progbits
+	.globl	hpc_core::buffer::inflight::<impl hpc_core::buffer::GpuBuffer<hpc_core::buffer::state::InFlight>>::wait
+	.p2align	4
+.type	hpc_core::buffer::inflight::<impl hpc_core::buffer::GpuBuffer<hpc_core::buffer::state::InFlight>>::wait,@function
+hpc_core::buffer::inflight::<impl hpc_core::buffer::GpuBuffer<hpc_core::buffer::state::InFlight>>::wait:
+		// crates/hpc-core/src/buffer/inflight.rs:12
+		pub fn wait(self, evt: Event) -> GpuBuffer<Ready> {
+	.cfi_startproc
+	push r14
+	.cfi_def_cfa_offset 16
+	push rbx
+	.cfi_def_cfa_offset 24
+	sub rsp, 24
+	.cfi_def_cfa_offset 48
+	.cfi_offset rbx, -24
+	.cfi_offset r14, -16
+	mov rbx, rsi
+	mov r14, rdi
+		// crates/hpc-core/src/buffer/guard.rs:15
+		Self { evt: Some(evt) }
+	mov qword ptr [rsp + 8], 1
+	mov qword ptr [rsp + 16], rdx
+	lea rdi, [rsp + 8]
+		// crates/hpc-core/src/buffer/inflight.rs:25
+		}
+	call core::ptr::drop_in_place<hpc_core::buffer::guard::GpuEventGuard>
+	mov rax, r14
+	mov rdx, rbx
+	add rsp, 24
+	.cfi_def_cfa_offset 24
+	pop rbx
+	.cfi_def_cfa_offset 16
+	pop r14
+	.cfi_def_cfa_offset 8
+	ret

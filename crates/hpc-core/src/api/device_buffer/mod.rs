@@ -26,7 +26,6 @@ pub struct DeviceBuffer<'brand, T, S: State> {
 //=============================================================================
 // SHARED IMPLEMENTATIONS
 //=============================================================================
-
 impl<'ctx, T, S: State> DeviceBuffer<'ctx, T, S> {
     /// Hilfsfunktion, die intern einfach das neue Objekt weitergibt
     pub(crate) fn from_inner(inner: GpuBuffer<S>, len_elems: usize) -> Self {

@@ -4,9 +4,13 @@ members = [
 resolver = "2" 
 
 [profile.release]
-opt-level        = 3
-lto              = "fat"
-codegen-units    = 1
-panic            = "abort"
-overflow-checks  = false
-debug-assertions = false
+codegen-units = 1
+lto = "thin"
+
+
+#[profile.release]
+#codegen-units = 1
+#lto = "thin"
+#debug = false     # für bloat ok; für asm-Spotchecks später ggf. true
+#strip = "symbols" # (ab Rust 1.80) kleinere Binaries
+#panic = "abort"   # weniger Backtrace-/Unwind-Ballast

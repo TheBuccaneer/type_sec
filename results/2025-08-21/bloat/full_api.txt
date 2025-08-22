@@ -1,0 +1,527 @@
+File  .text     Size        Crate Name
+0.4%   6.2%  15.9KiB          std std::backtrace_rs::symbolize::gimli::Cache::with_global
+0.3%   4.9%  12.7KiB          std std::backtrace_rs::symbolize::gimli::Context::new
+0.3%   3.7%   9.6KiB          std core::cell::once::OnceCell<T>::try_init
+0.3%   3.7%   9.5KiB          std gimli::read::dwarf::Unit<R>::new
+0.2%   2.5%   6.6KiB          std miniz_oxide::inflate::core::decompress
+0.1%   2.0%   5.1KiB          std gimli::read::unit::parse_attribute
+0.1%   1.7%   4.4KiB          std addr2line::function::Function<R>::parse_children
+0.1%   1.5%   3.8KiB          std core::cell::once::OnceCell<T>::try_init
+0.1%   1.4%   3.7KiB          std gimli::read::rnglists::RngListIter<R>::next
+0.1%   1.4%   3.6KiB          std std::sys::pal::unix::stack_overflow::thread_info::set_current_info
+0.1%   1.2%   3.1KiB          std std::backtrace_rs::symbolize::gimli::elf::<impl std::backtrace_rs::symbolize::gimli::Mapping>::new_debug
+0.1%   1.1%   2.8KiB          std rustc_demangle::demangle
+0.1%   1.0%   2.7KiB          std <rustc_demangle::legacy::Demangle as core::fmt::Display>::fmt
+0.1%   1.0%   2.7KiB          std core::slice::sort::stable::quicksort::quicksort
+0.1%   1.0%   2.6KiB          std core::slice::sort::stable::quicksort::quicksort
+0.1%   1.0%   2.6KiB          std gimli::read::index::UnitIndex<R>::parse
+0.1%   1.0%   2.5KiB          std core::slice::sort::stable::quicksort::quicksort
+0.1%   1.0%   2.5KiB          std gimli::read::line::parse_attribute
+0.1%   1.0%   2.5KiB          std core::slice::sort::stable::quicksort::quicksort
+0.1%   1.0%   2.5KiB          std core::slice::sort::stable::quicksort::quicksort
+0.1%   0.8%   2.2KiB          std core::cell::once::OnceCell<T>::try_init
+0.1%   0.8%   2.2KiB          std alloc::collections::btree::remove::<impl alloc::collections::btree::node::Handle<alloc::collections::btree::node::NodeRef<alloc::collections::btree::node::marke...
+0.1%   0.8%   2.1KiB          std <&str as core::str::pattern::Pattern>::is_contained_in
+0.1%   0.8%   2.0KiB          std <std::backtrace_rs::symbolize::gimli::parse_running_mmaps::MapsEntry as core::str::traits::FromStr>::from_str
+0.1%   0.7%   1.9KiB          std std::rt::lang_start_internal
+0.0%   0.7%   1.8KiB          std std::backtrace_rs::symbolize::gimli::elf::Object::parse
+0.0%   0.7%   1.7KiB          std core::slice::sort::stable::drift::sort
+0.0%   0.7%   1.7KiB          std core::slice::sort::stable::drift::sort
+0.0%   0.7%   1.7KiB          std rustc_demangle::v0::Printer::print_path
+0.0%   0.7%   1.7KiB          std core::slice::sort::stable::drift::sort
+0.0%   0.6%   1.7KiB          std core::slice::sort::stable::drift::sort
+0.0%   0.6%   1.7KiB          std core::slice::sort::stable::drift::sort
+0.0%   0.6%   1.6KiB          std rustc_demangle::v0::Printer::print_const
+0.0%   0.6%   1.5KiB          std gimli::read::unit::DebugInfoUnitHeadersIter<R>::next
+0.0%   0.6%   1.5KiB          std rust_eh_personality
+0.0%   0.6%   1.4KiB          std core::str::count::do_count_chars
+0.0%   0.5%   1.4KiB          std addr2line::lookup::LoopingLookup<T,L,F>::new_lookup
+0.0%   0.5%   1.4KiB          std core::slice::sort::shared::smallsort::small_sort_general
+0.0%   0.5%   1.3KiB          std gimli::read::unit::Attribute<R>::value
+0.0%   0.5%   1.3KiB          std gimli::read::unit::skip_attributes
+0.0%   0.5%   1.3KiB          std core::str::pattern::StrSearcher::new
+0.0%   0.5%   1.3KiB          std std::sys::pal::unix::stack_overflow::imp::drop_handler
+0.0%   0.5%   1.3KiB          std core::fmt::Formatter::pad_integral
+0.0%   0.5%   1.3KiB          std rustc_demangle::v0::Printer::print_type
+0.0%   0.5%   1.2KiB          std addr2line::unit::ResUnit<R>::find_function_or_location
+0.0%   0.4%   1.1KiB          std addr2line::line::render_file
+0.0%   0.4%   1.1KiB          std core::slice::sort::unstable::quicksort::quicksort
+0.0%   0.4%   1.1KiB          std miniz_oxide::inflate::core::init_tree
+0.0%   0.4%   1.1KiB          std miniz_oxide::inflate::core::transfer
+0.0%   0.4%   1.1KiB          std core::fmt::Formatter::pad
+0.0%   0.4%   1.1KiB          std std::backtrace_rs::symbolize::gimli::elf::<impl std::backtrace_rs::symbolize::gimli::Mapping>::load_dwarf_package
+0.0%   0.4%   1.0KiB          std <core::str::lossy::Debug as core::fmt::Debug>::fmt
+0.0%   0.4%   1.0KiB          std std::sys::pal::unix::stack_overflow::imp::make_handler
+0.0%   0.4%   1.0KiB          std <rustc_demangle::v0::Ident as core::fmt::Display>::fmt
+0.0%   0.4%   1.0KiB          std std::backtrace_rs::symbolize::gimli::libs_dl_iterate_phdr::callback
+0.0%   0.4%   1.0KiB          std alloc::collections::btree::map::IntoIter<K,V,A>::dying_next
+0.0%   0.4%   1.0KiB          std alloc::collections::btree::map::IntoIter<K,V,A>::dying_next
+0.0%   0.4%   1.0KiB          std addr2line::function::name_entry
+0.0%   0.4%    1006B          std adler2::Adler32::write_slice
+0.0%   0.4%     987B          std core::str::slice_error_fail_rt
+0.0%   0.4%     962B          std gimli::read::line::FileEntryFormat::parse
+0.0%   0.4%     949B          std <std::path::Components as core::iter::traits::double_ended::DoubleEndedIterator>::next_back
+0.0%   0.4%     948B          std alloc::collections::btree::node::BalancingContext<K,V>::do_merge
+0.0%   0.4%     945B          std std::sys::pal::unix::stack_overflow::imp::signal_handler
+0.0%   0.4%     945B          std std::backtrace_rs::print::BacktraceFrameFmt::print_raw_with_column
+0.0%   0.4%     930B          std <std::path::Components as core::iter::traits::iterator::Iterator>::next
+0.0%   0.3%     917B          std std::backtrace_rs::symbolize::gimli::elf::locate_build_id
+0.0%   0.3%     911B          std alloc::collections::btree::node::BalancingContext<K,V>::bulk_steal_right
+0.0%   0.3%     908B          std rustc_demangle::v0::Printer::print_type::{{closure}}
+0.0%   0.3%     901B          std std::path::Components::as_path
+0.0%   0.3%     897B          std std::backtrace_rs::symbolize::gimli::elf::Object::section
+0.0%   0.3%     893B          std <str as core::fmt::Debug>::fmt
+0.0%   0.3%     886B          std core::slice::sort::shared::smallsort::sort8_stable
+0.0%   0.3%     873B          std <core::str::pattern::StrSearcher as core::str::pattern::Searcher>::next
+0.0%   0.3%     846B          std std::path::PathBuf::_set_extension
+0.0%   0.3%     813B          std gimli::read::unit::EntriesCursor<R>::next_entry
+0.0%   0.3%     811B          std alloc::collections::btree::node::BalancingContext<K,V>::bulk_steal_left
+0.0%   0.3%     785B          std rustc_demangle::v0::Printer::print_const_str_literal
+0.0%   0.3%     782B          std <core::iter::sources::from_fn::FromFn<F> as core::iter::traits::iterator::Iterator>::next
+0.0%   0.3%     781B          std std::io::default_read_to_end
+0.0%   0.3%     749B          std std::path::Path::_strip_prefix
+0.0%   0.3%     745B          std gimli::read::line::parse_file_v5
+0.0%   0.3%     736B          std std::panicking::default_hook::{{closure}}::{{closure}}
+0.0%   0.3%     724B          std addr2line::unit::ResUnit<R>::find_function_or_location::{{closure}}
+0.0%   0.3%     712B          std std::sys::fs::unix::try_statx
+0.0%   0.3%     680B          std std::backtrace_rs::symbolize::gimli::mmap
+0.0%   0.3%     674B          std gimli::read::aranges::ArangeHeader<R,Offset>::parse
+0.0%   0.3%     664B          std std::sys::backtrace::_print_fmt::{{closure}}::{{closure}}
+0.0%   0.2%     649B          std alloc::collections::btree::node::Handle<alloc::collections::btree::node::NodeRef<alloc::collections::btree::node::marker::Mut,K,V,alloc::collections::btree::nod...
+0.0%   0.2%     648B          std <std::io::stdio::StdoutLock as std::io::Write>::write_all
+0.0%   0.2%     625B          std <std::sys::backtrace::BacktraceLock::print::DisplayBacktrace as core::fmt::Display>::fmt
+0.0%   0.2%     624B          std std::panicking::rust_panic_with_hook
+0.0%   0.2%     624B          std <std::io::error::Error as core::fmt::Display>::fmt
+0.0%   0.2%     617B          std alloc::collections::btree::node::Handle<alloc::collections::btree::node::NodeRef<alloc::collections::btree::node::marker::Mut,K,V,alloc::collections::btree::nod...
+0.0%   0.2%     615B          std <core::fmt::builders::PadAdapter as core::fmt::Write>::write_str
+0.0%   0.2%     606B         std? <std::path::Components as core::cmp::PartialEq>::eq
+0.0%   0.2%     602B          std <&std::io::stdio::Stdout as std::io::Write>::write_fmt
+0.0%   0.2%     598B          std gimli::read::line::FileEntry<R,Offset>::parse
+0.0%   0.2%     595B          std alloc::string::String::from_utf8_lossy
+0.0%   0.2%     589B          std std::io::buffered::bufwriter::BufWriter<W>::flush_buf
+0.0%   0.2%     566B          std std::io::stdio::print_to_buffer_if_capture_used
+0.0%   0.2%     548B          std rustc_demangle::v0::Printer::print_sep_list
+0.0%   0.2%     547B          std core::char::methods::<impl char>::escape_debug_ext
+0.0%   0.2%     547B          std std::sys::sync::once::futex::Once::call
+0.0%   0.2%     523B          std std::sync::poison::once::Once::call_once::{{closure}}
+0.0%   0.2%     519B          std core::fmt::write
+0.0%   0.2%     499B          std core::str::converts::from_utf8
+0.0%   0.2%     495B          std std::fs::OpenOptions::_open
+0.0%   0.2%     485B          std gimli::read::dwarf::Dwarf<R>::attr_string
+0.0%   0.2%     479B          std <core::ops::range::Range<Idx> as core::fmt::Debug>::fmt
+0.0%   0.2%     475B          std alloc::collections::btree::node::Handle<alloc::collections::btree::node::NodeRef<alloc::collections::btree::node::marker::Mut,K,V,alloc::collections::btree::nod...
+0.0%   0.2%     474B          std std::env::current_dir
+0.0%   0.2%     473B          std addr2line::line::path_push
+0.0%   0.2%     472B          std <core::str::pattern::CharSearcher as core::str::pattern::Searcher>::next_match
+0.0%   0.2%     465B          std rustc_demangle::v0::Printer::print_sep_list
+0.0%   0.2%     463B          std miniz_oxide::inflate::core::apply_match
+0.0%   0.2%     463B       memchr memchr::arch::x86_64::memchr::memchr_raw::detect
+0.0%   0.2%     461B          std rustc_demangle::v0::Parser::ident
+0.0%   0.2%     459B          std std::backtrace_rs::print::BacktraceFrameFmt::print_fileline
+0.0%   0.2%     459B          std std::io::Write::write_all_vectored
+0.0%   0.2%     458B          std std::sys::fs::unix::readlink
+0.0%   0.2%     440B          std std::env::current_exe
+0.0%   0.2%     431B       memchr memchr::arch::x86_64::memchr::memchr_raw::find_sse2
+0.0%   0.2%     431B          std std::sys::sync::rwlock::futex::RwLock::read_contended
+0.0%   0.2%     418B          std std::panicking::default_hook
+0.0%   0.2%     413B          std addr2line::function::name_attr
+0.0%   0.2%     409B          std rustc_demangle::v0::Printer::print_quoted_escaped_chars
+0.0%   0.2%     403B          std std::backtrace_rs::symbolize::gimli::elf::Object::build_id
+0.0%   0.2%     402B          std core::fmt::Write::write_char
+0.0%   0.2%     398B          std <core::str::lossy::Utf8Chunks as core::iter::traits::iterator::Iterator>::next
+0.0%   0.2%     398B          std std::panicking::default_hook::{{closure}}
+0.0%   0.1%     394B          std alloc::collections::btree::node::Handle<alloc::collections::btree::node::NodeRef<alloc::collections::btree::node::marker::Mut,K,V,alloc::collections::btree::nod...
+0.0%   0.1%     394B          std alloc::collections::btree::node::Handle<alloc::collections::btree::node::NodeRef<alloc::collections::btree::node::marker::Mut,K,V,alloc::collections::btree::nod...
+0.0%   0.1%     390B          std core::fmt::builders::DebugStruct::field
+0.0%   0.1%     387B          std rustc_demangle::v0::Printer::in_binder
+0.0%   0.1%     386B          std std::fs::buffer_capacity_required
+0.0%   0.1%     382B          std rustc_demangle::v0::Printer::in_binder
+0.0%   0.1%     373B          std alloc::collections::btree::node::Handle<alloc::collections::btree::node::NodeRef<alloc::collections::btree::node::marker::Mut,K,V,alloc::collections::btree::nod...
+0.0%   0.1%     366B          std core::str::<impl str>::trim_start_matches
+0.0%   0.1%     362B          std gimli::read::abbrev::Attributes::push
+0.0%   0.1%     361B          std rustc_demangle::v0::Printer::print_const_uint
+0.0%   0.1%     361B          std std::env::_var_os
+0.0%   0.1%     357B          std core::slice::sort::stable::driftsort_main
+0.0%   0.1%     357B          std core::slice::sort::shared::smallsort::sort4_stable
+0.0%   0.1%     356B          std core::num::<impl usize>::from_ascii_radix
+0.0%   0.1%     348B          std core::slice::sort::stable::driftsort_main
+0.0%   0.1%     346B          std std::io::impls::<impl std::io::Write for alloc::vec::Vec<u8,A>>::write_vectored
+0.0%   0.1%     344B          std std::alloc::default_alloc_error_hook
+0.0%   0.1%     343B          std std::sys::env::unix::getenv::{{closure}}
+0.0%   0.1%     337B          std addr2line::Context<R>::find_unit
+0.0%   0.1%     336B          std core::slice::sort::stable::driftsort_main
+0.0%   0.1%     336B          std core::slice::sort::stable::driftsort_main
+0.0%   0.1%     336B          std core::slice::sort::stable::driftsort_main
+0.0%   0.1%     335B          std alloc::collections::btree::node::Handle<alloc::collections::btree::node::NodeRef<alloc::collections::btree::node::marker::Mut,K,V,alloc::collections::btree::nod...
+0.0%   0.1%     334B          std core::str::iter::SplitInternal<P>::next
+0.0%   0.1%     333B          std std::sys::os_str::bytes::Slice::check_public_boundary::slow_path
+0.0%   0.1%     333B          std std::path::Components::len_before_body
+0.0%   0.1%     332B          std std::sys::backtrace::_print_fmt::{{closure}}
+0.0%   0.1%     328B          std std::sys::fs::metadata
+0.0%   0.1%     327B          std rustc_demangle::v0::Printer::print_path_maybe_open_generics
+0.0%   0.1%     327B          std alloc::collections::btree::node::Handle<alloc::collections::btree::node::NodeRef<alloc::collections::btree::node::marker::Mut,K,V,NodeType>,alloc::collections::...
+0.0%   0.1%     324B          std rustc_demangle::v0::Printer::print_sep_list
+0.0%   0.1%     322B          std core::fmt::Write::write_char
+0.0%   0.1%     320B          std <rustc_demangle::Demangle as core::fmt::Display>::fmt
+0.0%   0.1%     318B          std std::sys::fs::unix::File::open_c
+0.0%   0.1%     318B          std core::panicking::assert_failed_inner
+0.0%   0.1%     317B          std core::ptr::drop_in_place<gimli::read::abbrev::Abbreviations>
+0.0%   0.1%     316B          std std::io::impls::<impl std::io::Write for alloc::vec::Vec<u8,A>>::write_all_vectored
+0.0%   0.1%     315B          std std::io::buffered::bufwriter::BufWriter<W>::write_all_cold
+0.0%   0.1%     314B          std core::fmt::Formatter::debug_tuple_field1_finish
+0.0%   0.1%     311B          std <&[u8] as alloc::ffi::c_str::CString::new::SpecNewImpl>::spec_new_impl
+0.0%   0.1%     301B          std alloc::ffi::c_str::CString::_from_vec_unchecked
+0.0%   0.1%     301B          std std::io::Write::write_fmt
+0.0%   0.1%     301B          std std::io::Write::write_fmt
+0.0%   0.1%     301B          std std::io::Write::write_fmt
+0.0%   0.1%     298B          std addr2line::line::Lines::find_location
+0.0%   0.1%     295B clap_builder <alloc::string::String as core::fmt::Write>::write_char
+0.0%   0.1%     294B          std <std::panicking::begin_panic_handler::FormatStringPayload as core::panic::PanicPayload>::take_box
+0.0%   0.1%     289B          std core::slice::memchr::memrchr
+0.0%   0.1%     289B          std core::ffi::c_str::CStr::from_bytes_with_nul
+0.0%   0.1%     285B          std core::unicode::printable::is_printable
+0.0%   0.1%     281B          std std::sys::backtrace::output_filename
+0.0%   0.1%     280B          std core::fmt::num::imp::<impl core::fmt::Display for i32>::fmt
+0.0%   0.1%     275B          std core::unicode::printable::check
+0.0%   0.1%     274B          std core::fmt::builders::DebugList::entry
+0.0%   0.1%     271B          std core::fmt::num::imp::<impl core::fmt::Display for u32>::fmt
+0.0%   0.1%     265B          std core::fmt::num::imp::<impl core::fmt::Display for usize>::fmt
+0.0%   0.1%     263B          std alloc::collections::btree::node::Handle<alloc::collections::btree::node::NodeRef<alloc::collections::btree::node::marker::Mut,K,V,alloc::collections::btree::nod...
+0.0%   0.1%     263B          std core::ptr::drop_in_place<(usize,std::backtrace_rs::symbolize::gimli::Mapping)>
+0.0%   0.1%     261B          std std::backtrace_rs::symbolize::gimli::elf::decompress_zlib
+0.0%   0.1%     261B          std core::fmt::Write::write_char
+0.0%   0.1%     259B          std core::slice::sort::shared::pivot::median3_rec
+0.0%   0.1%     258B          std std::backtrace_rs::symbolize::gimli::stash::Stash::allocate
+0.0%   0.1%     257B          std gimli::read::abbrev::Abbreviations::insert
+0.0%   0.1%     256B          std core::num::<impl u64>::from_ascii_radix
+0.0%   0.1%     255B          std gimli::read::reader::Reader::read_sized_offset
+0.0%   0.1%     254B          std rustc_demangle::v0::HexNibbles::try_parse_uint
+0.0%   0.1%     253B          std std::sys::thread_local::guard::key::enable::run
+0.0%   0.1%     250B          std std::sys::thread_local::destructors::linux_like::register
+0.0%   0.1%     250B          std <&std::fs::File as std::io::Read>::read_to_string
+0.0%   0.1%     250B          std core::ptr::drop_in_place<std::io::buffered::linewriter::LineWriter<std::io::stdio::StdoutRaw>>
+0.0%   0.1%     249B          std core::unicode::unicode_data::grapheme_extend::lookup_slow
+0.0%   0.1%     249B          std core::ptr::drop_in_place<core::result::Result<addr2line::line::Lines,gimli::read::Error>>
+0.0%   0.1%     247B          std std::sys::sync::mutex::futex::Mutex::lock_contended
+0.0%   0.1%     246B          std core::fmt::Write::write_char
+0.0%   0.1%     245B          std std::io::default_read_to_end::small_probe_read
+0.0%   0.1%     245B          std core::ptr::drop_in_place<alloc::vec::Vec<addr2line::unit::SupUnit<gimli::read::endian_slice::EndianSlice<gimli::endianity::LittleEndian>>>>
+0.0%   0.1%     244B          std core::slice::sort::unstable::heapsort::heapsort
+0.0%   0.1%     243B          std alloc::raw_vec::RawVecInner<A>::grow_amortized
+0.0%   0.1%     243B          std core::ptr::drop_in_place<addr2line::unit::ResUnit<gimli::read::endian_slice::EndianSlice<gimli::endianity::LittleEndian>>>
+0.0%   0.1%     242B         std? <std::io::default_write_fmt::Adapter<T> as core::fmt::Write>::write_str
+0.0%   0.1%     241B          std rustc_demangle::v0::Printer::print_lifetime_from_index
+0.0%   0.1%     240B          std core::str::pattern::simd_contains::{{closure}}
+0.0%   0.1%     238B          std rustc_demangle::v0::Printer::print_backref
+0.0%   0.1%     238B          std rustc_demangle::v0::Printer::print_backref
+0.0%   0.1%     234B          std std::path::Components::parse_next_component_back
+0.0%   0.1%     232B          std std::io::stdio::_print
+0.0%   0.1%     231B          std core::slice::memchr::memchr_aligned
+0.0%   0.1%     229B          std core::ptr::drop_in_place<core::result::Result<addr2line::function::Functions<gimli::read::endian_slice::EndianSlice<gimli::endianity::LittleEndian>>,gimli::read...
+0.0%   0.1%     228B          std <std::ffi::os_str::Display as core::fmt::Display>::fmt
+0.0%   0.1%     225B          std rustc_demangle::v0::Printer::print_backref
+0.0%   0.1%     225B          std std::path::Path::is_dir
+0.0%   0.1%     225B          std std::path::Path::is_file
+0.0%   0.1%     225B          std gimli::read::line::parse_directory_v5
+0.0%   0.1%     224B          std __truncsfhf2
+0.0%   0.1%     221B          std core::ptr::drop_in_place<std::backtrace_rs::symbolize::gimli::stash::Stash>
+0.0%   0.1%     221B          std core::ptr::drop_in_place<gimli::read::abbrev::AbbreviationsCache>
+0.0%   0.1%     221B          std core::ptr::drop_in_place<addr2line::unit::SupUnits<gimli::read::endian_slice::EndianSlice<gimli::endianity::LittleEndian>>>
+0.0%   0.1%     221B          std core::ptr::drop_in_place<addr2line::unit::ResUnits<gimli::read::endian_slice::EndianSlice<gimli::endianity::LittleEndian>>>
+0.0%   0.1%     219B          std std::sys::thread_local::guard::key::enable
+0.0%   0.1%     218B          std core::slice::sort::unstable::ipnsort
+0.0%   0.1%     218B          std alloc::raw_vec::RawVecInner<A>::reserve::do_reserve_and_handle
+0.0%   0.1%     217B          std <&T as core::fmt::Debug>::fmt
+0.0%   0.1%     216B          std core::ops::function::Fn::call
+0.0%   0.1%     215B          std std::sys::sync::rwlock::futex::RwLock::wake_writer_or_readers
+0.0%   0.1%     214B          std <std::backtrace_rs::symbolize::SymbolName as core::fmt::Display>::fmt
+0.0%   0.1%     210B          std std::panicking::begin_panic_handler::{{closure}}
+0.0%   0.1%     208B          std std::sys::fs::unix::canonicalize
+0.0%   0.1%     207B          std std::backtrace_rs::symbolize::Symbol::name
+0.0%   0.1%     205B          std <char as core::fmt::Display>::fmt
+0.0%   0.1%     204B          std alloc::collections::btree::map::entry::VacantEntry<K,V,A>::insert_entry
+0.0%   0.1%     203B          std __rustc::__rust_foreign_exception
+0.0%   0.1%     203B          std __rustc::__rust_drop_panic
+0.0%   0.1%     201B          std std::panic::get_backtrace_style
+0.0%   0.1%     198B          std __udivti3
+0.0%   0.1%     198B          std core::ptr::drop_in_place<alloc::vec::Vec<addr2line::unit::ResUnit<gimli::read::endian_slice::EndianSlice<gimli::endianity::LittleEndian>>>>
+0.0%   0.1%     197B          std alloc::collections::btree::node::NodeRef<alloc::collections::btree::node::marker::Mut,K,V,alloc::collections::btree::node::marker::Internal>::push
+0.0%   0.1%     195B          std std::sys::pal::common::small_c_string::run_with_cstr_allocating
+0.0%   0.1%     194B          std alloc::string::String::try_reserve
+0.0%   0.1%     191B          std core::slice::sort::shared::smallsort::insertion_sort_shift_left
+0.0%   0.1%     190B          std core::escape::escape_unicode
+0.0%   0.1%     190B         std? <std::path::Component as core::cmp::PartialEq>::eq
+0.0%   0.1%     189B          std std::sys::pal::common::small_c_string::run_with_cstr_allocating
+0.0%   0.1%     188B          std core::ptr::drop_in_place<alloc::vec::Vec<addr2line::function::LazyFunction<gimli::read::endian_slice::EndianSlice<gimli::endianity::LittleEndian>>>>
+0.0%   0.1%     187B          std alloc::raw_vec::RawVecInner<A>::try_allocate_in
+0.0%   0.1%     186B          std core::fmt::Write::write_char
+0.0%   0.1%     185B          std core::str::count::char_count_general_case
+0.0%   0.1%     185B          std std::io::Write::write_all
+0.0%   0.1%     184B          std std::io::stdio::try_set_output_capture
+0.0%   0.1%     184B          std std::sys::pal::common::small_c_string::run_with_cstr_allocating
+0.0%   0.1%     183B         std? <std::backtrace_rs::symbolize::gimli::parse_running_mmaps::MapsEntry as core::str::traits::FromStr>::from_str::{{closure}}
+0.0%   0.1%     183B          std alloc::raw_vec::RawVec<T,A>::grow_one
+0.0%   0.1%     183B          std alloc::raw_vec::RawVec<T,A>::grow_one
+0.0%   0.1%     183B          std alloc::raw_vec::RawVec<T,A>::grow_one
+0.0%   0.1%     182B          std alloc::raw_vec::RawVec<T,A>::grow_one
+0.0%   0.1%     182B          std alloc::raw_vec::RawVec<T,A>::grow_one
+0.0%   0.1%     180B          std std::backtrace_rs::symbolize::gimli::elf::Object::search_symtab
+0.0%   0.1%     180B          std alloc::raw_vec::RawVec<T,A>::grow_one
+0.0%   0.1%     180B          std alloc::raw_vec::RawVec<T,A>::grow_one
+0.0%   0.1%     179B          std alloc::raw_vec::RawVec<T,A>::grow_one
+0.0%   0.1%     179B          std alloc::raw_vec::RawVec<T,A>::grow_one
+0.0%   0.1%     179B          std alloc::raw_vec::RawVec<T,A>::grow_one
+0.0%   0.1%     179B          std alloc::raw_vec::RawVec<T,A>::grow_one
+0.0%   0.1%     179B          std core::slice::sort::shared::pivot::median3_rec
+0.0%   0.1%     179B          std core::slice::sort::shared::pivot::median3_rec
+0.0%   0.1%     178B          std core::fmt::pointer_fmt_inner
+0.0%   0.1%     178B          std core::slice::sort::shared::pivot::median3_rec
+0.0%   0.1%     178B          std core::slice::sort::shared::pivot::median3_rec
+0.0%   0.1%     175B          std core::ptr::drop_in_place<alloc::boxed::Box<[addr2line::function::LazyFunction<gimli::read::endian_slice::EndianSlice<gimli::endianity::LittleEndian>>]>>
+0.0%   0.1%     174B          std core::ptr::drop_in_place<core::result::Result<core::option::Option<alloc::boxed::Box<addr2line::unit::DwoUnit<gimli::read::endian_slice::EndianSlice<gimli::endi...
+0.0%   0.1%     172B          std gimli::read::reader::Reader::read_uleb128
+0.0%   0.1%     172B          std core::slice::sort::shared::pivot::median3_rec
+0.0%   0.1%     170B          std core::fmt::Formatter::debug_struct_field1_finish
+0.0%   0.1%     169B          std <std::panicking::begin_panic_handler::FormatStringPayload as core::panic::PanicPayload>::get
+0.0%   0.1%     167B          std __rustc::__rdl_realloc
+0.0%   0.1%     166B          std gimli::read::reader::Reader::read_offset
+0.0%   0.1%     165B          std alloc::collections::btree::map::BTreeMap<K,V,A>::entry
+0.0%   0.1%     165B          std alloc::raw_vec::RawVecInner<A>::reserve::do_reserve_and_handle
+0.0%   0.1%     164B          std core::ptr::drop_in_place<std::io::error::Error>
+0.0%   0.1%     163B          std <alloc::string::String as core::convert::From<alloc::borrow::Cow<str>>>::from
+0.0%   0.1%     162B          std rustc_demangle::v0::Printer::print_sep_list
+0.0%   0.1%     162B          std rustc_demangle::v0::Parser::integer_62
+0.0%   0.1%     161B          std __rustc::__rust_start_panic
+0.0%   0.1%     161B          std core::slice::sort::shared::smallsort::insertion_sort_shift_left
+0.0%   0.1%     160B          std alloc::sync::Arc<T,A>::drop_slow
+0.0%   0.1%     159B          std rustc_demangle::v0::Parser::hex_nibbles
+0.0%   0.1%     159B          std core::ptr::drop_in_place<core::option::Option<gimli::read::line::IncompleteLineProgram<gimli::read::endian_slice::EndianSlice<gimli::endianity::LittleEndian>,us...
+0.0%   0.1%     158B          std alloc::collections::btree::node::NodeRef<alloc::collections::btree::node::marker::Mut,K,V,alloc::collections::btree::node::marker::Leaf>::push_with_handle
+0.0%   0.1%     157B          std rustc_demangle::v0::Printer::print_sep_list
+0.0%   0.1%     156B          std alloc::collections::btree::node::Handle<alloc::collections::btree::node::NodeRef<alloc::collections::btree::node::marker::Mut,K,V,alloc::collections::btree::nod...
+0.0%   0.1%     153B          std <char as core::fmt::Debug>::fmt
+0.0%   0.1%     152B         std? <std::io::default_write_fmt::Adapter<T> as core::fmt::Write>::write_str
+0.0%   0.1%     151B          std rustc_demangle::v0::Printer::print_sep_list
+0.0%   0.1%     150B          std core::ptr::drop_in_place<gimli::read::line::LineRows<gimli::read::endian_slice::EndianSlice<gimli::endianity::LittleEndian>,gimli::read::line::IncompleteLinePro...
+0.0%   0.1%     149B          std core::fmt::num::imp::<impl core::fmt::Display for u8>::fmt
+0.0%   0.1%     147B          std std::sys::pal::common::small_c_string::run_with_cstr_allocating
+0.0%   0.1%     145B          std <&T as core::fmt::Display>::fmt
+0.0%   0.1%     144B          std core::ptr::drop_in_place<alloc::vec::Vec<addr2line::line::LineSequence>>
+0.0%   0.1%     141B          std core::ptr::drop_in_place<alloc::boxed::Box<panic_unwind::imp::Exception>>
+0.0%   0.1%     140B          std __rustc::__rdl_alloc_zeroed
+0.0%   0.1%     140B          std core::str::validations::next_code_point
+0.0%   0.1%     140B          std core::ptr::drop_in_place<alloc::vec::Vec<alloc::string::String>>
+0.0%   0.1%     139B          std gimli::read::abbrev::Abbreviation::new
+0.0%   0.1%     137B          std std::sys::pal::unix::decode_error_kind
+0.0%   0.0%     132B          std std::sync::poison::once::Once::call_once_force::{{closure}}
+0.0%   0.0%     132B          std core::ops::function::FnOnce::call_once{{vtable.shim}}
+0.0%   0.0%     131B          std std::panicking::payload_as_str
+0.0%   0.0%     131B          std core::ptr::drop_in_place<<alloc::collections::btree::map::IntoIter<K,V,A> as core::ops::drop::Drop>::drop::DropGuard<u64,core::result::Result<alloc::sync::Arc<g...
+0.0%   0.0%     130B          std core::ptr::drop_in_place<alloc::boxed::Box<[alloc::string::String]>>
+0.0%   0.0%     130B          std core::ops::function::FnOnce::call_once{{vtable.shim}}
+0.0%   0.0%     128B          std addr2line::line::has_backward_slash_root
+0.0%   0.0%     126B          std core::slice::<impl [T]>::copy_within
+0.0%   0.0%     126B          std rustc_demangle::v0::Parser::backref
+0.0%   0.0%     126B          std <T as alloc::slice::<impl [T]>::to_vec_in::ConvertVec>::to_vec
+0.0%   0.0%     122B          std __extendhfsf2
+0.0%   0.0%     121B          std core::fmt::num::<impl core::fmt::LowerHex for isize>::fmt
+0.0%   0.0%     120B          std alloc::collections::btree::map::BTreeMap<K,V,A>::get
+0.0%   0.0%     118B          std core::fmt::num::<impl core::fmt::UpperHex for u32>::fmt
+0.0%   0.0%     118B          std core::fmt::num::<impl core::fmt::LowerHex for u32>::fmt
+0.0%   0.0%     118B          std core::str::<impl str>::trim_start_matches
+0.0%   0.0%     118B          std core::result::unwrap_failed
+0.0%   0.0%     117B          std core::fmt::num::<impl core::fmt::UpperHex for u8>::fmt
+0.0%   0.0%     117B          std core::fmt::num::<impl core::fmt::LowerHex for u8>::fmt
+0.0%   0.0%     117B          std alloc::raw_vec::finish_grow
+0.0%   0.0%     116B          std rustc_demangle::v0::Parser::opt_integer_62
+0.0%   0.0%     116B          std core::str::<impl str>::split_once
+0.0%   0.0%     114B          std alloc::raw_vec::finish_grow
+0.0%   0.0%     114B          std alloc::raw_vec::finish_grow
+0.0%   0.0%     113B          std core::cell::once::OnceCell<T>::try_init
+0.0%   0.0%     111B          std __rustc::rust_panic
+0.0%   0.0%     109B          std <[T] as core::fmt::Debug>::fmt
+0.0%   0.0%     108B          std core::ptr::drop_in_place<core::result::Result<addr2line::Context<gimli::read::endian_slice::EndianSlice<gimli::endianity::LittleEndian>>,gimli::read::Error>>
+0.0%   0.0%     107B          std std::io::impls::<impl std::io::Write for alloc::vec::Vec<u8,A>>::write
+0.0%   0.0%     105B          std core::ptr::drop_in_place<panic_unwind::imp::Exception>
+0.0%   0.0%     103B         std? <std::io::default_write_fmt::Adapter<T> as core::fmt::Write>::write_str
+0.0%   0.0%     103B          std std::io::impls::<impl std::io::Write for alloc::vec::Vec<u8,A>>::write_all
+0.0%   0.0%     103B          std alloc::sync::Arc<T,A>::drop_slow
+0.0%   0.0%     103B clap_builder <alloc::string::String as core::fmt::Write>::write_str
+0.0%   0.0%     103B          std core::ptr::drop_in_place<core::result::Result<std::sync::poison::mutex::MutexGuard<()>,std::sync::poison::PoisonError<std::sync::poison::mutex::MutexGuard<()>>>>
+0.0%   0.0%     103B          std core::slice::<impl [T]>::copy_from_slice::len_mismatch_fail::do_panic::runtime
+0.0%   0.0%     103B          std core::slice::index::slice_index_order_fail::do_panic::runtime
+0.0%   0.0%     103B          std core::slice::index::slice_end_index_len_fail::do_panic::runtime
+0.0%   0.0%     103B          std core::slice::index::slice_start_index_len_fail::do_panic::runtime
+0.0%   0.0%     100B          std <alloc::vec::Vec<T,A> as alloc::vec::spec_extend::SpecExtend<&T,core::slice::iter::Iter<T>>>::spec_extend
+0.0%   0.0%     100B          std core::ptr::drop_in_place<std::io::stdio::StdinLock>
+0.0%   0.0%      99B          std std::sys::backtrace::lock
+0.0%   0.0%      99B          std core::ptr::drop_in_place<core::result::Result<&core::result::Result<addr2line::function::Function<gimli::read::endian_slice::EndianSlice<gimli::endianity::Littl...
+0.0%   0.0%      99B          std core::ptr::drop_in_place<addr2line::function::LazyFunction<gimli::read::endian_slice::EndianSlice<gimli::endianity::LittleEndian>>>
+0.0%   0.0%      98B          std core::ptr::drop_in_place<addr2line::Context<gimli::read::endian_slice::EndianSlice<gimli::endianity::LittleEndian>>>
+0.0%   0.0%      95B          std <core::fmt::builders::PadAdapter as core::fmt::Write>::write_char
+0.0%   0.0%      93B          std __rustc::__rdl_alloc
+0.0%   0.0%      92B          std core::ptr::drop_in_place<alloc::sync::ArcInner<gimli::read::dwarf::Dwarf<gimli::read::endian_slice::EndianSlice<gimli::endianity::LittleEndian>>>>
+0.0%   0.0%      92B          std core::ptr::drop_in_place<gimli::read::dwarf::Dwarf<gimli::read::endian_slice::EndianSlice<gimli::endianity::LittleEndian>>>
+0.0%   0.0%      92B          std core::panicking::panic_bounds_check
+0.0%   0.0%      91B          std core::option::expect_failed
+0.0%   0.0%      91B          std core::cell::once::OnceCell<T>::try_init
+0.0%   0.0%      89B          std std::sync::once_lock::OnceLock<T>::initialize
+0.0%   0.0%      88B          std <std::panicking::begin_panic_handler::FormatStringPayload as core::fmt::Display>::fmt
+0.0%   0.0%      88B          std std::sys::backtrace::BacktraceLock::print
+0.0%   0.0%      86B          std rustc_demangle::v0::Printer::skipping_printing
+0.0%   0.0%      86B          std gimli::read::unit::AttributeValue<R,Offset>::udata_value
+0.0%   0.0%      86B          std alloc::sync::Arc<T,A>::drop_slow
+0.0%   0.0%      85B          std rustc_demangle::try_demangle
+0.0%   0.0%      85B          std std::sync::once_lock::OnceLock<T>::initialize
+0.0%   0.0%      84B          std core::fmt::Formatter::pad_integral::write_prefix
+0.0%   0.0%      84B          std core::ptr::drop_in_place<std::io::buffered::bufwriter::BufWriter<W>::flush_buf::BufGuard>
+0.0%   0.0%      83B          std core::cell::panic_already_borrowed
+0.0%   0.0%      82B          std __rustc::__rust_panic_cleanup
+0.0%   0.0%      80B          std <std::sys::stdio::unix::Stderr as std::io::Write>::write
+0.0%   0.0%      80B         std? <std::io::default_write_fmt::Adapter<T> as core::fmt::Write>::write_str
+0.0%   0.0%      79B          std rustc_demangle::v0::Parser::namespace
+0.0%   0.0%      79B          std <&[u8] as object::read::read_ref::ReadRef>::read_bytes_at_until
+0.0%   0.0%      79B          std <std::sys::stdio::unix::Stderr as std::io::Write>::write_vectored
+0.0%   0.0%      78B          std std::panicking::panic_count::increase
+0.0%   0.0%      78B          std alloc::sync::Arc<T,A>::drop_slow
+0.0%   0.0%      76B          std <std::panicking::begin_panic_handler::StaticStrPayload as core::panic::PanicPayload>::take_box
+0.0%   0.0%      76B         std? <gimli::read::unit::AttributeValue<R,Offset> as core::clone::Clone>::clone
+0.0%   0.0%      75B          std core::slice::index::range
+0.0%   0.0%      75B          std core::ptr::drop_in_place<gimli::read::dwarf::Unit<gimli::read::endian_slice::EndianSlice<gimli::endianity::LittleEndian>,usize>>
+0.0%   0.0%      75B          std core::ptr::drop_in_place<addr2line::unit::SupUnit<gimli::read::endian_slice::EndianSlice<gimli::endianity::LittleEndian>>>
+0.0%   0.0%      74B          std std::rt::handle_rt_panic
+0.0%   0.0%      73B          std std::sync::poison::once::Once::call_once_force::{{closure}}
+0.0%   0.0%      73B          std core::ptr::drop_in_place<std::backtrace_rs::symbolize::gimli::Library>
+0.0%   0.0%      73B          std core::ops::function::FnOnce::call_once{{vtable.shim}}
+0.0%   0.0%      71B          std alloc::raw_vec::RawVec<T,A>::grow_one
+0.0%   0.0%      71B          std alloc::raw_vec::RawVec<T,A>::grow_one
+0.0%   0.0%      70B          std alloc::raw_vec::RawVecInner<A>::deallocate
+0.0%   0.0%      70B          std std::backtrace_rs::backtrace::libunwind::trace::trace_fn
+0.0%   0.0%      69B    criterion <core::num::error::ParseIntError as core::fmt::Debug>::fmt
+0.0%   0.0%      69B          std core::panicking::panic_nounwind_nobacktrace
+0.0%   0.0%      69B          std core::panicking::panic_nounwind_fmt
+0.0%   0.0%      67B          std <rustc_demangle::DemangleStyle as core::fmt::Display>::fmt
+0.0%   0.0%      66B          std alloc::alloc::exchange_malloc
+0.0%   0.0%      66B          std core::ptr::drop_in_place<std::backtrace_rs::backtrace::libunwind::Bomb>
+0.0%   0.0%      66B          std core::panicking::panic_nounwind
+0.0%   0.0%      60B          std <gimli::read::abbrev::Attributes as core::ops::deref::Deref>::deref
+0.0%   0.0%      60B          std core::panicking::panic
+0.0%   0.0%      59B          std core::slice::sort::shared::smallsort::panic_on_ord_violation
+0.0%   0.0%      59B          std std::thread::ThreadId::new::exhausted
+0.0%   0.0%      58B bloat_target bloat_target::main
+0.0%   0.0%      55B          std core::fmt::Formatter::debug_list
+0.0%   0.0%      55B          std core::panicking::panic_const::panic_const_rem_by_zero
+0.0%   0.0%      55B          std core::panicking::panic_const::panic_const_div_by_zero
+0.0%   0.0%      55B          std core::slice::index::slice_end_index_overflow_fail
+0.0%   0.0%      55B          std alloc::raw_vec::capacity_overflow
+0.0%   0.0%      53B         std? <std::path::StripPrefixError as core::fmt::Debug>::fmt
+0.0%   0.0%      53B          std core::ptr::drop_in_place<std::sync::reentrant_lock::ReentrantLockGuard<core::cell::RefCell<std::io::buffered::linewriter::LineWriter<std::io::stdio::StdoutRaw>>>>
+0.0%   0.0%      52B          std core::fmt::builders::DebugList::finish
+0.0%   0.0%      49B          std alloc::boxed::Box<T,A>::new_uninit_in
+0.0%   0.0%      49B          std alloc::boxed::Box<T,A>::new_uninit_in
+0.0%   0.0%      49B          std alloc::raw_vec::RawVecInner<A>::reserve::do_reserve_and_handle
+0.0%   0.0%      48B          std core::panicking::assert_failed
+0.0%   0.0%      48B          std core::panicking::assert_failed
+0.0%   0.0%      43B          std rustc_demangle::v0::basic_type
+0.0%   0.0%      43B          std <&T as core::fmt::Debug>::fmt
+0.0%   0.0%      39B    [Unknown] main
+0.0%   0.0%      38B          std <&T as core::fmt::Debug>::fmt
+0.0%   0.0%      38B    [Unknown] _start
+0.0%   0.0%      37B          std <rustc_demangle::SizeLimitedFmtAdapter<F> as core::fmt::Write>::write_str
+0.0%   0.0%      36B          std <&T as core::fmt::Debug>::fmt
+0.0%   0.0%      34B          std <[A] as core::slice::cmp::SlicePartialEq<B>>::equal
+0.0%   0.0%      33B          std core::slice::sort::stable::drift::sqrt_approx
+0.0%   0.0%      33B          std std::alloc::rust_oom
+0.0%   0.0%      32B          std core::ptr::drop_in_place<std::panicking::begin_panic_handler::FormatStringPayload>
+0.0%   0.0%      32B          std core::panicking::panic_fmt
+0.0%   0.0%      31B          std <std::ffi::os_str::Display as core::fmt::Debug>::fmt
+0.0%   0.0%      31B          std core::ptr::drop_in_place<std::backtrace_rs::symbolize::gimli::elf::Object>
+0.0%   0.0%      31B          std core::ptr::drop_in_place<core::result::Result<core::option::Option<alloc::sync::Arc<std::sync::poison::mutex::Mutex<alloc::vec::Vec<u8>>>>,std::thread::local::A...
+0.0%   0.0%      30B          std core::ops::function::FnOnce::call_once{{vtable.shim}}
+0.0%   0.0%      29B          std __rustc::rust_begin_unwind
+0.0%   0.0%      29B          std core::ptr::drop_in_place<std::sync::poison::rwlock::RwLockReadGuard<std::panicking::Hook>>
+0.0%   0.0%      29B          std std::panicking::panic_count::is_zero_slow_path
+0.0%   0.0%      27B          std core::ops::function::Fn::call
+0.0%   0.0%      26B          std std::sys::backtrace::_print_fmt::{{closure}}
+0.0%   0.0%      25B          std std::sys::thread_local::native::eager::destroy
+0.0%   0.0%      25B          std core::option::unwrap_failed
+0.0%   0.0%      24B          std panic_unwind::imp::panic::exception_cleanup
+0.0%   0.0%      24B          std core::ptr::drop_in_place<std::ffi::os_str::OsString>
+0.0%   0.0%      24B          std core::ptr::drop_in_place<alloc::vec::Vec<u8>>
+0.0%   0.0%      24B          std core::ptr::drop_in_place<alloc::string::String>
+0.0%   0.0%      23B          std alloc::raw_vec::handle_error
+0.0%   0.0%      21B          std <core::cell::BorrowMutError as core::fmt::Display>::fmt
+0.0%   0.0%      21B         std? <rustc_demangle::SizeLimitExhausted as core::fmt::Debug>::fmt
+0.0%   0.0%      21B          std <core::str::iter::Chars as core::iter::traits::iterator::Iterator>::count
+0.0%   0.0%      21B clap_builder <core::fmt::Error as core::fmt::Debug>::fmt
+0.0%   0.0%      21B          std <() as core::fmt::Debug>::fmt
+0.0%   0.0%      21B          std <&T as core::fmt::Debug>::fmt
+0.0%   0.0%      21B          std <T as core::any::Any>::type_id
+0.0%   0.0%      21B          std <T as core::any::Any>::type_id
+0.0%   0.0%      20B tinytemplate <alloc::string::String as core::fmt::Display>::fmt
+0.0%   0.0%      20B          std core::panicking::panic_in_cleanup
+0.0%   0.0%      20B          std core::panicking::panic_cannot_unwind
+0.0%   0.0%      19B          std <&T as core::fmt::Display>::fmt
+0.0%   0.0%      19B          std <&mut T as core::fmt::Debug>::fmt
+0.0%   0.0%      19B          std <&T as core::fmt::Debug>::fmt
+0.0%   0.0%      19B          std <std::panicking::begin_panic_handler::StaticStrPayload as core::fmt::Display>::fmt
+0.0%   0.0%      19B          std <&T as core::fmt::Display>::fmt
+0.0%   0.0%      19B          std core::slice::<impl [T]>::copy_from_slice::len_mismatch_fail
+0.0%   0.0%      19B          std alloc::alloc::handle_alloc_error
+0.0%   0.0%      19B          std __rustc::__rg_oom
+0.0%   0.0%      18B          std core::unicode::unicode_data::cc::lookup
+0.0%   0.0%      18B          std <str as core::fmt::Display>::fmt
+0.0%   0.0%      18B          std std::sys::args::unix::imp::ARGV_INIT_ARRAY::init_wrapper
+0.0%   0.0%      17B          std core::ptr::drop_in_place<std::io::default_write_fmt::Adapter<std::io::cursor::Cursor<&mut [u8]>>>
+0.0%   0.0%      16B          std <&T as core::fmt::Debug>::fmt
+0.0%   0.0%      16B          std <core::fmt::Formatter as core::fmt::Write>::write_char
+0.0%   0.0%      16B          std <core::fmt::Formatter as core::fmt::Write>::write_str
+0.0%   0.0%      16B          std <core::fmt::Arguments as core::fmt::Display>::fmt
+0.0%   0.0%      16B          std core::fmt::Write::write_fmt
+0.0%   0.0%      16B          std core::fmt::Write::write_fmt
+0.0%   0.0%      16B          std <alloc::raw_vec::RawVec<T,A> as core::ops::drop::Drop>::drop
+0.0%   0.0%      16B          std <&mut T as core::fmt::Display>::fmt
+0.0%   0.0%      16B          std core::ptr::drop_in_place<core::result::Result<&core::result::Result<core::option::Option<alloc::boxed::Box<addr2line::unit::DwoUnit<gimli::read::endian_slice::E...
+0.0%   0.0%      16B          std core::ptr::drop_in_place<core::result::Result<&core::result::Result<addr2line::function::Functions<gimli::read::endian_slice::EndianSlice<gimli::endianity::Litt...
+0.0%   0.0%      16B          std core::ptr::drop_in_place<core::result::Result<&core::result::Result<addr2line::line::Lines,gimli::read::Error>,(&core::result::Result<addr2line::line::Lines,gim...
+0.0%   0.0%      16B          std core::fmt::Write::write_fmt
+0.0%   0.0%      16B          std core::fmt::Write::write_fmt
+0.0%   0.0%      16B          std core::fmt::Write::write_fmt
+0.0%   0.0%      16B          std core::fmt::Write::write_fmt
+0.0%   0.0%      16B          std core::fmt::Write::write_fmt
+0.0%   0.0%      13B          std core::ops::function::FnOnce::call_once{{vtable.shim}}
+0.0%   0.0%      13B          std std::rt::lang_start::{{closure}}
+0.0%   0.0%      12B          std std::sys::personality::gcc::find_eh_action::{{closure}}
+0.0%   0.0%      12B          std std::sys::personality::gcc::find_eh_action::{{closure}}
+0.0%   0.0%      12B          std core::ops::function::FnOnce::call_once{{vtable.shim}}
+0.0%   0.0%      12B          std core::ops::function::FnOnce::call_once{{vtable.shim}}
+0.0%   0.0%      11B         std? <std::panicking::begin_panic_handler::StaticStrPayload as core::panic::PanicPayload>::get
+0.0%   0.0%      11B          std core::ptr::drop_in_place<core::result::Result<(),std::io::error::Error>>
+0.0%   0.0%      10B          std core::str::slice_error_fail
+0.0%   0.0%      10B          std core::slice::index::slice_index_order_fail
+0.0%   0.0%      10B          std core::slice::index::slice_end_index_len_fail
+0.0%   0.0%      10B          std core::slice::index::slice_start_index_len_fail
+0.0%   0.0%      10B          std std::sys::pal::unix::abort_internal
+0.0%   0.0%       9B          std <&T as core::fmt::Display>::fmt
+0.0%   0.0%       9B          std std::sys::backtrace::__rust_end_short_backtrace
+0.0%   0.0%       9B          std <*mut T as core::fmt::Debug>::fmt
+0.0%   0.0%       9B          std std::process::abort
+0.0%   0.0%       8B         std? <std::panicking::begin_panic_handler::StaticStrPayload as core::panic::PanicPayload>::as_str
+0.0%   0.0%       6B          std __rustc::__rdl_dealloc
+0.0%   0.0%       5B          std core::ops::function::FnOnce::call_once{{vtable.shim}}
+0.0%   0.0%       5B          std core::ops::function::FnOnce::call_once{{vtable.shim}}
+0.0%   0.0%       5B      __rustc __rustc::__rust_alloc_error_handler
+0.0%   0.0%       5B      __rustc __rustc::__rust_alloc_zeroed
+0.0%   0.0%       5B      __rustc __rustc::__rust_realloc
+0.0%   0.0%       5B      __rustc __rustc::__rust_dealloc
+0.0%   0.0%       5B      __rustc __rustc::__rust_alloc
+0.0%   0.0%       5B          std std::sys::backtrace::__rust_begin_short_backtrace
+0.0%   0.0%       3B          std <std::sys::stdio::unix::Stderr as std::io::Write>::flush
+0.0%   0.0%       3B          std <std::sys::stdio::unix::Stderr as std::io::Write>::is_write_vectored
+0.0%   0.0%       3B          std std::io::impls::<impl std::io::Write for alloc::vec::Vec<u8,A>>::flush
+0.0%   0.0%       3B          std std::io::impls::<impl std::io::Write for alloc::vec::Vec<u8,A>>::is_write_vectored
+0.0%   0.0%       3B          std core::panic::PanicPayload::as_str
+0.0%   0.0%       2B          std <alloc::collections::btree::mem::replace::PanicGuard as core::ops::drop::Drop>::drop
+0.0%   0.0%       1B          std <alloc::vec::Vec<T,A> as core::ops::drop::Drop>::drop
+0.0%   0.0%       1B      __rustc __rustc::__rust_no_alloc_shim_is_unstable_v2
+6.9% 100.0% 258.5KiB              .text section size, the file size is 3.6MiB

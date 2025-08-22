@@ -17,7 +17,7 @@ pub struct Kernel<'brand> {
 }
 
 impl<'brand> Kernel<'brand> {
-    pub fn from_source(ctx: &Context<'brand>, src: &str, name: &str) -> Result<Self> {
+    pub fn from_source(ctx: &'brand Context<'brand>, src: &str, name: &str) -> Result<Self> {
         let program = CLProgram::create_and_build_from_source(ctx.raw(), src, "")?;
         let inner = CLKernel::create(&program, name)?;
         Ok(Self {

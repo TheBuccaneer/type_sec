@@ -1,0 +1,12 @@
+error: unused `EventToken` in tuple element 1 that must be used
+  --> tests/compile_fail/api_forget_wait.rs:13:5
+   |
+13 |     buf.enqueue_kernel(&queue, &kernel, 16).unwrap();
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = note: GPU work is in-flight: call wait(event, buf) to complete it
+note: the lint level is defined here
+  --> tests/compile_fail/api_forget_wait.rs:1:9
+   |
+1  | #![deny(unused_must_use)]
+   |         ^^^^^^^^^^^^^^^

@@ -1,0 +1,200 @@
+.section .text.hpc_core::api::opencl::context::Context::create_context,"ax",@progbits
+	.globl	hpc_core::api::opencl::context::Context::create_context
+	.p2align	4
+.type	hpc_core::api::opencl::context::Context::create_context,@function
+hpc_core::api::opencl::context::Context::create_context:
+		// crates/hpc-core/src/api/opencl/context.rs:35
+		pub fn create_context() -> Result<Self> {
+	.cfi_startproc
+	.cfi_personality 155, DW.ref.rust_eh_personality
+	.cfi_lsda 27, .Lexception6
+	push rbp
+	.cfi_def_cfa_offset 16
+	push r15
+	.cfi_def_cfa_offset 24
+	push r14
+	.cfi_def_cfa_offset 32
+	push r13
+	.cfi_def_cfa_offset 40
+	push r12
+	.cfi_def_cfa_offset 48
+	push rbx
+	.cfi_def_cfa_offset 56
+	sub rsp, 88
+	.cfi_def_cfa_offset 144
+	.cfi_offset rbx, -56
+	.cfi_offset r12, -48
+	.cfi_offset r13, -40
+	.cfi_offset r14, -32
+	.cfi_offset r15, -24
+	.cfi_offset rbp, -16
+	mov r15, rdi
+	movabs rbp, -9223372036854775808
+	lea rdi, [rsp + 16]
+		// crates/hpc-core/src/api/opencl/context.rs:36
+		let _platforms = get_platforms()?; // aktuell ungenutzt, später ggf. filtern
+	call qword ptr [rip + opencl3::platform::get_platforms@GOTPCREL]
+		// ~/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/lib/rustlib/src/rust/library/core/src/result.rs:2066
+		match self {
+	mov rbx, qword ptr [rsp + 16]
+	mov rax, rbx
+	neg rax
+	mov eax, dword ptr [rsp + 24]
+	jno .LBB17_7
+		// ~/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/lib/rustlib/src/rust/library/core/src/result.rs:2079
+		Err(e) => Err(From::from(e)),
+	mov dword ptr [r15 + 8], 0
+	mov dword ptr [r15 + 12], eax
+	mov qword ptr [r15], rbp
+	jmp .LBB17_2
+.LBB17_7:
+		// crates/hpc-core/src/api/opencl/context.rs:36
+		let _platforms = get_platforms()?; // aktuell ungenutzt, später ggf. filtern
+	mov r14d, dword ptr [rsp + 28]
+	shl r14, 32
+	or r14, rax
+	lea rdi, [rsp + 16]
+		// crates/hpc-core/src/api/opencl/context.rs:37
+		let devices: Vec<cl_device_id> = get_all_devices(CL_DEVICE_TYPE_GPU)?;
+	mov esi, 4
+	call qword ptr [rip + opencl3::device::get_all_devices@GOTPCREL]
+		// ~/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/lib/rustlib/src/rust/library/core/src/result.rs:2066
+		match self {
+	mov r12, qword ptr [rsp + 16]
+	mov eax, dword ptr [rsp + 24]
+	cmp r12, rbp
+	jne .LBB17_13
+		// ~/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/lib/rustlib/src/rust/library/core/src/result.rs:2079
+		Err(e) => Err(From::from(e)),
+	mov dword ptr [r15 + 8], 0
+	mov dword ptr [r15 + 12], eax
+	mov qword ptr [r15], rbp
+	jmp .LBB17_20
+.LBB17_13:
+		// ~/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/lib/rustlib/src/rust/library/core/src/result.rs:2067
+		Ok(v) => ControlFlow::Continue(v),
+	mov rdx, qword ptr [rsp + 32]
+		// crates/hpc-core/src/api/opencl/context.rs:37
+		let devices: Vec<cl_device_id> = get_all_devices(CL_DEVICE_TYPE_GPU)?;
+	mov r13d, dword ptr [rsp + 28]
+	shl r13, 32
+	or r13, rax
+		// crates/hpc-core/src/api/opencl/context.rs:39
+		let ctx = CLContext::from_devices(&devices, props, None, ptr::null_mut())?;
+	mov qword ptr [rsp], 0
+	lea rdi, [rsp + 56]
+	mov ecx, 8
+	mov rsi, r13
+	mov qword ptr [rsp + 48], rdx
+	xor r8d, r8d
+	xor r9d, r9d
+	call qword ptr [rip + opencl3::context::Context::from_devices@GOTPCREL]
+		// ~/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/lib/rustlib/src/rust/library/core/src/result.rs:2066
+		match self {
+	mov rcx, qword ptr [rsp + 56]
+	mov eax, dword ptr [rsp + 64]
+	cmp rcx, rbp
+	jne .LBB17_16
+		// ~/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/lib/rustlib/src/rust/library/core/src/result.rs:2079
+		Err(e) => Err(From::from(e)),
+	mov dword ptr [r15 + 8], 0
+	mov dword ptr [r15 + 12], eax
+	mov qword ptr [r15], rbp
+		// ~/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/lib/rustlib/src/rust/library/alloc/src/raw_vec/mod.rs:527
+		if elem_layout.size() == 0 || self.cap.as_inner() == 0 {
+	test r12, r12
+	je .LBB17_20
+.LBB17_19:
+		// ~/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/lib/rustlib/src/rust/library/core/src/num/uint_macros.rs:954
+		intrinsics::unchecked_mul(self, rhs)
+	shl r12, 3
+		// ~/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/lib/rustlib/src/rust/library/alloc/src/alloc.rs:114
+		unsafe { __rust_dealloc(ptr, layout.size(), layout.align()) }
+	mov edx, 8
+	mov rdi, r13
+	mov rsi, r12
+	call qword ptr [rip + __rustc::__rust_dealloc@GOTPCREL]
+.LBB17_20:
+		// ~/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/lib/rustlib/src/rust/library/alloc/src/raw_vec/mod.rs:527
+		if elem_layout.size() == 0 || self.cap.as_inner() == 0 {
+	test rbx, rbx
+	je .LBB17_2
+		// ~/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/lib/rustlib/src/rust/library/core/src/num/uint_macros.rs:954
+		intrinsics::unchecked_mul(self, rhs)
+	shl rbx, 3
+		// ~/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/lib/rustlib/src/rust/library/alloc/src/alloc.rs:114
+		unsafe { __rust_dealloc(ptr, layout.size(), layout.align()) }
+	mov edx, 8
+	mov rdi, r14
+	mov rsi, rbx
+	call qword ptr [rip + __rustc::__rust_dealloc@GOTPCREL]
+.LBB17_2:
+		// crates/hpc-core/src/api/opencl/context.rs:46
+		}
+	mov rax, r15
+	add rsp, 88
+	.cfi_def_cfa_offset 56
+	pop rbx
+	.cfi_def_cfa_offset 48
+	pop r12
+	.cfi_def_cfa_offset 40
+	pop r13
+	.cfi_def_cfa_offset 32
+	pop r14
+	.cfi_def_cfa_offset 24
+	pop r15
+	.cfi_def_cfa_offset 16
+	pop rbp
+	.cfi_def_cfa_offset 8
+	ret
+.LBB17_16:
+	.cfi_def_cfa_offset 144
+		// ~/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/lib/rustlib/src/rust/library/core/src/result.rs:2067
+		Ok(v) => ControlFlow::Continue(v),
+	mov edx, dword ptr [rsp + 84]
+	mov dword ptr [rsp + 44], edx
+	movups xmm0, xmmword ptr [rsp + 68]
+	movups xmmword ptr [rsp + 28], xmm0
+		// crates/hpc-core/src/api/opencl/context.rs:42
+		inner: ctx,
+	mov qword ptr [rsp + 16], rcx
+	mov dword ptr [rsp + 24], eax
+		// ~/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/lib/rustlib/src/rust/library/core/src/slice/index.rs:269
+		&(*slice)[self]
+	cmp qword ptr [rsp + 48], 0
+	je .LBB17_23
+		// crates/hpc-core/src/api/opencl/context.rs:43
+		device: devices[0],
+	mov rax, qword ptr [r13]
+		// crates/hpc-core/src/api/opencl/context.rs:41
+		Ok(Self {
+	mov rcx, qword ptr [rsp + 16]
+	mov edx, dword ptr [rsp + 24]
+	mov esi, dword ptr [rsp + 28]
+	mov rdi, qword ptr [rsp + 32]
+	mov qword ptr [r15 + 16], rdi
+	mov edi, dword ptr [rsp + 40]
+	mov dword ptr [r15 + 24], edi
+	mov edi, dword ptr [rsp + 44]
+	mov dword ptr [r15 + 28], edi
+	mov qword ptr [r15], rcx
+	mov dword ptr [r15 + 8], edx
+	mov dword ptr [r15 + 12], esi
+	mov qword ptr [r15 + 32], rax
+		// ~/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/lib/rustlib/src/rust/library/alloc/src/raw_vec/mod.rs:527
+		if elem_layout.size() == 0 || self.cap.as_inner() == 0 {
+	test r12, r12
+	jne .LBB17_19
+	jmp .LBB17_20
+.LBB17_23:
+		// ~/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/lib/rustlib/src/rust/library/core/src/slice/index.rs:269
+		&(*slice)[self]
+	lea rdx, [rip + .Lanon.f8581d1c690bf6808f778301e2a8a64b.12]
+	xor edi, edi
+	xor esi, esi
+	call qword ptr [rip + core::panicking::panic_bounds_check@GOTPCREL]
+	ud2
+	mov r15, rax
+	lea rdi, [rsp + 16]
+		// crates/hpc-core/src/api/opencl/context.rs:45
+		})

@@ -30,13 +30,6 @@ impl GpuBuffer<Empty> {
     }
 }
 
-#[cfg(not(feature = "bloat-probe"))]
-impl GpuBuffer<Empty> {
-    pub fn dev_alloc_bytes(_bytes: usize) -> Self {
-        // deine bisherige Variante (ggf. unimplemented!())
-        unimplemented!("buffer::GpuBuffer<Empty>::dev_alloc_bytes");
-    }
-}
 
 impl GpuBuffer<Empty> {
     pub fn enqueue_write(

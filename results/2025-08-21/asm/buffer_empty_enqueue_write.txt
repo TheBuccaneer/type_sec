@@ -1,0 +1,113 @@
+.section ".text.hpc_core::buffer::empty::<impl hpc_core::buffer::GpuBuffer<hpc_core::buffer::state::Empty>>::enqueue_write","ax",@progbits
+	.globl	hpc_core::buffer::empty::<impl hpc_core::buffer::GpuBuffer<hpc_core::buffer::state::Empty>>::enqueue_write
+	.p2align	4
+.type	hpc_core::buffer::empty::<impl hpc_core::buffer::GpuBuffer<hpc_core::buffer::state::Empty>>::enqueue_write,@function
+hpc_core::buffer::empty::<impl hpc_core::buffer::GpuBuffer<hpc_core::buffer::state::Empty>>::enqueue_write:
+		// crates/hpc-core/src/buffer/empty.rs:35
+		pub fn enqueue_write(
+	.cfi_startproc
+	push r15
+	.cfi_def_cfa_offset 16
+	push r14
+	.cfi_def_cfa_offset 24
+	push rbx
+	.cfi_def_cfa_offset 32
+	sub rsp, 16
+	.cfi_def_cfa_offset 48
+	.cfi_offset rbx, -32
+	.cfi_offset r14, -24
+	.cfi_offset r15, -16
+	mov r14, rsi
+	mov rbx, rdi
+		// crates/hpc-core/src/buffer/empty.rs:41
+		if host.len() != self.len_bytes {
+	cmp r9, rdx
+	jne .LBB8_5
+	mov rax, r8
+		// crates/hpc-core/src/buffer/empty.rs:49
+		let evt = queue.enqueue_write_buffer(&mut self.buf, CL_NON_BLOCKING, 0, host, &[])?;
+	mov rdi, qword ptr [rcx]
+		// ~/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/lib/rustlib/src/rust/library/core/src/ptr/metadata.rs:129
+		aggregate_raw_ptr(data_pointer, metadata)
+	mov qword ptr [rsp + 8], 0
+		// ~/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/cl3-0.7.0/src/command_queue.rs:336
+		clEnqueueWriteBuffer(
+	sub rsp, 8
+	.cfi_adjust_cfa_offset 8
+	lea r10, [rsp + 16]
+	mov rsi, r14
+	xor edx, edx
+	xor ecx, ecx
+	mov r15, r9
+	mov r8, r9
+	mov r9, rax
+	push r10
+	.cfi_adjust_cfa_offset 8
+	push 0
+	.cfi_adjust_cfa_offset 8
+	push 0
+	.cfi_adjust_cfa_offset 8
+	call qword ptr [rip + clEnqueueWriteBuffer@GOTPCREL]
+	add rsp, 32
+	.cfi_adjust_cfa_offset -32
+		// ~/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/cl3-0.7.0/src/command_queue.rs:348
+		if CL_SUCCESS != status {
+	test eax, eax
+	je .LBB8_3
+		// ~/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/lib/rustlib/src/rust/library/core/src/result.rs:2079
+		Err(e) => Err(From::from(e)),
+	mov dword ptr [rbx + 8], 0
+	mov dword ptr [rbx + 12], eax
+	jmp .LBB8_6
+.LBB8_5:
+		// crates/hpc-core/src/buffer/empty.rs:42
+		return Err(Error::BufferSizeMismatch {
+	mov dword ptr [rbx + 8], 3
+	mov qword ptr [rbx + 16], rdx
+	mov qword ptr [rbx + 24], r9
+.LBB8_6:
+	mov qword ptr [rbx], 1
+		// ~/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/cl3-0.7.0/src/memory.rs:373
+		let status: cl_int = unsafe { clReleaseMemObject(memobj) };
+	mov rdi, r14
+	call qword ptr [rip + clReleaseMemObject@GOTPCREL]
+		// ~/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/cl3-0.7.0/src/memory.rs:374
+		if CL_SUCCESS != status {
+	test eax, eax
+	jne .LBB8_7
+.LBB8_4:
+		// crates/hpc-core/src/buffer/empty.rs:59
+		}
+	mov rax, rbx
+	add rsp, 16
+	.cfi_def_cfa_offset 32
+	pop rbx
+	.cfi_def_cfa_offset 24
+	pop r14
+	.cfi_def_cfa_offset 16
+	pop r15
+	.cfi_def_cfa_offset 8
+	ret
+.LBB8_3:
+	.cfi_def_cfa_offset 48
+		// ~/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/cl3-0.7.0/src/command_queue.rs:351
+		Ok(event)
+	mov rax, qword ptr [rsp + 8]
+		// crates/hpc-core/src/buffer/empty.rs:51
+		Ok((
+	mov qword ptr [rbx + 8], r14
+	mov qword ptr [rbx + 16], r15
+	mov qword ptr [rbx + 24], 1
+	mov qword ptr [rbx + 32], rax
+	mov qword ptr [rbx], 0
+	jmp .LBB8_4
+.LBB8_7:
+		// ~/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/lib/rustlib/src/rust/library/core/src/result.rs:1119
+		Err(e) => unwrap_failed(msg, &e),
+	mov dword ptr [rsp + 4], eax
+	lea rdi, [rip + .Lanon.f8581d1c690bf6808f778301e2a8a64b.1]
+	lea rcx, [rip + .Lanon.f8581d1c690bf6808f778301e2a8a64b.0]
+	lea r8, [rip + .Lanon.f8581d1c690bf6808f778301e2a8a64b.3]
+	lea rdx, [rsp + 4]
+	mov esi, 25
+	call qword ptr [rip + core::result::unwrap_failed@GOTPCREL]

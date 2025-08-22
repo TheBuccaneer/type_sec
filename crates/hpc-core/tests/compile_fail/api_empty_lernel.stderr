@@ -1,0 +1,19 @@
+error[E0599]: no method named `enqueue_kernel` found for struct `DeviceBuffer<'_, u8, hpc_core::Empty>` in the current scope
+  --> tests/compile_fail/api_empty_lernel.rs:11:33
+   |
+11 |     let (_inflight, _evt) = buf.enqueue_kernel(&queue, &unimplemented!(), 16).unwrap();
+   |                                 ^^^^^^^^^^^^^^ method not found in `DeviceBuffer<'_, u8, hpc_core::Empty>`
+   |
+   = note: the method was found for
+           - `DeviceBuffer<'brand, T, hpc_core::Ready>`
+
+warning: unreachable expression
+  --> tests/compile_fail/api_empty_lernel.rs:11:56
+   |
+11 |     let (_inflight, _evt) = buf.enqueue_kernel(&queue, &unimplemented!(), 16).unwrap();
+   |                                                        ^----------------
+   |                                                        ||
+   |                                                        |any code following this expression is unreachable
+   |                                                        unreachable expression
+   |
+   = note: `#[warn(unreachable_code)]` on by default

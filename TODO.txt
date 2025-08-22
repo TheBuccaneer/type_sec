@@ -102,3 +102,75 @@ Rust Documentation
 +2
 Rust Documentation
 +2
+
+
+Ja! Du meinst das Lifetime-Branding zwischen Context, Queue und Buffer!
+Das Problem: Aktuell können Buffer und Queues von verschiedenen Contexts gemischt werden:
+
+
+BUFFER CENTRIC ABSCHAFFEN bei kernelafurf
+
+
+Fehlerklasse F6 muss noch verbessert werden
+
+
+Noch offen / zu sichern
+
+Compile-Fail-Belege (EPS)
+
+In tests/compile_fail/ → sicherstellen, dass alle Kernfehlerklassen (F1–F8) drin sind.
+
+Doku/Mapping in SPEC-tests-map.md: jede Regel ↔ Testfall.
+
+Artefakte: Screenshots/Logs von 1–2 Tests für die Demo.
+
+Bug-Injection Crate
+
+crates/bug_injection/ mit Minimal-Baselines (zeigen Fehlverhalten).
+
+Runner, der zählt: #Injected, #Prevented.
+
+PSC-Metrik updaten (z. B. 9/12 = 75 %).
+
+Leak-Report
+
+RAII-Zähler für OpenCL-Objekte.
+
+Aggregierter JSONL-Export unter results/YYYY-MM-DD/leaks/.
+
+Drop-Summary in der Demo zeigen („Leak=0“ im Happy-Path).
+
+Mini-Fuzzer v0
+
+Seeds: VecAdd, Reduction, Scatter/Gather.
+
+Runner mit CLI-Flags.
+
+Output → JSONL unter results/YYYY-MM-DD/fuzzer/.
+
+Cross-Mapping & Related Work
+
+docs/cross_mapping.md: Tabelle (SYCL, CUDA, OpenCL).
+
+docs/related_work.md: 4–6 Quellen, kurze Zusammenfassung.
+
+Paper-Integration
+
+paper/main.md muss IMRaD-Struktur haben.
+
+evaluation.md enthält Bench-Plots + Threats-Section (Varianz, pinned vs. pageable).
+
+Repro-Doku
+
+docs/reproduce.md: Step-by-Step „10 min to snapshot“.
+
+Checksummen der Artefakte + CI-Badge.
+
+Release/Badges
+
+Tag v0.1.0-eps.
+
+GitHub Release mit Assets (Paper PDF, Results, SPEC, Bug-Injection, Benches).
+
+Zenodo DOI eintragen, Badges im README.
+

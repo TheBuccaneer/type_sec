@@ -1,0 +1,19 @@
+// crates/hpc-core/tests/compile_fail/api_cross_context.rs
+use hpc_core::*;
+
+fn main() {
+    // Zwei verschiedene Contexts
+    let ctx1 = Context::create_context().unwrap();
+    let ctx2 = Context::create_context().unwrap();
+
+    let queue1 = ctx1.create_queue().unwrap();
+    let queue2 = ctx2.create_queue().unwrap();
+
+    // Buffer hängt an ctx1 → Ready
+    let buf1 = ctx1
+        .create_buffer::<u8>(16).unwrap()
+        .enqueue_write(&queue1, &[0u8; 16]).unwrap();
+
+    // illegal: Buffer (ctx1) mit Queue (ctx2) verwenden
+    let (_inflight, _evt) = buf1.enqueue_kernel(&queue2, &unimplemented!(), 16).unwrap();
+}

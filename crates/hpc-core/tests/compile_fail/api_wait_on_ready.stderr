@@ -1,0 +1,5 @@
+error[E0599]: no method named `wait` found for struct `DeviceBuffer` in the current scope
+  --> tests/compile_fail/api_wait_on_ready.rs:14:24
+   |
+14 |     let _illegal = buf.wait();
+   |                        ^^^^ method not found in `DeviceBuffer<'_, u8, hpc_core::Ready>`

@@ -1,4 +1,4 @@
-#![cfg(feature = "memtrace")]
+#![cfg(feature = "memtracer")]
 
 //! Memory transfer tracing utilities
 

@@ -22,7 +22,7 @@ pub struct DeviceBuffer<'brand, T, S: State> {
     pub(crate) len: usize,
     // Zwei separate Marker:
     pub(crate) _brand: PhantomData<fn(&'brand ()) -> &'brand ()>, // invariant für Context
-    pub(crate) _type: PhantomData<T>, // kovariant für Typ (das ist OK)
+    pub(crate) _type: PhantomData<T>,                             // kovariant für Typ (das ist OK)
 }
 
 impl<'ctx, T, S: State> DeviceBuffer<'ctx, T, S> {
@@ -30,8 +30,8 @@ impl<'ctx, T, S: State> DeviceBuffer<'ctx, T, S> {
         Self {
             inner,
             len: len_elems,
-            _brand: PhantomData,  // ← für Context-Branding
-            _type: PhantomData,   // ← für Typ-Parameter
+            _brand: PhantomData, // ← für Context-Branding
+            _type: PhantomData,  // ← für Typ-Parameter
         }
     }
 }

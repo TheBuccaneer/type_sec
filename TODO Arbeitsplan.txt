@@ -1,0 +1,19 @@
+Es sieht so aus, als hättet ihr alle wesentlichen Punkte in eurer Definition of Done abgedeckt. Ergänzend könntet ihr noch folgende Aspekte prüfen, sofern ihr sie nicht schon implementiert habt:
+
+    Zero-Cost-Abstraktion verifiziert
+    – Statische Analyse (z. B. Assembly-Inspection), dass keine zusätzlichen Synchronisations- oder Ownership-Checks zur Laufzeit erzeugt werden.
+
+    Dokumentation der Fehlerszenarien
+    – Ein Abschnitt in den Docs zu möglichen „Device Lost“- oder „Out of Resources“-Fehlern und wie die API darauf reagiert.
+
+    Feature-Gating
+    – Async-API und Benchmarks hinter Feature-Flags (async, bench) verstecken, um den Default-Build schlank zu halten.
+
+    Versionierung und Kompatibilität
+    – Sicherstellen, dass MSRV, Edition und SemVer-Richtlinie klar in CI und README stehen.
+
+    Performance-Smoke-Tests in CI
+    – Ein einfacher Throughput-Check, der bei signifikanten Regressionen den Build fehlschlägt.
+
+    Erweiterte Trybuild-Tests
+    – Komplexere Szenarien, z. B. mehrfaches Pipelines aus InFlight-Buffern auf der gleichen Queue, um unerwartete Compiler-Warnungen oder -Errors abzudecken.

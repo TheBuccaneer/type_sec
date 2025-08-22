@@ -3,8 +3,11 @@
 use crate::EventToken;
 use crate::api::{DeviceBuffer, Queue};
 use crate::buffer::state::{InFlight, Ready};
-use crate::error::{Error, Result};
+use crate::error::Result;
 use opencl3::types::{CL_BLOCKING, CL_NON_BLOCKING};
+
+#[cfg(feature = "memtracer")]
+use crate::memtracer::{Dir, start};
 
 //=============================================================================
 // WRITE OPERATIONS
@@ -40,47 +43,17 @@ impl<'brand, T> DeviceBuffer<'brand, T, Ready> {
         ))
     }
 
-    pub fn overwrite_byte_non_blocking(
-        self,
+    pub fn benchmark_overwrite_non_blocking(
+        &mut self,
         queue: &Queue<'brand>,
-        data: &[u8],
-    ) -> Result<(DeviceBuffer<'brand, T, InFlight>, EventToken<'brand>)> {
-        if data.len() != self.len * std::mem::size_of::<T>() {
-            return Err(Error::BufferSizeMismatch {
-                expected: self.len * std::mem::size_of::<T>(),
-                actual: data.len(),
-            });
-        }
-        let (inner_inflight, evt) = self.inner.overwrite_byte_consuming(
-            queue.raw(),
-            data, // ← direkt data, ohne cast
-            CL_NON_BLOCKING,
-        )?;
-
-        Ok((
-            DeviceBuffer::from_inner(inner_inflight, self.len),
-            EventToken::from_event(evt),
-        ))
-    }
-
-    pub fn benchmark_overwrite_non_blocking(&mut self, queue: &Queue<'brand>, data: &[T]) -> Result<()>
+        data: &[T],
+    ) -> Result<()>
     where
         T: bytemuck::Pod,
     {
         let bytes = bytemuck::cast_slice(data);
         let _evt = self.inner.overwrite(queue.raw(), bytes, CL_NON_BLOCKING)?;
 
-        Ok(())
-    }
-
-    pub fn overwrite_byte_blocking(&mut self, queue: &Queue<'brand>, data: &[u8]) -> Result<()> {
-        if data.len() != self.len * std::mem::size_of::<T>() {
-            return Err(Error::BufferSizeMismatch {
-                expected: self.len * std::mem::size_of::<T>(),
-                actual: data.len(),
-            });
-        }
-        self.inner.overwrite_byte(queue.raw(), data, CL_BLOCKING)?;
         Ok(())
     }
 }

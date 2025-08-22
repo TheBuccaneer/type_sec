@@ -1,4 +1,4 @@
-#![cfg(feature = "memtrace")]
+#![cfg(feature = "memtracer")]
 
 use super::{AUTO_TRACE, Dir, LOG, Phase, Record};
 use once_cell::sync::Lazy;

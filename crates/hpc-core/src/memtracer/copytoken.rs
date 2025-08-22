@@ -1,4 +1,4 @@
-#![cfg(feature = "memtrace")]
+#![cfg(feature = "memtracer")]
 
 use super::{AUTO_TRACE, CURRENT_ABORT, Dir, LOG, Phase, Record, T0};
 use std::time::Instant;

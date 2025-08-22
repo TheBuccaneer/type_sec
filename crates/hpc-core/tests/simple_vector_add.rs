@@ -32,14 +32,16 @@ fn main() -> Result<()> {
     // 4. Buffer erstellen und Daten hochladen (neue Context-API)
     let buffer_a = ctx.create_buffer::<u8>(size)?.enqueue_write(&queue, &a)?;
     let buffer_b = ctx.create_buffer::<u8>(size)?.enqueue_write(&queue, &b)?;
-    let buffer_result = ctx.create_buffer::<u8>(size)?.enqueue_write(&queue, &result)?;
+    let buffer_result = ctx
+        .create_buffer::<u8>(size)?
+        .enqueue_write(&queue, &result)?;
 
     // 5. Kernel kompilieren
     let kernel = Kernel::from_source(&ctx, kernel_source, "vector_add")?;
 
     // 6. ✅ Kernel-Argumente setzen (type-safe branded API)
-    kernel.set_arg_buffer(0, &buffer_a)?;      // Input A
-    kernel.set_arg_buffer(1, &buffer_b)?;      // Input B  
+    kernel.set_arg_buffer(0, &buffer_a)?; // Input A
+    kernel.set_arg_buffer(1, &buffer_b)?; // Input B  
     kernel.set_arg_buffer(2, &buffer_result)?; // Output
     kernel.set_arg_scalar(3, &(size as u32))?; // Size parameter
 

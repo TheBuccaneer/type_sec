@@ -28,20 +28,16 @@ impl<'brand> EventToken<'brand> {
     }
 
     /// Konsumierender Übergang: einzig erlaubter Pfad von InFlight → Ready.
-    pub fn wait<T>(
-    self,
-    buf: DeviceBuffer<'brand, T, InFlight>
-) -> DeviceBuffer<'brand, T, Ready> {
-    self.inner.wait();
+    pub fn wait<T>(self, buf: DeviceBuffer<'brand, T, InFlight>) -> DeviceBuffer<'brand, T, Ready> {
+        self.inner.wait();
 
-    DeviceBuffer::from_inner(
-        crate::buffer::GpuBuffer {
-            buf: buf.inner.buf,
-            len_bytes: buf.inner.len_bytes,
-            _state: PhantomData::<Ready>,
-        },
-        buf.len,
-    )
-}
-
+        DeviceBuffer::from_inner(
+            crate::buffer::GpuBuffer {
+                buf: buf.inner.buf,
+                len_bytes: buf.inner.len_bytes,
+                _state: PhantomData::<Ready>,
+            },
+            buf.len,
+        )
+    }
 }

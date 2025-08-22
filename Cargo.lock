@@ -251,6 +251,7 @@ version = "0.1.0"
 dependencies = [
  "bytemuck",
  "criterion",
+ "once_cell",
  "opencl3",
  "serde",
  "serde_json",

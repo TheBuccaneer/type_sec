@@ -7,7 +7,9 @@ fn enqueue_write_same_queue_smoke() {
     let buf = ctx.create_buffer::<u32>(4).expect("buffer");
 
     let data = [1u32, 2, 3, 4];
-    let _evt = buf.enqueue_write(&q, &data).expect("enqueue_write should succeed");
+    let _evt = buf
+        .enqueue_write(&q, &data)
+        .expect("enqueue_write should succeed");
 }
 
 #[test]

@@ -4,7 +4,7 @@ use crate::error::{Error, Result};
 use core::mem::size_of;
 use opencl3::command_queue::CommandQueue;
 use opencl3::memory::CL_MEM_READ_WRITE;
-use opencl3::types::CL_NON_BLOCKING;
+use opencl3::types::CL_BLOCKING;
 use opencl3::{context::Context, memory::Buffer, types::cl_mem_flags};
 use std::marker::PhantomData;
 
@@ -30,7 +30,6 @@ impl GpuBuffer<Empty> {
     }
 }
 
-
 impl GpuBuffer<Empty> {
     pub fn enqueue_write(
         mut self,
@@ -46,7 +45,7 @@ impl GpuBuffer<Empty> {
         }
 
         // Write enqueuen
-        let evt = queue.enqueue_write_buffer(&mut self.buf, CL_NON_BLOCKING, 0, host, &[])?;
+        let evt = queue.enqueue_write_buffer(&mut self.buf, CL_BLOCKING, 0, host, &[])?;
 
         Ok((
             GpuBuffer {

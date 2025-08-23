@@ -2,13 +2,13 @@
 
 use crate::api::util::{EventToken, ReadGuard};
 use crate::api::{DeviceBuffer, Queue};
-use crate::buffer::state::{InFlight, Ready};
+use crate::buffer::state::{InFlight, Written};
 use crate::error::{Error, Result};
 
-impl<'brand, T> DeviceBuffer<'brand, T, Ready> {
+impl<'brand, T> DeviceBuffer<'brand, T, Written> {
     //############################READING FUNCTIONS
 
-    pub fn enqueue_read_blocking(&self, queue: &Queue<'brand>, out: &mut [T]) -> Result<()>
+    pub fn read_blocking(&self, queue: &Queue<'brand>, out: &mut [T]) -> Result<()>
     where
         T: bytemuck::Pod,
     {
@@ -27,7 +27,7 @@ impl<'brand, T> DeviceBuffer<'brand, T, Ready> {
         Ok(())
     }
 
-    pub fn enqueue_read_non_blocking<'a>(
+    pub fn read_non_blocking<'a>(
         self,
         queue: &Queue<'brand>,
         out: &'a mut [T],

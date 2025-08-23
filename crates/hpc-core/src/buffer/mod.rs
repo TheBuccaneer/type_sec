@@ -1,32 +1,18 @@
 //! GPU Buffer management with type-state pattern
 
-mod guard;
+mod gpu_guard;
+mod map_guard;
 
-pub use guard::GpuEventGuard;
+pub use gpu_guard::GpuEventGuard;
+pub use map_guard::MapGuard;
 pub mod state;
-pub use state::{InFlight, Ready, State};
+pub use state::{InFlight, Mapped, State};
 
 mod empty;
 mod inflight;
-mod ready;
+mod written;
 
 use opencl3::memory::Buffer;
-
-#[cfg(feature = "metrics")]
-use std::time::Instant;
-
-#[cfg(feature = "metrics")]
-use std::sync::atomic::Ordering;
-
-#[cfg(feature = "metrics")]
-use crate::metrics::{RunLog, log_run};
-
-#[cfg(feature = "metrics")]
-#[inline]
-fn mlog(example: &'static str, n: usize) {
-    // eine JSONL-Zeile, Fehler bewusst ignorieren (keine Panik im Fast-Path)
-    let _ = log_run(&RunLog { example, n });
-}
 
 #[derive(Debug)]
 pub struct GpuBuffer<S: State> {
@@ -58,9 +44,7 @@ impl<S: State> GpuBuffer<S> {
     pub fn len_bytes(&self) -> usize {
         self.len_bytes
     }
-}
 
-impl<S: State> GpuBuffer<S> {
     #[inline]
     pub fn dev_len_bytes(&self) -> usize {
         self.len_bytes()

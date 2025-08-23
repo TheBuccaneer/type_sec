@@ -1,6 +1,7 @@
 use crate::api::DeviceBuffer;
 use crate::buffer::GpuEventGuard;
-use crate::buffer::state::{InFlight, Ready};
+use crate::buffer::state::InFlight;
+use crate::buffer::state::Written;
 use core::marker::PhantomData;
 use opencl3::event::Event;
 
@@ -28,14 +29,17 @@ impl<'brand> EventToken<'brand> {
     }
 
     /// Konsumierender Übergang: einzig erlaubter Pfad von InFlight → Ready.
-    pub fn wait<T>(self, buf: DeviceBuffer<'brand, T, InFlight>) -> DeviceBuffer<'brand, T, Ready> {
+    pub fn wait<T>(
+        self,
+        buf: DeviceBuffer<'brand, T, InFlight>,
+    ) -> DeviceBuffer<'brand, T, Written> {
         self.inner.wait();
 
         DeviceBuffer::from_inner(
             crate::buffer::GpuBuffer {
                 buf: buf.inner.buf,
                 len_bytes: buf.inner.len_bytes,
-                _state: PhantomData::<Ready>,
+                _state: PhantomData::<Written>,
             },
             buf.len,
         )

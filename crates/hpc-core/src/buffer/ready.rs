@@ -8,7 +8,6 @@ use opencl3::types::cl_bool;
 use std::ffi::c_void;
 use std::marker::PhantomData;
 
-
 impl GpuBuffer<Ready> {
     /*
     #######################################
@@ -80,7 +79,6 @@ impl GpuBuffer<Ready> {
         }
 
         let evt = queue.enqueue_write_buffer(&mut self.buf, blocking, 0, host, &[])?;
-
 
         Ok(evt)
     }

@@ -1,6 +1,6 @@
 use super::EventToken;
 use crate::api::DeviceBuffer;
-use crate::buffer::state::{InFlight, Ready};
+use crate::buffer::state::{InFlight, Written};
 
 /// Guard that holds a mutable slice until GPU read operation completes
 #[must_use]
@@ -17,7 +17,7 @@ impl<'a, 'brand, T> ReadGuard<'a, 'brand, T> {
 
     /// Wait until GPU is finished, then return Ready buffer and release the slice
     #[must_use]
-    pub fn wait(self, buf: DeviceBuffer<'brand, T, InFlight>) -> DeviceBuffer<'brand, T, Ready> {
+    pub fn wait(self, buf: DeviceBuffer<'brand, T, InFlight>) -> DeviceBuffer<'brand, T, Written> {
         let buf_ready = self.token.wait(buf);
         // Nach dem wait() ist self konsumiert und die Slice-Referenz wird freigegeben
         // Der Aufrufer kann seine ursprüngliche Slice wieder normal nutzen

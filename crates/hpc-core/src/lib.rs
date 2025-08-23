@@ -6,25 +6,6 @@
 // LOW-LEVEL MODULES
 //=============================================================================
 
-// memtracer öffentlich machen (falls noch nicht)
-#[cfg(feature = "memtracer")]
-pub mod memtracer;
-
-// C-Callback, das der Event aufruft, wenn er fertig ist (CL_COMPLETE)
-#[cfg(feature = "memtracer")]
-#[unsafe(no_mangle)]
-pub extern "C" fn memtrace_callback(
-    _event: *const core::ffi::c_void,
-    user_data: *mut core::ffi::c_void,
-) {
-    // Box zurückholen → finish() loggt und droppt das Token
-    unsafe { Box::from_raw(user_data.cast::<crate::memtracer::CopyToken>()) }.finish();
-}
-
-#[cfg(feature = "memtracer")]
-pub use memtracer::{CopyToken, Dir, start as memtracer_start};
-
-
 pub mod buffer;
 pub mod error;
 
@@ -54,7 +35,7 @@ pub use api::{
 //=============================================================================
 
 // Buffer states for advanced usage
-pub use buffer::state::{Empty, InFlight, Ready, State};
+pub use buffer::state::{Empty, InFlight, Mapped, State, Written};
 
 // Low-level buffer for tests/benches
 pub use buffer::GpuBuffer;

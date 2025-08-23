@@ -3,6 +3,7 @@
 use hpc_core::*;
 
 fn main() -> Result<()> {
+    /*
     // 1. OpenCL Context und Queue erstellen (neue API)
     let ctx = Context::create_context()?;
     let queue = ctx.create_queue()?;
@@ -40,7 +41,7 @@ fn main() -> Result<()> {
 
     // 6. Kernel-Argumente setzen (type-safe branded API)
     kernel.set_arg_buffer(0, &buffer_a)?; // Input A
-    kernel.set_arg_buffer(1, &buffer_b)?; // Input B  
+    kernel.set_arg_buffer(1, &buffer_b)?; // Input B
     kernel.set_arg_buffer(2, &buffer_result)?; // Output
     kernel.set_arg_scalar(3, &(size as u32))?; // Size parameter
 
@@ -66,5 +67,11 @@ fn main() -> Result<()> {
     }
 
     println!("Vector addition erfolgreich!");
+    Ok(())
+
+
+
+    */
+
     Ok(())
 }

@@ -3,8 +3,9 @@
 use opencl3::{kernel::Kernel as CLKernel, program::Program as CLProgram};
 
 use super::Context;
+use crate::DeviceBuffer;
+use crate::buffer::state::Written;
 use crate::error::Result;
-use crate::{DeviceBuffer, Ready};
 use std::marker::PhantomData;
 
 #[must_use]
@@ -35,7 +36,7 @@ impl<'brand> Kernel<'brand> {
     pub fn set_arg_buffer<T>(
         &self,
         index: u32,
-        buf: &DeviceBuffer<'brand, T, Ready>,
+        buf: &DeviceBuffer<'brand, T, Written>,
     ) -> Result<()> {
         self.inner.set_arg(index, buf.inner.raw())?;
         Ok(())

@@ -1,0 +1,174 @@
+use crate::buffer::GpuBuffer;
+use crate::buffer::state::{InFlight, Written, Mapped};
+use crate::error::{Error, Result};
+use opencl3::command_queue::CommandQueue;
+use opencl3::event::Event;
+use opencl3::types::CL_BLOCKING;
+use opencl3::types::CL_NON_BLOCKING;
+use opencl3::types::cl_bool;
+use std::marker::PhantomData;
+use crate::buffer::MapGuard;
+use opencl3::memory::CL_MEM_READ_WRITE;
+use opencl3::memory::ClMem; // <-- Das fehlt!
+use std::ffi::c_void;
+
+
+impl GpuBuffer<Written> {
+
+    pub fn overwrite(
+        &mut self,
+        queue: &CommandQueue,
+        host: &[u8],
+        blocking: cl_bool,
+    ) -> Result<Event> {
+        if host.len() != self.len_bytes {
+            return Err(Error::BufferSizeMismatch {
+                expected: self.len_bytes,
+                actual: host.len(),
+            });
+        }
+
+        let evt = queue.enqueue_write_buffer(&mut self.buf, blocking, 0, host, &[])?;
+
+
+        Ok(evt)
+    }
+    
+    pub fn write_block(
+        mut self,
+        queue: &CommandQueue,
+        host: &[u8],
+    ) -> Result<(GpuBuffer<Written>)> {
+        if host.len() != self.len_bytes {
+            return Err(Error::BufferSizeMismatch {
+                expected: self.len_bytes,
+                actual: host.len(),
+            });
+        }
+
+        // Write enqueuen
+        let _evt = queue.enqueue_write_buffer(&mut self.buf, CL_BLOCKING, 0, host, &[])?;
+
+        Ok(GpuBuffer {
+            buf: self.buf,
+            len_bytes: self.len_bytes,
+            _state: PhantomData::<Written>,
+        })
+    }
+
+    pub fn write_non_block(
+        mut self, // Konsumiert self
+        queue: &CommandQueue,
+        host: &[u8],
+    ) -> Result<(GpuBuffer<InFlight>, Event)> {
+        let evt = queue.enqueue_write_buffer(&mut self.buf, CL_NON_BLOCKING, 0, host, &[])?;
+        Ok((
+            GpuBuffer {
+                buf: self.buf, // Move ist OK, da self konsumiert wird
+                len_bytes: self.len_bytes,
+                _state: PhantomData::<InFlight>,
+            },
+            evt,
+        ))
+    }
+
+
+     pub fn enqueue_read(
+        &self,
+        queue: &CommandQueue,
+        host: &mut [u8],
+        blocking: cl_bool,
+    ) -> Result<Event> {
+        if host.len() != self.len_bytes {
+            return Err(Error::BufferSizeMismatch {
+                expected: self.len_bytes,
+                actual: host.len(),
+            });
+        }
+
+        let evt = queue.enqueue_read_buffer(&self.buf, blocking, 0, host, &[])?;
+
+        Ok(evt)
+    }
+
+    pub fn enqueue_read_consuming(
+        self,
+        queue: &CommandQueue,
+        host: &mut [u8],
+        blocking: cl_bool,
+    ) -> Result<(GpuBuffer<InFlight>, Event)> {
+        if host.len() != self.len_bytes {
+            return Err(Error::BufferSizeMismatch {
+                expected: self.len_bytes,
+                actual: host.len(),
+            });
+        }
+
+        let evt = queue.enqueue_read_buffer(&self.buf, blocking, 0, host, &[])?;
+
+        Ok((
+            GpuBuffer {
+                buf: self.buf,
+                len_bytes: self.len_bytes,
+                _state: PhantomData::<InFlight>,
+            },
+            evt,
+        ))
+    }
+
+
+        pub fn map_for_write_block(
+        mut self,
+        queue: &CommandQueue,
+    ) -> Result<(GpuBuffer<Mapped>, MapGuard<'_>)> {
+        let mut mapped_ptr: *mut std::ffi::c_void = std::ptr::null_mut();
+
+        let _event = queue.enqueue_map_buffer(
+            &mut self.buf,
+            opencl3::types::CL_TRUE, // blocking
+            CL_MEM_READ_WRITE,
+            0,
+            self.len_bytes,
+            &mut mapped_ptr,
+            &[],
+        )?;
+
+        let guard = MapGuard::new(queue, self.buf.get(), mapped_ptr as *mut u8);
+
+        Ok((
+            GpuBuffer {
+                buf: self.buf,
+                len_bytes: self.len_bytes,
+                _state: PhantomData::<Mapped>,
+            },
+            guard, // Für späteren unmap
+        ))
+    }
+    
+     pub fn enqueue_kernel(
+        self,
+        queue: &CommandQueue,
+        kernel: &opencl3::kernel::Kernel,
+        global_work_size: usize,
+    ) -> Result<(GpuBuffer<InFlight>, Event)> {
+        let kernel_ptr = kernel.get() as *mut c_void;
+
+        let evt = queue.enqueue_nd_range_kernel(
+            kernel_ptr,
+            1, // 1D NDRange (später anpassen)
+            std::ptr::null(),
+            &global_work_size as *const usize,
+            std::ptr::null(),
+            &[],
+        )?;
+
+        Ok((
+            GpuBuffer {
+                buf: self.buf,
+                len_bytes: self.len_bytes,
+                _state: PhantomData::<InFlight>,
+            },
+            evt,
+        ))
+    }
+}

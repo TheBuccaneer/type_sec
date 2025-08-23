@@ -6,7 +6,8 @@ use std::marker::PhantomData;
 // State-specific implementations
 mod empty;
 mod inflight;
-mod ready;
+mod mapped;
+mod written;
 
 //=============================================================================
 // STRUCT DEFINITION

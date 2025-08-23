@@ -5,8 +5,6 @@ use opencl3::event::Event;
 /// Guard that waits for event completion on drop
 pub struct GpuEventGuard {
     evt: Option<Event>,
-    #[cfg(feature = "metrics")]
-    start_time: std::time::Instant,
 }
 
 impl GpuEventGuard {

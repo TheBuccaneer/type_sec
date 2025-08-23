@@ -53,13 +53,13 @@ impl<'brand> Context<'brand> {
         })
     }
 
-    pub fn create_buffer<T>(
+    pub fn create_empty_buffer<T>(
         &'brand self,
         n_elems: usize,
     ) -> Result<DeviceBuffer<'brand, T, Empty>> {
         // Delegiere an die bestehende create_buffer Funktion, aber mit branded DeviceBuffer
         let inner: crate::buffer::GpuBuffer<Empty> =
-            crate::buffer::GpuBuffer::<Empty>::create_uninit_elems::<T>(&self.inner, n_elems)?;
+            crate::buffer::GpuBuffer::<Empty>::create_empty_buffer::<T>(&self.inner, n_elems)?;
 
         Ok(DeviceBuffer::from_inner(inner, n_elems))
     }

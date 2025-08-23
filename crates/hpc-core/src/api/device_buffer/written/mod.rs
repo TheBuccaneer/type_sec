@@ -2,7 +2,7 @@
 
 use crate::EventToken;
 use crate::api::{DeviceBuffer, Kernel, Queue};
-use crate::buffer::state::{InFlight, Ready};
+use crate::buffer::state::{InFlight, Written};
 use crate::error::Result;
 
 // Import I/O implementations
@@ -12,7 +12,7 @@ mod io;
 // COMPUTE OPERATIONS
 //=============================================================================
 
-impl<'brand, T> DeviceBuffer<'brand, T, Ready> {
+impl<'brand, T> DeviceBuffer<'brand, T, Written> {
     pub fn enqueue_kernel(
         self,
         queue: &'brand Queue,

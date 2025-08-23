@@ -40,8 +40,6 @@ impl Drop for GpuEventGuard {
     fn drop(&mut self) {
         if let Some(evt) = self.evt.take() {
             let _ = evt.wait();
-            #[cfg(feature = "metrics")]
-            crate::metrics::record("event_wait", self.start_time);
         }
     }
 }

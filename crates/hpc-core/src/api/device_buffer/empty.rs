@@ -25,7 +25,7 @@ impl<'brand, T> DeviceBuffer<'brand, T, Empty> {
         // Cast &[T] → &[u8]
         let bytes: &[u8] = bytemuck::cast_slice(data);
 
-        let (inner_ready, _evt) = self.inner.enqueue_write(queue.raw(), bytes)?;
+        let inner_ready /*_evt*/ = self.inner.enqueue_write(queue.raw(), bytes)?;
         Ok(DeviceBuffer::from_inner(inner_ready, self.len))
     }
 

@@ -3,7 +3,7 @@ use crate::buffer::{GpuBuffer, GpuEventGuard};
 use crate::error::{Error, Result};
 use core::mem::size_of;
 use opencl3::command_queue::CommandQueue;
-use opencl3::memory::{CL_MEM_READ_WRITE, CL_MEM_ALLOC_HOST_PTR};
+use opencl3::memory::{CL_MEM_READ_WRITE};
 use opencl3::types::CL_BLOCKING;
 use opencl3::{context::Context, memory::Buffer, types::cl_mem_flags};
 use std::marker::PhantomData;
@@ -35,7 +35,7 @@ impl GpuBuffer<Empty> {
         mut self,
         queue: &CommandQueue,
         host: &[u8],
-    ) -> Result<(GpuBuffer<Ready>, GpuEventGuard)> {
+    ) -> Result<(GpuBuffer<Ready> /* , GpuEventGuard*/)> {
         // Größenprüfung
         if host.len() != self.len_bytes {
             return Err(Error::BufferSizeMismatch {
@@ -47,13 +47,13 @@ impl GpuBuffer<Empty> {
         // Write enqueuen
         let evt = queue.enqueue_write_buffer(&mut self.buf, CL_BLOCKING, 0, host, &[])?;
 
-        Ok((
+        Ok(
             GpuBuffer {
                 buf: self.buf,
                 len_bytes: self.len_bytes,
                 _state: PhantomData::<Ready>,
-            },
-            GpuEventGuard::new(evt),
-        ))
+            }//,
+            //GpuEventGuard::new(evt),
+        )
     }
 }

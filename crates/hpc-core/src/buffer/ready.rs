@@ -8,8 +8,6 @@ use opencl3::types::cl_bool;
 use std::ffi::c_void;
 use std::marker::PhantomData;
 
-#[cfg(feature = "memtracer")]
-use crate::memtracer::{Dir, start};
 
 impl GpuBuffer<Ready> {
     /*
@@ -80,27 +78,9 @@ impl GpuBuffer<Ready> {
                 actual: host.len(),
             });
         }
-        #[cfg(feature = "memtracer")]
-        let token_box = if crate::memtracer::is_auto_trace_enabled() {
-            Some(Box::new(crate::memtracer::start(
-                crate::memtracer::Dir::H2D,
-                host.len(),
-            )))
-        } else {
-            None
-        };
 
         let evt = queue.enqueue_write_buffer(&mut self.buf, blocking, 0, host, &[])?;
 
-        #[cfg(feature = "memtracer")]
-        if let Some(token_box) = token_box {
-            use opencl3::event::CL_COMPLETE;
-            let ptr = Box::into_raw(token_box) as *mut std::ffi::c_void;
-            if let Err(e) = evt.set_callback(CL_COMPLETE, crate::memtrace_callback, ptr) {
-                eprintln!("callback failed: {e}");
-                unsafe { Box::from_raw(ptr.cast::<crate::memtracer::CopyToken>()) }.finish();
-            }
-        }
 
         Ok(evt)
     }

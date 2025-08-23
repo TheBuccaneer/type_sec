@@ -23,6 +23,15 @@ impl<'brand, T> DeviceBuffer<'brand, T, Ready> {
         Ok(())
     }
 
+        pub fn overwrite_blocking_for_bench(&mut self, queue: &Queue<'brand>, data: &[T]) -> Result<()>
+    where
+        T: bytemuck::Pod,
+    {
+        let bytes = bytemuck::cast_slice(data);
+        let _evt = self.inner.overwrite(queue.raw(), bytes, CL_BLOCKING)?;
+        Ok(())
+    }
+
     pub fn overwrite_non_blocking(
         self,
         queue: &Queue<'brand>,

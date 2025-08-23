@@ -28,4 +28,6 @@ impl<'brand, T> DeviceBuffer<'brand, T, Empty> {
         let (inner_ready, _evt) = self.inner.enqueue_write(queue.raw(), bytes)?;
         Ok(DeviceBuffer::from_inner(inner_ready, self.len))
     }
+
+
 }

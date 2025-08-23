@@ -15,11 +15,11 @@ const SIZES: &[usize] = &[
     16 * 1024 * 1024, // 16 MiB
 ];
 
-fn memcpy_bench(c: &mut Criterion) {
+fn api_memcpy_bench(c: &mut Criterion) {
     let ctx = Context::create_context().unwrap();
     let queue = ctx.create_queue().unwrap();
 
-    let mut group = c.benchmark_group("memcpy_api_bytes");
+    let mut group = c.benchmark_group("api_memcpy_bench");
 
     for &nbytes in SIZES {
         group.throughput(Throughput::Bytes(nbytes as u64));
@@ -50,7 +50,7 @@ fn memcpy_opencl3_bench(c: &mut Criterion) {
     let ctx = CLContext::from_devices(&device_ids, &[], None, ptr::null_mut()).unwrap();
     let queue = CommandQueue::create(&ctx, device_ids[0], 0).unwrap();
 
-    let mut group = c.benchmark_group("memcpy_opencl3");
+    let mut group = c.benchmark_group("memcpy_opencl3_bench");
 
     for &nbytes in SIZES {
         group.throughput(Throughput::Bytes(nbytes as u64));
@@ -75,5 +75,134 @@ fn memcpy_opencl3_bench(c: &mut Criterion) {
     group.finish();
 }
 
-criterion_group!(benches, memcpy_bench, memcpy_opencl3_bench);
+fn api_memcpy_bench_full(c: &mut Criterion) {
+    let ctx = Context::create_context().unwrap();
+    let queue = ctx.create_queue().unwrap();
+
+    let mut group = c.benchmark_group("api_memcpy_bench_full");
+
+    for &nbytes in SIZES {
+        group.throughput(Throughput::Bytes(nbytes as u64));
+
+        // Daten vorbereiten
+        let src: Vec<u8> = vec![1; nbytes];
+        let mut dst: Vec<u8> = vec![0; nbytes];
+
+        // Buffer einmal anlegen und initialisieren
+        //let buf = ctx.create_buffer::<u8>(nbytes).unwrap(); // Empty
+        group.bench_function(format!("copy_bytes_{}", nbytes), |b| {
+            b.iter(|| {
+                let buf = ctx.create_buffer::<u8>(nbytes).unwrap(); // Empty
+                let mut buf = buf.enqueue_write(&queue, &src).unwrap(); // Ready
+                buf.overwrite_blocking(&queue, black_box(&src)).unwrap(); //InFlight
+                buf.enqueue_read_blocking(&queue, black_box(&mut dst))
+                    //.unwrap();
+            });
+        });
+    }
+
+    group.finish();
+}
+
+fn memcpy_opencl3_bench_full(c: &mut Criterion) {
+    let device_ids =
+        get_all_devices(opencl3::device::CL_DEVICE_TYPE_GPU).expect("Kein GPU gefunden");
+    let ctx = CLContext::from_devices(&device_ids, &[], None, ptr::null_mut()).unwrap();
+    let queue = CommandQueue::create(&ctx, device_ids[0], 0).unwrap();
+
+    let mut group = c.benchmark_group("memcpy_opencl3_bench_full");
+
+    for &nbytes in SIZES {
+        group.throughput(Throughput::Bytes(nbytes as u64));
+
+        let src: Vec<u8> = vec![1; nbytes];
+        let mut dst: Vec<u8> = vec![0; src.len()];
+
+        group.bench_function(format!("copy_only_{}", nbytes), |b| {
+            b.iter(|| {
+                let mut buf: CLBuffer<u8> =
+                CLBuffer::create(&ctx, CL_MEM_READ_WRITE, src.len(), ptr::null_mut()).unwrap();
+                queue
+                    .enqueue_write_buffer(&mut buf, CL_BLOCKING, 0, black_box(&src), &[])
+                    .unwrap();
+                queue
+                    .enqueue_read_buffer(&buf, CL_BLOCKING, 0, black_box(&mut dst), &[])
+                    .unwrap();
+            });
+        });
+    }
+
+    group.finish();
+}
+
+
+fn api_memcpy_bench_buffer_rewrite(c: &mut Criterion) {
+    let ctx = Context::create_context().unwrap();
+    let queue = ctx.create_queue().unwrap();
+
+    let mut group = c.benchmark_group("api_memcpy_bench_buffer_rewrite");
+
+    for &nbytes in SIZES {
+        group.throughput(Throughput::Bytes(nbytes as u64));
+
+        // Daten vorbereiten
+        let src: Vec<u8> = vec![1; nbytes];
+        let mut dst: Vec<u8> = vec![0; nbytes];
+
+        // Buffer einmal anlegen und initialisieren
+        
+        group.bench_function(format!("copy_bytes_{}", nbytes), |b| {
+            b.iter(|| {
+                let buf = ctx.create_buffer::<u8>(nbytes).unwrap(); // Empty
+                let mut buf = buf.enqueue_write(&queue, &src).unwrap(); // Ready
+                buf.overwrite_blocking(&queue, black_box(&src)).unwrap(); //InFlight
+                buf.enqueue_read_blocking(&queue, black_box(&mut dst))
+                    .unwrap();
+            });
+        });
+    }
+
+    group.finish();
+}
+
+fn memcpy_opencl3_bench_buffer_rewrite(c: &mut Criterion) {
+    let device_ids =
+        get_all_devices(opencl3::device::CL_DEVICE_TYPE_GPU).expect("Kein GPU gefunden");
+    let ctx = CLContext::from_devices(&device_ids, &[], None, ptr::null_mut()).unwrap();
+    let queue = CommandQueue::create(&ctx, device_ids[0], 0).unwrap();
+
+    let mut group = c.benchmark_group("memcpy_opencl3_bench_full");
+
+    for &nbytes in SIZES {
+        group.throughput(Throughput::Bytes(nbytes as u64));
+
+        let src: Vec<u8> = vec![1; nbytes];
+        let mut dst: Vec<u8> = vec![0; src.len()];
+
+        group.bench_function(format!("copy_only_{}", nbytes), |b| {
+            b.iter(|| {
+                let mut buf: CLBuffer<u8> =
+                CLBuffer::create(&ctx, CL_MEM_READ_WRITE, src.len(), ptr::null_mut()).unwrap();
+                queue
+                    .enqueue_write_buffer(&mut buf, CL_BLOCKING, 0, black_box(&src), &[])
+                    .unwrap();
+                queue
+                    .enqueue_read_buffer(&buf, CL_BLOCKING, 0, black_box(&mut dst), &[])
+                    .unwrap();
+            });
+        });
+    }
+
+    group.finish();
+}
+
+
+
+criterion_group!(benches, 
+    memcpy_opencl3_bench, 
+    api_memcpy_bench,
+    //memcpy_opencl3_bench_full, 
+    //api_memcpy_bench_full, 
+    /*api_memcpy_bench_buffer_rewrite, 
+    memcpy_opencl3_bench_buffer_rewrite*/ );
 criterion_main!(benches);

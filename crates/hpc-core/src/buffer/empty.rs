@@ -3,7 +3,7 @@ use crate::buffer::{GpuBuffer, GpuEventGuard};
 use crate::error::{Error, Result};
 use core::mem::size_of;
 use opencl3::command_queue::CommandQueue;
-use opencl3::memory::CL_MEM_READ_WRITE;
+use opencl3::memory::{CL_MEM_READ_WRITE, CL_MEM_ALLOC_HOST_PTR};
 use opencl3::types::CL_BLOCKING;
 use opencl3::{context::Context, memory::Buffer, types::cl_mem_flags};
 use std::marker::PhantomData;

@@ -22,6 +22,29 @@ This script will:
 **Note:**: In our measurements the GPU link was pinned to PCIe Gen3,
 since higher link speeds caused Bandwidth stability issues on our platform.
 
+nvidia-smi -q | grep -A 5 "PCI"
+    PCI
+        Bus                               : 0x01
+        Device                            : 0x00
+        Domain                            : 0x0000
+        Base Classcode                    : 0x3
+        Sub Classcode                     : 0x0
+--
+            PCIe Generation
+                Max                       : 3
+                Current                   : 1
+                Device Current            : 1
+                Device Max                : 4
+                Host Max                  : 3
+--
+            SRAM PCIE                     : N/A
+            SRAM Other                    : N/A
+    Retired Pages
+        Single Bit ECC                    : N/A
+        Double Bit ECC                    : N/A
+        Pending Page Blacklist            : N/A
+
+
 Bandwidth checked with `cuda_benchmark.cu` and `opencl_benchmark.c` in `scripts/`
 
 ## Running the Benchmarks
@@ -40,7 +63,14 @@ This will execute for example:
   (measures `api_write_bench` and `raw_write_bench` for pure writing performance with varying sizes)
   (measures `api_full_bench` and `raw_full_bench` for full pipline buffer create + write + execute kernel + read with varying sizes)
 
-Criterion outputs throughput numbers (`MiB/s` or `GiB/s`) and plots.
+### Results Archive
+The raw outputs of our 5 benchmark runs are stored in:
+
+results/2025-08-25/criterion/run1
+results/2025-08-25/criterion/run2
+results/2025-08-25/criterion/run3
+results/2025-08-25/criterion/run4
+results/2025-08-25/criterion/run5
 
 ## Cleanup
 

@@ -6,8 +6,8 @@ fn main() {
 
     // Buffer → Ready
     let buf = ctx
-        .create_buffer::<u8>(16).unwrap()
-        .enqueue_write(&queue, &[0u8; 16]).unwrap();
+        .create_empty_buffer::<u8>(16).unwrap()
+        .write_block(&queue, &[0u8; 16]).unwrap();
 
     // Kernel, das einen Buffer + eine Zahl erwartet
     let kernel = Kernel::from_source(
@@ -16,6 +16,6 @@ fn main() {
         "dummy"
     ).unwrap();
 
-    // ❌ Illegal: falsche Arg-Art – API erwartet `u32`, bekommt aber `DeviceBuffer`
+    // wrong argument. Only scalar
     let _illegal = kernel.set_arg_scalar(1, &buf).unwrap();
 }

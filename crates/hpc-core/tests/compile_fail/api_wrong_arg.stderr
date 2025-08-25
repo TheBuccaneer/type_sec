@@ -1,8 +1,8 @@
-error[E0277]: the trait bound `DeviceBuffer<'_, u8, hpc_core::Ready>: api::opencl::kernel::KernelScalar` is not satisfied
+error[E0277]: the trait bound `DeviceBuffer<'_, u8, Written>: api::opencl::kernel::KernelScalar` is not satisfied
   --> tests/compile_fail/api_wrong_arg.rs:20:45
    |
 20 |     let _illegal = kernel.set_arg_scalar(1, &buf).unwrap();
-   |                           --------------    ^^^^ the trait `api::opencl::kernel::KernelScalar` is not implemented for `DeviceBuffer<'_, u8, hpc_core::Ready>`
+   |                           --------------    ^^^^ the trait `api::opencl::kernel::KernelScalar` is not implemented for `DeviceBuffer<'_, u8, Written>`
    |                           |
    |                           required by a bound introduced by this call
    |

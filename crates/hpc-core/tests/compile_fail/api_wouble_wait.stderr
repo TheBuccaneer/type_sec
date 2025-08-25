@@ -1,15 +1,12 @@
-error[E0308]: mismatched types
-  --> tests/compile_fail/api_wouble_wait.rs:19:29
-   |
-19 |     let _illegal = evt.wait(ready);
-   |                        ---- ^^^^^ expected `DeviceBuffer<'_, _, InFlight>`, found `DeviceBuffer<'_, u8, Ready>`
-   |                        |
-   |                        arguments to this method are incorrect
-   |
-   = note: expected struct `DeviceBuffer<'_, _, InFlight>`
-              found struct `DeviceBuffer<'_, u8, hpc_core::Ready>`
-note: method defined here
-  --> src/api/util/event_token.rs
-   |
-   |     pub fn wait<T>(
-   |            ^^^^
+error[E0599]: no method named `create_buffer` found for struct `hpc_core::Context` in the current scope
+ --> tests/compile_fail/api_wouble_wait.rs:9:10
+  |
+8 |       let buf = ctx
+  |  _______________-
+9 | |         .create_buffer::<u8>(16).unwrap()
+  | |_________-^^^^^^^^^^^^^
+  |
+help: there is a method `create_empty_buffer` with a similar name
+  |
+9 |         .create_empty_buffer::<u8>(16).unwrap()
+  |                 ++++++

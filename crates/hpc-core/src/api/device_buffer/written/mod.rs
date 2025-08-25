@@ -13,6 +13,7 @@ mod io;
 //=============================================================================
 
 impl<'brand, T> DeviceBuffer<'brand, T, Written> {
+    #[must_use = "GPU kernel started: you must wait for completion"]
     pub fn enqueue_kernel(
         self,
         queue: &'brand Queue,

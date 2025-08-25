@@ -3,18 +3,19 @@
 use hpc_core::*;
 
 fn main() -> Result<()> {
-    /*
-    // 1. OpenCL Context und Queue erstellen (neue API)
+    // 1. OpenCL Context und Queue erstellen
     let ctx = Context::create_context()?;
     let queue = ctx.create_queue()?;
 
-    // 2. Test-Daten vorbereiten (u8)
+    // 2. Test-Daten vorbereiten - einfach mit 1en
     let size = 1024;
-    let a: Vec<u8> = (0..size).map(|i| (i % 256) as u8).collect();
-    let b: Vec<u8> = (0..size).map(|i| ((i * 2) % 256) as u8).collect();
+    let a: Vec<u8> = vec![1; size];  // Alle Elemente = 1
+    let b: Vec<u8> = vec![1; size];  // Alle Elemente = 1
     let mut result: Vec<u8> = vec![0; size];
 
-    // 3. Kernel-Source (angepasst für u8)
+    println!("Vorbereitung: {} Elemente", size);
+
+    // 3. Kernel-Source für u8 vector addition
     let kernel_source = r#"
         __kernel void vector_add(
             __global const uchar* a,
@@ -29,49 +30,66 @@ fn main() -> Result<()> {
         }
     "#;
 
-    // 4. Buffer erstellen und Daten hochladen (neue Context-API)
-    let buffer_a = ctx.create_buffer::<u8>(size)?.enqueue_write(&queue, &a)?;
-    let buffer_b = ctx.create_buffer::<u8>(size)?.enqueue_write(&queue, &b)?;
-    let buffer_result = ctx
-        .create_buffer::<u8>(size)?
-        .enqueue_write(&queue, &result)?;
+    // 4. Buffer erstellen und Daten hochladen
+    let buffer_a = ctx.create_empty_buffer::<u8>(size)?
+        .write_block(&queue, &a)?; // Empty → Written
+
+    let buffer_b = ctx.create_empty_buffer::<u8>(size)?
+        .write_block(&queue, &b)?; // Empty → Written
+
+    let buffer_result = ctx.create_empty_buffer::<u8>(size)?
+        .write_block(&queue, &result)?; // Empty → Written (mit Nullen)
+
+    println!("Buffer erstellt und initialisiert");
 
     // 5. Kernel kompilieren
     let kernel = Kernel::from_source(&ctx, kernel_source, "vector_add")?;
+    println!("Kernel kompiliert");
 
-    // 6. Kernel-Argumente setzen (type-safe branded API)
+    // 6. Kernel-Argumente setzen
     kernel.set_arg_buffer(0, &buffer_a)?; // Input A
-    kernel.set_arg_buffer(1, &buffer_b)?; // Input B
+    kernel.set_arg_buffer(1, &buffer_b)?; // Input B  
     kernel.set_arg_buffer(2, &buffer_result)?; // Output
     kernel.set_arg_scalar(3, &(size as u32))?; // Size parameter
 
-    // 7. Kernel ausführen (buffer-zentriert)
-    let (result_inflight, event) = buffer_result.enqueue_kernel(&queue, &kernel, size)?;
+    println!("Kernel-Argumente gesetzt");
 
-    // 8. Zurück zu Ready (nach Kernel-Completion)
-    let result_ready = event.wait(result_inflight);
+    // 7. Kernel ausführen
+    let (inflight_buffer, event) = buffer_result.enqueue_kernel(&queue, &kernel, size)?;
+    println!("Kernel gestartet");
 
-    // 9. Ergebnis zurück lesen
-    result_ready.enqueue_read_blocking(&queue, &mut result)?;
+    // 8. Warten bis Kernel fertig ist und zurück zu Written
+    let result_buffer = event.wait(inflight_buffer); // InFlight → Written (kein ?)
+    println!("Kernel abgeschlossen");
 
-    // 10. Ergebnis prüfen
-    println!("Erste 10 Ergebnisse:");
-    for i in 0..10 {
-        println!("{}:  {} + {} = {}", i, a[i], b[i], result[i]);
+    // 9. Ergebnis zurück lesen  
+    result_buffer.read_blocking(&queue, &mut result)?;
+    println!("Ergebnis gelesen");
+
+    // 10. Erste 100 Ergebnisse anzeigen
+    println!("\nErste 100 Ergebnisse der Vektor-Addition:");
+    for i in 0..100.min(size) {
+        println!("{:3}: {:3} + {:3} = {:3}", i, a[i], b[i], result[i]);
     }
 
-    // 11. Verify (mit u8 Overflow-Check)
+    // 11. Vollständige Verifikation (sollte überall 2 sein)
+    let mut errors = 0;
     for i in 0..size {
-        let expected = (a[i] as u16 + b[i] as u16) as u8; // Handle overflow
-        assert_eq!(result[i], expected, "Mismatch at index {}", i);
+        let expected = 2u8; // 1 + 1 = 2
+        if result[i] != expected {
+            if errors < 5 { // Nur erste 5 Fehler anzeigen
+                println!("Fehler bei Index {}: erwartet {}, bekommen {}", i, expected, result[i]);
+            }
+            errors += 1;
+        }
     }
 
-    println!("Vector addition erfolgreich!");
-    Ok(())
-
-
-
-    */
+    if errors == 0 {
+        println!("\nVector Addition erfolgreich! Alle {} Ergebnisse korrekt.", size);
+    } else {
+        println!("\n {} Fehler bei {} Elementen gefunden", errors, size);
+        return Err("Verifikation fehlgeschlagen".into());
+    }
 
     Ok(())
 }

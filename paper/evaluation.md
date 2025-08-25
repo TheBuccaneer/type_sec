@@ -37,6 +37,60 @@ only the underlying OpenCL calls.
 
 ---
 
+## Runtime Benchmarks (Criterion, 5-Run Average)
+
+To validate that our abstractions do not introduce measurable runtime overhead,
+we benchmarked buffer operations, reads, writes, and full pipeline execution
+(Write→Kernel→Read). All numbers are averages over 5 runs with Criterion.
+Times are given in microseconds (µs). Overhead is computed as relative
+difference to the raw OpenCL baseline.
+
+### Buffer Operations (Create + Read/Write)
+
+| Size    | API [µs]  | Raw [µs]  | Overhead |
+|---------|-----------|-----------|----------|
+| 1KB     | 118.59    | 118.64    |  -0.04% |
+| 64KB    | 138.40    | 138.55    |  -0.10% |
+| 1MB     | 400.38    | 400.86    |  -0.12% |
+| 16MB    | 3.41      | 3.28      |  +3.88% |
+| 100MB   | 20.04     | 20.17     |  -0.64% |
+
+### Read Operations (Device→Host)
+
+| Size    | API [µs]  | Raw [µs]  | Overhead |
+|---------|-----------|-----------|----------|
+| 1KB     | 7.275     | 7.246     |  +0.39% |
+| 64KB    | 15.820    | 15.742    |  +0.50% |
+| 1MB     | 153.188   | 153.508   |  -0.21% |
+| 16MB    | 1.366     | 1.368     |  -0.21% |
+| 100MB   | 9.003     | 9.039     |  -0.39% |
+
+### Write Operations (Host→Device)
+
+| Size    | API [µs]  | Raw [µs]  | Overhead |
+|---------|-----------|-----------|----------|
+| 1KB     | 6.273     | 6.268     |  +0.08% |
+| 64KB    | 14.337    | 14.453    |  -0.81% |
+| 1MB     | 142.872   | 142.868   |  +0.00% |
+| 16MB    | 1.403     | 1.404     |  -0.06% |
+| 100MB   | 8.676     | 8.860     |  -2.08% |
+
+### Full Pipeline (Write→Kernel→Read)
+
+| Size    | API [µs]  | Raw [µs]  | Overhead |
+|---------|-----------|-----------|----------|
+| 1KB     | 154.18    | 151.88    |  +1.52% |
+| 4KB     | 153.79    | 153.94    |  -0.09% |
+| 16KB    | 161.78    | 161.69    |  +0.06% |
+| 64KB    | 189.27    | 188.38    |  +0.47% |
+| 256KB   | 303.02    | 302.77    |  +0.08% |
+| 1MB     | 865.56    | 864.15    |  +0.16% |
+
+**Summary:** Across all cases the average overhead remains close to 0%.
+Overheads fluctuate between -2.08% and +3.88%, well within the variance
+expected from system noise. This confirms that our API is effectively
+zero-cost at runtime.
+
 ## Conclusion
 
 Both code-size analysis and assembly spotchecks confirm that our API is

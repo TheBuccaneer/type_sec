@@ -1,0 +1,290 @@
+     Running benches/memcpy_api_criterion.rs (target/release/deps/memcpy_api_criterion-17c3792daaf79f3b)
+Gnuplot not found, using plotters backend
+api_buffer_bench/copy_bytes_1024
+                        time:   [118.17 µs 118.22 µs 118.26 µs]
+                        thrpt:  [8.2574 MiB/s 8.2608 MiB/s 8.2639 MiB/s]
+Found 8 outliers among 100 measurements (8.00%)
+  2 (2.00%) low mild
+  3 (3.00%) high mild
+  3 (3.00%) high severe
+api_buffer_bench/copy_bytes_65536
+                        time:   [137.30 µs 137.38 µs 137.49 µs]
+                        thrpt:  [454.58 MiB/s 454.94 MiB/s 455.20 MiB/s]
+Found 6 outliers among 100 measurements (6.00%)
+  2 (2.00%) high mild
+  4 (4.00%) high severe
+api_buffer_bench/copy_bytes_1048576
+                        time:   [400.11 µs 400.18 µs 400.27 µs]
+                        thrpt:  [2.4397 GiB/s 2.4403 GiB/s 2.4408 GiB/s]
+Found 9 outliers among 100 measurements (9.00%)
+  1 (1.00%) low severe
+  3 (3.00%) high mild
+  5 (5.00%) high severe
+api_buffer_bench/copy_bytes_16777216
+                        time:   [3.3960 ms 3.3972 ms 3.3983 ms]
+                        thrpt:  [4.5979 GiB/s 4.5994 GiB/s 4.6010 GiB/s]
+Found 3 outliers among 100 measurements (3.00%)
+  3 (3.00%) high mild
+api_buffer_bench/copy_bytes_104857600
+                        time:   [19.875 ms 19.880 ms 19.885 ms]
+                        thrpt:  [4.9110 GiB/s 4.9123 GiB/s 4.9135 GiB/s]
+Found 4 outliers among 100 measurements (4.00%)
+  4 (4.00%) high mild
+
+raw_buffer_bench/copy_only_1024
+                        time:   [118.74 µs 119.00 µs 119.27 µs]
+                        thrpt:  [8.1875 MiB/s 8.2067 MiB/s 8.2242 MiB/s]
+Found 17 outliers among 100 measurements (17.00%)
+  2 (2.00%) low mild
+  4 (4.00%) high mild
+  11 (11.00%) high severe
+raw_buffer_bench/copy_only_65536
+                        time:   [139.35 µs 139.60 µs 139.82 µs]
+                        thrpt:  [447.00 MiB/s 447.71 MiB/s 448.51 MiB/s]
+Found 2 outliers among 100 measurements (2.00%)
+  1 (1.00%) high mild
+  1 (1.00%) high severe
+raw_buffer_bench/copy_only_1048576
+                        time:   [401.27 µs 401.40 µs 401.52 µs]
+                        thrpt:  [2.4322 GiB/s 2.4329 GiB/s 2.4337 GiB/s]
+Found 6 outliers among 100 measurements (6.00%)
+  1 (1.00%) low mild
+  4 (4.00%) high mild
+  1 (1.00%) high severe
+raw_buffer_bench/copy_only_16777216
+                        time:   [3.2984 ms 3.2992 ms 3.3000 ms]
+                        thrpt:  [4.7348 GiB/s 4.7360 GiB/s 4.7372 GiB/s]
+Found 6 outliers among 100 measurements (6.00%)
+  6 (6.00%) high mild
+raw_buffer_bench/copy_only_104857600
+                        time:   [20.153 ms 20.182 ms 20.210 ms]
+                        thrpt:  [4.8320 GiB/s 4.8389 GiB/s 4.8457 GiB/s]
+
+api_read_bench/copy_bytes_1024
+                        time:   [7.2597 µs 7.2616 µs 7.2638 µs]
+                        thrpt:  [134.44 MiB/s 134.48 MiB/s 134.52 MiB/s]
+Found 13 outliers among 100 measurements (13.00%)
+  2 (2.00%) low severe
+  5 (5.00%) low mild
+  4 (4.00%) high mild
+  2 (2.00%) high severe
+api_read_bench/copy_bytes_65536
+                        time:   [15.799 µs 15.802 µs 15.805 µs]
+                        thrpt:  [3.8617 GiB/s 3.8625 GiB/s 3.8631 GiB/s]
+Found 5 outliers among 100 measurements (5.00%)
+  1 (1.00%) low severe
+  4 (4.00%) high mild
+api_read_bench/copy_bytes_1048576
+                        time:   [154.47 µs 154.50 µs 154.54 µs]
+                        thrpt:  [6.3192 GiB/s 6.3206 GiB/s 6.3219 GiB/s]
+Found 6 outliers among 100 measurements (6.00%)
+  1 (1.00%) low severe
+  1 (1.00%) low mild
+  2 (2.00%) high mild
+  2 (2.00%) high severe
+Benchmarking api_read_bench/copy_bytes_16777216: Warming up for 3.0000 s
+Warning: Unable to complete 100 samples in 5.0s. You may wish to increase target time to 7.0s, enable flat sampling, or reduce sample count to 50.
+api_read_bench/copy_bytes_16777216
+                        time:   [1.3805 ms 1.3810 ms 1.3814 ms]
+                        thrpt:  [11.311 GiB/s 11.315 GiB/s 11.318 GiB/s]
+Found 7 outliers among 100 measurements (7.00%)
+  1 (1.00%) low mild
+  2 (2.00%) high mild
+  4 (4.00%) high severe
+api_read_bench/copy_bytes_104857600
+                        time:   [9.0988 ms 9.1016 ms 9.1045 ms]
+                        thrpt:  [10.726 GiB/s 10.730 GiB/s 10.733 GiB/s]
+Found 1 outliers among 100 measurements (1.00%)
+  1 (1.00%) high severe
+
+raw_read_bench/copy_only_1024
+                        time:   [7.2767 µs 7.2786 µs 7.2807 µs]
+                        thrpt:  [134.13 MiB/s 134.17 MiB/s 134.20 MiB/s]
+Found 4 outliers among 100 measurements (4.00%)
+  4 (4.00%) high severe
+raw_read_bench/copy_only_65536
+                        time:   [15.830 µs 15.834 µs 15.838 µs]
+                        thrpt:  [3.8537 GiB/s 3.8547 GiB/s 3.8557 GiB/s]
+Found 5 outliers among 100 measurements (5.00%)
+  3 (3.00%) low severe
+  1 (1.00%) low mild
+  1 (1.00%) high severe
+raw_read_bench/copy_only_1048576
+                        time:   [154.16 µs 154.20 µs 154.23 µs]
+                        thrpt:  [6.3317 GiB/s 6.3332 GiB/s 6.3347 GiB/s]
+Found 4 outliers among 100 measurements (4.00%)
+  2 (2.00%) low severe
+  2 (2.00%) high severe
+Benchmarking raw_read_bench/copy_only_16777216: Warming up for 3.0000 s
+Warning: Unable to complete 100 samples in 5.0s. You may wish to increase target time to 7.0s, enable flat sampling, or reduce sample count to 50.
+raw_read_bench/copy_only_16777216
+                        time:   [1.3797 ms 1.3800 ms 1.3803 ms]
+                        thrpt:  [11.320 GiB/s 11.323 GiB/s 11.325 GiB/s]
+Found 10 outliers among 100 measurements (10.00%)
+  2 (2.00%) low severe
+  1 (1.00%) low mild
+  2 (2.00%) high mild
+  5 (5.00%) high severe
+raw_read_bench/copy_only_104857600
+                        time:   [9.0804 ms 9.0837 ms 9.0871 ms]
+                        thrpt:  [10.747 GiB/s 10.751 GiB/s 10.755 GiB/s]
+Found 2 outliers among 100 measurements (2.00%)
+  1 (1.00%) low mild
+  1 (1.00%) high mild
+
+api_write_bench/copy_bytes_1024
+                        time:   [6.3187 µs 6.3205 µs 6.3224 µs]
+                        thrpt:  [154.46 MiB/s 154.51 MiB/s 154.55 MiB/s]
+Found 5 outliers among 100 measurements (5.00%)
+  1 (1.00%) low severe
+  3 (3.00%) high mild
+  1 (1.00%) high severe
+api_write_bench/copy_bytes_65536
+                        time:   [14.329 µs 14.332 µs 14.335 µs]
+                        thrpt:  [4.2577 GiB/s 4.2587 GiB/s 4.2597 GiB/s]
+Found 6 outliers among 100 measurements (6.00%)
+  1 (1.00%) low mild
+  2 (2.00%) high mild
+  3 (3.00%) high severe
+api_write_bench/copy_bytes_1048576
+                        time:   [142.86 µs 142.87 µs 142.89 µs]
+                        thrpt:  [6.8341 GiB/s 6.8351 GiB/s 6.8359 GiB/s]
+Found 22 outliers among 100 measurements (22.00%)
+  8 (8.00%) low severe
+  2 (2.00%) low mild
+  1 (1.00%) high mild
+  11 (11.00%) high severe
+Benchmarking api_write_bench/copy_bytes_16777216: Warming up for 3.0000 s
+Warning: Unable to complete 100 samples in 5.0s. You may wish to increase target time to 7.1s, enable flat sampling, or reduce sample count to 50.
+api_write_bench/copy_bytes_16777216
+                        time:   [1.4118 ms 1.4121 ms 1.4125 ms]
+                        thrpt:  [11.062 GiB/s 11.065 GiB/s 11.068 GiB/s]
+Found 13 outliers among 100 measurements (13.00%)
+  1 (1.00%) low mild
+  6 (6.00%) high mild
+  6 (6.00%) high severe
+api_write_bench/copy_bytes_104857600
+                        time:   [8.5628 ms 8.5651 ms 8.5677 ms]
+                        thrpt:  [11.398 GiB/s 11.402 GiB/s 11.405 GiB/s]
+Found 4 outliers among 100 measurements (4.00%)
+  3 (3.00%) high mild
+  1 (1.00%) high severe
+
+raw_write_bench/copy_only_1024
+                        time:   [6.2308 µs 6.2320 µs 6.2333 µs]
+                        thrpt:  [156.67 MiB/s 156.70 MiB/s 156.73 MiB/s]
+Found 6 outliers among 100 measurements (6.00%)
+  3 (3.00%) high mild
+  3 (3.00%) high severe
+raw_write_bench/copy_only_65536
+                        time:   [14.827 µs 14.887 µs 14.936 µs]
+                        thrpt:  [4.0864 GiB/s 4.0999 GiB/s 4.1164 GiB/s]
+raw_write_bench/copy_only_1048576
+                        time:   [142.86 µs 142.86 µs 142.88 µs]
+                        thrpt:  [6.8349 GiB/s 6.8356 GiB/s 6.8360 GiB/s]
+Found 16 outliers among 100 measurements (16.00%)
+  5 (5.00%) low severe
+  3 (3.00%) low mild
+  3 (3.00%) high mild
+  5 (5.00%) high severe
+Benchmarking raw_write_bench/copy_only_16777216: Warming up for 3.0000 s
+Warning: Unable to complete 100 samples in 5.0s. You may wish to increase target time to 7.1s, enable flat sampling, or reduce sample count to 50.
+raw_write_bench/copy_only_16777216
+                        time:   [1.4002 ms 1.4005 ms 1.4007 ms]
+                        thrpt:  [11.155 GiB/s 11.157 GiB/s 11.159 GiB/s]
+Found 14 outliers among 100 measurements (14.00%)
+  1 (1.00%) low severe
+  1 (1.00%) low mild
+  5 (5.00%) high mild
+  7 (7.00%) high severe
+raw_write_bench/copy_only_104857600
+                        time:   [8.9089 ms 8.9226 ms 8.9337 ms]
+                        thrpt:  [10.931 GiB/s 10.945 GiB/s 10.962 GiB/s]
+Found 13 outliers among 100 measurements (13.00%)
+  6 (6.00%) low severe
+  2 (2.00%) low mild
+  3 (3.00%) high mild
+  2 (2.00%) high severe
+
+api_full_bench/vector_add_1024
+                        time:   [152.71 µs 153.02 µs 153.33 µs]
+                        thrpt:  [6.3688 MiB/s 6.3821 MiB/s 6.3949 MiB/s]
+Found 3 outliers among 100 measurements (3.00%)
+  2 (2.00%) high mild
+  1 (1.00%) high severe
+api_full_bench/vector_add_4096
+                        time:   [153.43 µs 153.46 µs 153.49 µs]
+                        thrpt:  [25.449 MiB/s 25.455 MiB/s 25.460 MiB/s]
+Found 5 outliers among 100 measurements (5.00%)
+  1 (1.00%) high mild
+  4 (4.00%) high severe
+api_full_bench/vector_add_16384
+                        time:   [162.50 µs 162.67 µs 162.89 µs]
+                        thrpt:  [95.922 MiB/s 96.054 MiB/s 96.151 MiB/s]
+Found 12 outliers among 100 measurements (12.00%)
+  1 (1.00%) low mild
+  2 (2.00%) high mild
+  9 (9.00%) high severe
+api_full_bench/vector_add_65536
+                        time:   [191.11 µs 191.22 µs 191.34 µs]
+                        thrpt:  [326.65 MiB/s 326.85 MiB/s 327.04 MiB/s]
+Found 11 outliers among 100 measurements (11.00%)
+  1 (1.00%) low mild
+  6 (6.00%) high mild
+  4 (4.00%) high severe
+api_full_bench/vector_add_262144
+                        time:   [302.44 µs 302.60 µs 302.79 µs]
+                        thrpt:  [825.67 MiB/s 826.17 MiB/s 826.62 MiB/s]
+Found 6 outliers among 100 measurements (6.00%)
+  1 (1.00%) low severe
+  1 (1.00%) low mild
+  2 (2.00%) high mild
+  2 (2.00%) high severe
+api_full_bench/vector_add_1048576
+                        time:   [864.04 µs 864.29 µs 864.54 µs]
+                        thrpt:  [1.1296 GiB/s 1.1299 GiB/s 1.1302 GiB/s]
+Found 5 outliers among 100 measurements (5.00%)
+  1 (1.00%) low mild
+  1 (1.00%) high mild
+  3 (3.00%) high severe
+
+raw_full_bench/vector_add_1024
+                        time:   [152.00 µs 152.14 µs 152.35 µs]
+                        thrpt:  [6.4102 MiB/s 6.4187 MiB/s 6.4249 MiB/s]
+Found 12 outliers among 100 measurements (12.00%)
+  4 (4.00%) high mild
+  8 (8.00%) high severe
+raw_full_bench/vector_add_4096
+                        time:   [153.53 µs 153.57 µs 153.62 µs]
+                        thrpt:  [25.429 MiB/s 25.436 MiB/s 25.443 MiB/s]
+Found 10 outliers among 100 measurements (10.00%)
+  1 (1.00%) low mild
+  2 (2.00%) high mild
+  7 (7.00%) high severe
+raw_full_bench/vector_add_16384
+                        time:   [162.41 µs 162.48 µs 162.55 µs]
+                        thrpt:  [96.124 MiB/s 96.168 MiB/s 96.205 MiB/s]
+Found 9 outliers among 100 measurements (9.00%)
+  1 (1.00%) low mild
+  4 (4.00%) high mild
+  4 (4.00%) high severe
+raw_full_bench/vector_add_65536
+                        time:   [185.55 µs 185.61 µs 185.68 µs]
+                        thrpt:  [336.61 MiB/s 336.73 MiB/s 336.84 MiB/s]
+Found 9 outliers among 100 measurements (9.00%)
+  1 (1.00%) low mild
+  7 (7.00%) high mild
+  1 (1.00%) high severe
+raw_full_bench/vector_add_262144
+                        time:   [303.07 µs 303.31 µs 303.72 µs]
+                        thrpt:  [823.12 MiB/s 824.24 MiB/s 824.88 MiB/s]
+Found 6 outliers among 100 measurements (6.00%)
+  2 (2.00%) high mild
+  4 (4.00%) high severe
+raw_full_bench/vector_add_1048576
+                        time:   [863.26 µs 863.57 µs 863.86 µs]
+                        thrpt:  [1.1305 GiB/s 1.1308 GiB/s 1.1312 GiB/s]
+Found 10 outliers among 100 measurements (10.00%)
+  4 (4.00%) low mild
+  5 (5.00%) high mild
+  1 (1.00%) high severe

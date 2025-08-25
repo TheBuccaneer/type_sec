@@ -1,3 +1,5 @@
+#![allow(warnings)]
+
 use criterion::{Criterion, Throughput, black_box, criterion_group, criterion_main};
 use hpc_core::api::Context;
 
@@ -404,12 +406,12 @@ criterion_group!(
     benches,
     api_buffer_bench,
     raw_buffer_bench,
-    //api_read_bench,
-    //raw_read_bench,
-    //api_write_bench,
-    //raw_write_bench,
-    //api_full_bench,
-    //raw_full_bench,
+    api_read_bench,
+    raw_read_bench,
+    api_write_bench,
+    raw_write_bench,
+    api_full_bench,
+    raw_full_bench,
 
 );
 criterion_main!(benches);

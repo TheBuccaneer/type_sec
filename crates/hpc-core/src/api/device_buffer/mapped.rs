@@ -2,7 +2,7 @@
 
 use crate::api::DeviceBuffer;
 use crate::api::util::MapToken;
-use crate::buffer::state::{Mapped, Written};
+use crate::buffer::state::{Mapped};
 use crate::error::{Error, Result};
 //=============================================================================
 // MAPPED STATE IMPLEMENTATIONS

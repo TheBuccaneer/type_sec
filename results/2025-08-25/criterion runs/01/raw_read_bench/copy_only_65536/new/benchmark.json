@@ -1,0 +1,1 @@
+{"group_id":"raw_read_bench","function_id":"copy_only_65536","value_str":null,"throughput":{"Bytes":65536},"full_id":"raw_read_bench/copy_only_65536","directory_name":"raw_read_bench/copy_only_65536","title":"raw_read_bench/copy_only_65536"}

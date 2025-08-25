@@ -1,0 +1,1 @@
+{"group_id":"api_buffer_bench","function_id":"copy_bytes_65536","value_str":null,"throughput":{"Bytes":65536},"full_id":"api_buffer_bench/copy_bytes_65536","directory_name":"api_buffer_bench/copy_bytes_65536","title":"api_buffer_bench/copy_bytes_65536"}

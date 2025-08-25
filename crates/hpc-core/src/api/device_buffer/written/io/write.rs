@@ -4,7 +4,7 @@ use crate::EventToken;
 use crate::api::{DeviceBuffer, Queue};
 use crate::buffer::state::{InFlight, Written, Mapped};
 use crate::error::Result;
-use opencl3::types::{CL_BLOCKING, CL_NON_BLOCKING};
+use opencl3::types::{CL_BLOCKING};
 use crate::api::util::MapToken;
 use crate::error::{Error};
 

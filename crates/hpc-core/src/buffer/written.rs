@@ -38,7 +38,7 @@ impl GpuBuffer<Written> {
         mut self,
         queue: &CommandQueue,
         host: &[u8],
-    ) -> Result<(GpuBuffer<Written>)> {
+    ) -> Result<GpuBuffer<Written>> {
         if host.len() != self.len_bytes {
             return Err(Error::BufferSizeMismatch {
                 expected: self.len_bytes,

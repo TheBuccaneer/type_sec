@@ -1,17 +1,15 @@
 # Cross-Mapping of API Concepts
 
-Diese Tabelle zeigt, wie zentrale Konstrukte unserer API (`hpc-core`) zu bekannten
-Konzepten in OpenCL, CUDA und SYCL in Beziehung stehen. Sie dient nur der Orientierung
-für Leser:innen, die aus der GPU-Welt kommen. Wir implementieren *keine* dieser
-APIs, sondern zeigen, was inhaltlich vergleichbar ist und wo unsere Typ-States
-einen Unterschied machen.
+This table shows how the main constructs of our API (`hpc-core`) relate to
+concepts in OpenCL, CUDA, and SYCL. The mapping is only for orientation
+purposes — we do not re-implement these APIs, but highlight where our
+type-state model introduces differences.
 
-| Our API (`hpc-core`)              | OpenCL (C-API)            | CUDA / SYCL (roughly)          | Notes |
-|-----------------------------------|---------------------------|--------------------------------|-------|
-| `Context::create_context`         | `clCreateContext`         | `sycl::context`                | Resource root, hält Geräteinfo |
-| `Context::create_queue`           | `clCreateCommandQueue`    | `sycl::queue` / CUDA stream    | Queue ist an Context/Device gebunden |
-| `create_buffer::<T>`              | `clCreateBuffer`          | `sycl::buffer` / `cudaMalloc`  | Unser Typ trägt zusätzlich Size + State |
-| `enqueue_write`                   | `clEnqueueWriteBuffer`    | `queue.submit(copy)`           | Erzwingt Transition: Empty → Ready |
-| `enqueue_kernel`                  | `clEnqueueNDRangeKernel`  | `parallel_for` / CUDA kernel launch | Rückgabe: InFlight + EventToken |
-| `EventToken`                      | `cl_event`                | `sycl::event` / CUDA event     | Muss explizit `wait()` oder `detach()` werden |
-| Type-State (`Empty/Ready/InFlight`)| –                        | –                              | Compile-time Enforcements, kein Gegenstück in CL/SYCL/CUDA |
+| Our API (`hpc-core`)              | OpenCL (C-API)            | CUDA / SYCL (roughly)             | Notes |
+|-----------------------------------|---------------------------|-----------------------------------|-------|
+| `Context::create_context`         | `clCreateContext`         | `sycl::context`                   | Resource root, owns device information. |
+| `Context::create_queue`           | `clCreateCommandQueue`    | `sycl::queue` / CUDA stream       | Queue is bound to a specific context/device. |
+| `create_empty_buffer<T>`          | `clCreateBuffer`          | `sycl::buffer` / `cudaMalloc`     | Our type carries element size and state information. |
+| `write_(non)_blocking`            | `clEnqueueWriteBuffer`    | `queue.submit(copy)`              | Enforces state transition: `Empty → Written`. |
+| `enqueue_kernel`                  | `clEnqueueNDRangeKernel`  | `parallel_for` / CUDA kernel launch | Returns buffer in `InFlight` plus an `EventToken`. |
+| `EventToken`                      | `cl_event`                | `sycl::event` / CUDA event        | Must be explicitly consumed via `wait()` or detached. |

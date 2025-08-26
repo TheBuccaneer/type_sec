@@ -1,0 +1,37 @@
+cff-version: "1.2.0"
+message: "If you use this software, please cite it as below."
+type: software
+title: "RUST IT (Host–Device Session Types API)"
+version: "v0.3.1"
+date-released: "2025-08-29"
+
+authors:
+  - family-names: "Bicanic"
+    given-names: "Tihomir Thomas"
+    orcid: "https://orcid.org/0009-0003-1562-3497"
+    affiliation: "University Trier"
+
+repository-code: "https://github.com/TheBuccaneer/type_sec/tree/feature/zero-cost"
+license: "Apache-2.0"
+abstract: >
+  A zero-cost, type-state API for safe host–device interaction with OpenCL.
+  Compile-time session types prevent protocol misuse without runtime overhead.
+keywords:
+  - rust
+  - opencl
+  - session types
+  - zero-cost abstractions
+  - gpu
+
+# If you have a paper, add this so users cite the article, not (only) the repo:
+preferred-citation:
+  type: article
+  title: "Zero-Cost Session Types for Host–Device APIs"
+  authors:
+    - family-names: "Muster"
+      given-names: "Max"
+    - family-names: "Beispiel"
+      given-names: "Eva"
+  year: 2025
+  journal: "Proceedings of XYZ"
+  doi: "10.5281/zenodo.1234567"

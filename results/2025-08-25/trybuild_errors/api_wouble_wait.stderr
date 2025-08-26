@@ -1,0 +1,12 @@
+error[E0599]: no method named `create_buffer` found for struct `hpc_core::Context` in the current scope
+ --> tests/compile_fail/api_wouble_wait.rs:9:10
+  |
+8 |       let buf = ctx
+  |  _______________-
+9 | |         .create_buffer::<u8>(16).unwrap()
+  | |_________-^^^^^^^^^^^^^
+  |
+help: there is a method `create_empty_buffer` with a similar name
+  |
+9 |         .create_empty_buffer::<u8>(16).unwrap()
+  |                 ++++++

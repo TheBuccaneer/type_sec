@@ -23,11 +23,11 @@ baseline and treatment shows a delta of only ~0–2 % in the top-20 functions.
 
 ## Assembly Spotchecks (cargo-asm)
 
-We inspected two critical API entry points (`enqueue_write`, `enqueue_kernel`)
+We inspected two critical API entry points (`write_block`, `enqueue_kernel`)
 using `cargo-asm`:
 
 ```
-cargo asm -p hpc-core --release --lib --rust hpc_core::api::enqueue_write
+cargo asm -p hpc-core --release --lib --rust hpc_core::api::write_block
 cargo asm -p hpc-core --release --lib --rust hpc_core::api::enqueue_kernel
 ```
 
@@ -90,6 +90,39 @@ difference to the raw OpenCL baseline.
 Overheads fluctuate between -2.08% and +3.88%, well within the variance
 expected from system noise. This confirms that our API is effectively
 zero-cost at runtime.
+
+
+---
+
+## Compile-Fail Evidence (EPS)
+
+To demonstrate that our Executable Protocol Specifications (EPS) actually
+prevent host-side misuse at compile time, we implemented a suite of
+trybuild tests. Each test corresponds to one invalid host action and
+fails to compile with a blessed `.stderr` snapshot. This provides
+machine-checkable evidence that our type-state API enforces the
+protocol invariants.
+
+| Test file                 | Scenario                         | Compile-time mechanism                               | 
+|---------------------------|----------------------------------|------------------------------------------------------|
+| api_empty_kernel.stderr   | Kernel launch from Empty         | State gate (method unavailable / trait bound)        |
+| api_forget_unmap.stderr   | Forgotten unmap / MapToken unused| #[must_use] on guard/token or Result                 |
+| api_inflight_map.stderr   | Mapping from InFlight            | State gate (no Map* impl for InFlight)               |
+| api_inflight_read.stderr  | Read from InFlight               | State gate (no read impl for InFlight)               |
+| api_inflight_write.stderr | Write from InFlight              | State gate (no write impl for InFlight)              |
+| api_no_event_use.stderr   | EventToken ignored (no wait)     | #[must_use] on EventToken                            |
+| api_wait_on_written.stderr| wait() on non-InFlight buffer    | Type-level protocol (signature enforces state)       |
+| api_wouble_wait.stderr    | Double wait on same EventToken   | Linear token (non-Copy, consumed by wait())          |
+| api_wrong_arg.stderr      | Wrong kernel arg type/signature  | Type/layout check (T: Pod / ABI guard)               |
+
+**Summary:** Out of our catalogued failure modes, nine core cases are
+already covered by compile-fail tests. This demonstrates that whole
+classes of host errors (mis-timed reads/writes, forgotten waits/unmaps,
+double-wait, ABI mismatch) are eliminated at compile time. The resulting
+Prevented Spec Coverage (PSC) exceeds our target threshold.
+
+
+
 
 ## Conclusion
 

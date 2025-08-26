@@ -1,21 +1,22 @@
-// src/api/device_buffer/ready/io/write.rs
+//! Write operations for DeviceBuffer<T, Written>
+//!
+//! Provides blocking and non-blocking host write methods.
+//! - Blocking: copies data into the buffer and waits for completion.
+//! - Non-blocking: enqueues write and returns an `EventToken` for sync.
 
 use crate::EventToken;
-use crate::api::{DeviceBuffer, Queue};
-use crate::buffer::state::{InFlight, Written, Mapped};
-use crate::error::Result;
-use opencl3::types::{CL_BLOCKING};
 use crate::api::util::MapToken;
-use crate::error::{Error};
+use crate::api::{DeviceBuffer, Queue};
+use crate::buffer::state::{InFlight, Mapped, Written};
+use crate::error::{Error, Result};
+use opencl3::types::CL_BLOCKING;
 
-#[cfg(feature = "memtracer")]
-use crate::memtracer::{Dir, start};
-
-//=============================================================================
+//#####
 // WRITE OPERATIONS
-//=============================================================================
+//#####
 
 impl<'brand, T> DeviceBuffer<'brand, T, Written> {
+    ///Performs blocking write for api DeviceBuffer
     pub fn write_blocking(
         self,
         queue: &Queue<'brand>,
@@ -29,6 +30,16 @@ impl<'brand, T> DeviceBuffer<'brand, T, Written> {
         Ok(DeviceBuffer::from_inner(inner_written, self.len))
     }
 
+    /// This method exists only for Criterion benchmarks:
+    /// - Buffers are often allocated once outside of the `b.iter(...)` closure
+    ///   to avoid measuring allocation costs.
+    /// - Before each iteration, the buffer must be re-initialized with fresh
+    ///   host data.
+    /// - The operation is blocking to ensure deterministic timing without
+    ///   overlapping asynchronous writes.
+    ///
+    /// Not intended for normal API usage; prefer the standard write methods
+
     pub fn overwrite_blocking_for_bench(&mut self, queue: &Queue<'brand>, data: &[T]) -> Result<()>
     where
         T: bytemuck::Pod,
@@ -38,6 +49,7 @@ impl<'brand, T> DeviceBuffer<'brand, T, Written> {
         Ok(())
     }
 
+    /// like write. None blocke alternative.
     pub fn write_non_block(
         self,
         queue: &Queue<'brand>,
@@ -56,9 +68,10 @@ impl<'brand, T> DeviceBuffer<'brand, T, Written> {
         ))
     }
 
+    ///we use this function for a mapped write. Only used in the Mapped state
     pub fn map_for_write_block(
         self,
-        queue: &'brand Queue<'brand>, // <-- 'brand explizit hinzufügen
+        queue: &'brand Queue<'brand>,
     ) -> Result<(DeviceBuffer<'brand, T, Mapped>, MapToken<'brand>)>
     where
         T: bytemuck::Pod,
@@ -70,15 +83,10 @@ impl<'brand, T> DeviceBuffer<'brand, T, Written> {
             });
         }
 
-        // Delegation - gibt (GpuBuffer<Mapped>, MapGuard) zurück
         let (inner_mapped, map_guard) = self.inner.map_for_write_block(queue.raw())?;
 
-        // MapGuard in MapToken wrappen
-        let map_token = MapToken::new(map_guard); // Einfach MapGuard übergeben
+        let map_token = MapToken::new(map_guard);
 
         Ok((DeviceBuffer::from_inner(inner_mapped, self.len), map_token))
     }
-
-
-    
 }

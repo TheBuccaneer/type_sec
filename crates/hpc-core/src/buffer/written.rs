@@ -1,20 +1,24 @@
+//! Operations for DeviceBuffer<T, Written>.
+//!
+//! Represents a buffer that has been modified on the host but not yet
+//! synchronized with the device. This state exists to prevent accidental
+//! reuse of stale data on the GPU.
+
 use crate::buffer::GpuBuffer;
-use crate::buffer::state::{InFlight, Written, Mapped};
+use crate::buffer::MapGuard;
+use crate::buffer::state::{InFlight, Mapped, Written};
 use crate::error::{Error, Result};
 use opencl3::command_queue::CommandQueue;
 use opencl3::event::Event;
+use opencl3::memory::CL_MEM_READ_WRITE;
+use opencl3::memory::ClMem; // <-- Das fehlt!
 use opencl3::types::CL_BLOCKING;
 use opencl3::types::CL_NON_BLOCKING;
 use opencl3::types::cl_bool;
-use std::marker::PhantomData;
-use crate::buffer::MapGuard;
-use opencl3::memory::CL_MEM_READ_WRITE;
-use opencl3::memory::ClMem; // <-- Das fehlt!
 use std::ffi::c_void;
-
+use std::marker::PhantomData;
 
 impl GpuBuffer<Written> {
-
     pub fn overwrite(
         &mut self,
         queue: &CommandQueue,
@@ -30,15 +34,10 @@ impl GpuBuffer<Written> {
 
         let evt = queue.enqueue_write_buffer(&mut self.buf, blocking, 0, host, &[])?;
 
-
         Ok(evt)
     }
-    
-    pub fn write_block(
-        mut self,
-        queue: &CommandQueue,
-        host: &[u8],
-    ) -> Result<GpuBuffer<Written>> {
+
+    pub fn write_block(mut self, queue: &CommandQueue, host: &[u8]) -> Result<GpuBuffer<Written>> {
         if host.len() != self.len_bytes {
             return Err(Error::BufferSizeMismatch {
                 expected: self.len_bytes,
@@ -72,8 +71,7 @@ impl GpuBuffer<Written> {
         ))
     }
 
-
-     pub fn enqueue_read(
+    pub fn enqueue_read(
         &self,
         queue: &CommandQueue,
         host: &mut [u8],
@@ -116,8 +114,7 @@ impl GpuBuffer<Written> {
         ))
     }
 
-
-        pub fn map_for_write_block(
+    pub fn map_for_write_block(
         mut self,
         queue: &CommandQueue,
     ) -> Result<(GpuBuffer<Mapped>, MapGuard<'_>)> {
@@ -144,8 +141,8 @@ impl GpuBuffer<Written> {
             guard, // Für späteren unmap
         ))
     }
-    
-     pub fn enqueue_kernel(
+
+    pub fn enqueue_kernel(
         self,
         queue: &CommandQueue,
         kernel: &opencl3::kernel::Kernel,

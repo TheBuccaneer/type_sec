@@ -1,0 +1,9 @@
+error[E0599]: no method named `write_blocking` found for struct `DeviceBuffer<'_, u8, InFlight>` in the current scope
+  --> tests/compile_fail/api_inflight_write.rs:20:14
+   |
+20 |     inflight.write_blocking(&queue, &mut out).unwrap();
+   |              ^^^^^^^^^^^^^^ method not found in `DeviceBuffer<'_, u8, InFlight>`
+   |
+   = note: the method was found for
+           - `DeviceBuffer<'brand, T, Mapped>`
+           - `DeviceBuffer<'brand, T, Written>`

@@ -15,9 +15,9 @@ use crate::error::Result;
 use std::marker::PhantomData;
 use std::ptr;
 
-//=============================================================================
+//#####
 // CONTEXT
-//=============================================================================
+//#####
 
 #[must_use]
 #[derive(Debug)]
@@ -28,7 +28,7 @@ pub struct Context<'brand> {
 }
 
 impl<'brand> Context<'brand> {
-    /// Baue einen OpenCL-Context für das erste gefundene GPU-Device + passende Queue.
+    /// Build an OpenCL context for the first found GPU device + matching queue.
     /*
     possible error: Assumption: 1 platform with 1 device -> NVIDIA
     */
@@ -57,14 +57,14 @@ impl<'brand> Context<'brand> {
         &'brand self,
         n_elems: usize,
     ) -> Result<DeviceBuffer<'brand, T, Empty>> {
-        // Delegiere an die bestehende create_buffer Funktion, aber mit branded DeviceBuffer
+        // Delegate to the existing create_buffer function, but with branded DeviceBuffer
         let inner: crate::buffer::GpuBuffer<Empty> =
             crate::buffer::GpuBuffer::<Empty>::create_empty_buffer::<T>(&self.inner, n_elems)?;
 
         Ok(DeviceBuffer::from_inner(inner, n_elems))
     }
 
-    /// Low‑Level‑Zugriff (nur wenn unbedingt nötig)
+    /// Low-level access (only when absolutely necessary)
     pub fn raw(&self) -> &CLContext {
         &self.inner
     }

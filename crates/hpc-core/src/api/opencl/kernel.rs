@@ -1,5 +1,7 @@
-// src/api/kernel.rs
-
+//! High-level wrapper for OpenCL kernels.
+//! Provides a safe API around cl_kernel handles, bound to a specific
+//! - Lifetime branding (`'q`) to prevent cross-queue mixing.
+//!
 use opencl3::{kernel::Kernel as CLKernel, program::Program as CLProgram};
 
 use super::Context;
@@ -32,7 +34,7 @@ impl<'brand> Kernel<'brand> {
         &self.inner
     }
 
-    /// Setze ein Buffer-Argument (nur Ready-Buffer mit gleicher Brand erlaubt)
+    /// Set a buffer argument (only ready buffers with the same brand are allowed)
     pub fn set_arg_buffer<T>(
         &self,
         index: u32,
@@ -42,14 +44,14 @@ impl<'brand> Kernel<'brand> {
         Ok(())
     }
 
-    /// Scalar-Argument: nur zugelassene POD-Typen
+    /// Scalar argument: only allowed POD types
     pub fn set_arg_scalar<S: KernelScalar>(&self, index: u32, val: &S) -> Result<()> {
         self.inner.set_arg(index, val)?; // unsafe entfernt - nicht nötig
         Ok(())
     }
 }
 
-/// Marker-Trait für erlaubte Skalare (keine &Vec/&[T]/Pointer etc.)
+/// Marker trait for allowed scalars (no &Vec/&[T]/Pointer etc.)
 pub trait KernelScalar: bytemuck::Pod {}
 impl KernelScalar for u8 {}
 impl KernelScalar for i32 {}

@@ -24,7 +24,7 @@ impl<'a> MapToken<'a> {
         self,
         mapped_buffer: DeviceBuffer<'_, T, Mapped>,
     ) -> crate::error::Result<DeviceBuffer<'_, T, Written>> {
-        // MapGuard aufräumen (das macht das eigentliche OpenCL unmap)
+        // Clean up MapGuard (this does the actual OpenCL unmap)
         drop(self.map_guard);
 
         // Buffer State-Transition

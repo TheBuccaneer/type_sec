@@ -1,0 +1,8 @@
+error[E0599]: no method named `enqueue_kernel` found for struct `DeviceBuffer<'_, u8, hpc_core::Empty>` in the current scope
+  --> tests/compile_fail/api_empty_kernel.rs:16:33
+   |
+16 |     let (_inflight, _evt) = buf.enqueue_kernel(&queue, &kernel, 16).unwrap();
+   |                                 ^^^^^^^^^^^^^^ method not found in `DeviceBuffer<'_, u8, hpc_core::Empty>`
+   |
+   = note: the method was found for
+           - `DeviceBuffer<'brand, T, Written>`

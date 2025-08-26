@@ -1,4 +1,5 @@
-// src/api/opencl/mod.rs
+//! High-level OpenCL API module.
+//! Exposes safe wrappers around the core OpenCL concepts used in this
 
 mod context;
 mod kernel;

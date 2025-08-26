@@ -1,3 +1,6 @@
+//! IMPLEMENATION OPSOLETE
+
+
 use super::GpuBuffer;
 use crate::buffer::state::{InFlight, Ready};
 use crate::error::{Error, Result};

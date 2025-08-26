@@ -29,7 +29,7 @@ impl GpuEventGuard {
     #[inline]
     pub fn wait(mut self) {
         if let Some(e) = self.evt.take() {
-            let _ = e.wait(); // oder e.wait()? wenn du Result propagieren willst
+            let _ = e.wait();
         }
     }
 }

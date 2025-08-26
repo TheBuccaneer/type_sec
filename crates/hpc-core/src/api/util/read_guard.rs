@@ -19,14 +19,12 @@ impl<'a, 'brand, T> ReadGuard<'a, 'brand, T> {
     #[must_use]
     pub fn wait(self, buf: DeviceBuffer<'brand, T, InFlight>) -> DeviceBuffer<'brand, T, Written> {
         let buf_ready = self.token.wait(buf);
-        // Nach dem wait() ist self konsumiert und die Slice-Referenz wird freigegeben
-        // Der Aufrufer kann seine ursprüngliche Slice wieder normal nutzen
         buf_ready
     }
 }
 
-// ReadGuard ist NICHT Deref/DerefMut - das wäre unsicher!
-// Die Daten sind erst nach wait() gültig
+// ReadGuard is NOT Deref/DerefMut - that would be unsafe!
+// The data is only valid after wait()
 
 // Optional: Debug implementation
 impl<'a, 'brand, T> std::fmt::Debug for ReadGuard<'a, 'brand, T> {

@@ -1,3 +1,7 @@
+//! Compile-fail test harness.
+//!
+//! Runs all `.rs` files under `tests/compile_fail/` with `trybuild`.
+
 #[test]
 fn compile_fail_tests() {
     let t = trybuild::TestCases::new();

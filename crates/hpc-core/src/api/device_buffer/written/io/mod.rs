@@ -1,7 +1,8 @@
-// src/api/device_buffer/ready/io/mod.rs
+//! I/O operations for `DeviceBuffer<T, Ready>`
+//!
+//! This module groups read and write implementations, which are attached
+//! directly to `DeviceBuffer<T, Ready>`.
+//! There are no public re-exports here.
 
-// Import read and write implementations
 mod read;
 mod write;
-
-// No re-exports needed - implementations are attached to DeviceBuffer<T,Ready> directly

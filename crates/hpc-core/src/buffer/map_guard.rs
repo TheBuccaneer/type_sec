@@ -1,3 +1,7 @@
+//! Guard type for mapped device memory.
+//!
+//! A MapGuard represents a region of device memory that has been
+//! mapped into host address space via clEnqueueMapBuffer.
 use opencl3::command_queue::CommandQueue;
 use opencl3::types::cl_mem;
 

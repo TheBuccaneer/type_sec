@@ -1,4 +1,8 @@
+use hpc_core::*;
+
 fn main() {
-    // Dummy-Aufruf, damit das Binary die Library einbindet
-    println!("Bloat-Check");
+    // Force inclusion of API symbols so cargo-bloat can measure them.
+    let _ctx = Context::create_context().unwrap();
+    println!("treatment build ready");
+
 }

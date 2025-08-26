@@ -1,3 +1,7 @@
+//! Operations for `DeviceBuffer<T, Empty>`.
+//!
+//! Represents a freshly allocated but uninitialized device buffer.
+
 use crate::buffer::GpuBuffer;
 use crate::buffer::MapGuard;
 use crate::buffer::state::{Empty, Mapped, Written};
@@ -31,11 +35,9 @@ impl GpuBuffer<Empty> {
         })
     }
 
-    pub fn write_block(
-        mut self,
-        queue: &CommandQueue,
-        host: &[u8],
-    ) -> Result<GpuBuffer<Written>> {
+    /// works also with other datatypes bc of enqueue_write_buffer, but needs to be
+    /// TODO: transfered into generic version
+    pub fn write_block(mut self, queue: &CommandQueue, host: &[u8]) -> Result<GpuBuffer<Written>> {
         if host.len() != self.len_bytes {
             return Err(Error::BufferSizeMismatch {
                 expected: self.len_bytes,
@@ -43,7 +45,6 @@ impl GpuBuffer<Empty> {
             });
         }
 
-        // Write enqueuen
         let _evt = queue.enqueue_write_buffer(&mut self.buf, CL_BLOCKING, 0, host, &[])?;
 
         Ok(GpuBuffer {
@@ -53,8 +54,9 @@ impl GpuBuffer<Empty> {
         })
     }
 
-    /// Mappt den Buffer auf der Host-Seite → Mapped.
-    /// Liefert einen Guard, über den du `&mut [T]` bekommst.
+    /// Maps the buffer on the host side → Mapped.
+    /// Returns a guard that gives you `&mut [T]`.
+
     pub fn map_for_write_block(
         mut self,
         queue: &CommandQueue,

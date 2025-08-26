@@ -3,7 +3,7 @@ name = "hpc-core"
 version = "0.1.0"
 edition = "2024"
 authors = ["Tihomir Thomas Bicanic"]
-description = "High-performance type-safe Rust API for OpenCL (Type-States, Metrics, Memtracer)"
+description = "High-performance type-safe Rust API for OpenCL"
 license = "MIT OR Apache-2.0"
 repository = "https://github.com/TheBuccaneer/hpc-core"
 

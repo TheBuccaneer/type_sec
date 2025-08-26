@@ -16,14 +16,13 @@ mod written;
 /// High-Level typisierter Buffer. Delegiert an den GPUBuffer
 ///
 /// User API: Buffers können erstellt, gelesen, geschrieben und für Kernels genutzt werden.
-/// Die interne Struktur ist versteckt - Type-State Pattern sorgt für Compile-Time Safety.
 #[derive(Debug)]
 pub struct DeviceBuffer<'brand, T, S: State> {
     pub(crate) inner: GpuBuffer<S>,
     pub(crate) len: usize,
     // Zwei separate Marker:
-    pub(crate) _brand: PhantomData<fn(&'brand ()) -> &'brand ()>, // invariant für Context
-    pub(crate) _type: PhantomData<T>,                             // kovariant für Typ (das ist OK)
+    pub(crate) _brand: PhantomData<fn(&'brand ()) -> &'brand ()>,
+    pub(crate) _type: PhantomData<T>,
 }
 
 impl<'ctx, T, S: State> DeviceBuffer<'ctx, T, S> {
@@ -31,8 +30,8 @@ impl<'ctx, T, S: State> DeviceBuffer<'ctx, T, S> {
         Self {
             inner,
             len: len_elems,
-            _brand: PhantomData, // ← für Context-Branding
-            _type: PhantomData,  // ← für Typ-Parameter
+            _brand: PhantomData,
+            _type: PhantomData,
         }
     }
 }

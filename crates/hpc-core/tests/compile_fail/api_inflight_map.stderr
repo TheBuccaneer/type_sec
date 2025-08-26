@@ -1,0 +1,9 @@
+error[E0599]: no method named `map_write_blocking` found for struct `hpc_core::DeviceBuffer` in the current scope
+  --> tests/compile_fail/api_inflight_map.rs:17:10
+   |
+16 |       let _mapped = buf_inflight
+   |  ___________________-
+17 | |         .map_write_blocking(&q, 0..16, /*invalidate=*/ true)
+   | |         -^^^^^^^^^^^^^^^^^^ method not found in `hpc_core::DeviceBuffer<'static, u8, hpc_core::InFlight>`
+   | |_________|
+   |

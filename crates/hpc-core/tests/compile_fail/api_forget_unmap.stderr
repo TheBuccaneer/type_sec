@@ -1,0 +1,12 @@
+error: unused `api::util::map_token::MapToken` in tuple element 1 that must be used
+  --> tests/compile_fail/api_forget_unmap.rs:20:5
+   |
+20 |     buf.map_for_write_block(&queue).unwrap();
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = note: call .unmap(...) with this token to release the mapped buffer
+note: the lint level is defined here
+  --> tests/compile_fail/api_forget_unmap.rs:4:9
+   |
+4  | #![deny(unused_must_use)]
+   |         ^^^^^^^^^^^^^^^

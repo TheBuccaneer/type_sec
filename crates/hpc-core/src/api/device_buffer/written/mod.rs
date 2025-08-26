@@ -8,9 +8,9 @@ use crate::error::Result;
 // Import I/O implementations
 mod io;
 
-//=============================================================================
+//#####
 // COMPUTE OPERATIONS
-//=============================================================================
+//#####
 
 impl<'brand, T> DeviceBuffer<'brand, T, Written> {
     #[must_use = "GPU kernel started: you must wait for completion"]

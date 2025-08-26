@@ -1,4 +1,5 @@
-// src/api/empty.rs
+//! Operations for `DeviceBuffer<T, Empty>`
+//! Provides creation and initialization methods for buffers in the Empty
 
 use super::DeviceBuffer;
 use crate::api::util::MapToken;
@@ -22,11 +23,10 @@ impl<'brand, T> DeviceBuffer<'brand, T, Empty> {
             });
         }
 
-        // Delegation - gibt (GpuBuffer<Mapped>, MapGuard) zurück
         let (inner_mapped, map_guard) = self.inner.map_for_write_block(queue.raw())?;
 
         // MapGuard in MapToken wrappen
-        let map_token = MapToken::new(map_guard); // Einfach MapGuard übergeben
+        let map_token = MapToken::new(map_guard);
 
         Ok((DeviceBuffer::from_inner(inner_mapped, self.len), map_token))
     }

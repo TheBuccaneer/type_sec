@@ -1,4 +1,9 @@
-// src/api/device_buffer/ready/io/read.rs
+//! Read operations for DeviceBuffer<T, Written>
+//!
+//!
+//! - Blocking read: copies data to host memory and keeps buffer in Written.
+//! - Non-blocking read: enqueues transfer, returns an EventToken to
+//!   synchronize completion.
 
 use crate::api::util::{EventToken, ReadGuard};
 use crate::api::{DeviceBuffer, Queue};

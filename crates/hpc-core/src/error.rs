@@ -1,3 +1,7 @@
+//! Error handling for the high-level API.
+//!
+//! Defines a unified Error type wrapping OpenCL error codes
+
 use opencl3::error_codes::ClError;
 
 #[derive(Debug)]

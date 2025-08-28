@@ -1,7 +1,7 @@
 cff-version: "1.2.0"
 message: "If you use this software, please cite it as below."
 type: software
-title: "RUST IT (Host–Device Session Types API)"
+title: "TypeSec: Compile-Time Resource Safety for GPU APIs"
 version: "v0.3.1"
 date-released: "2025-08-29"
 
@@ -9,29 +9,33 @@ authors:
   - family-names: "Bicanic"
     given-names: "Tihomir Thomas"
     orcid: "https://orcid.org/0009-0003-1562-3497"
-    affiliation: "University Trier"
+    affiliation: "University of Trier"
 
 repository-code: "https://github.com/TheBuccaneer/type_sec/tree/feature/zero-cost"
 license: "Apache-2.0"
 abstract: >
-  A zero-cost, type-state API for safe host–device interaction with OpenCL.
+  A zero-cost, type-state framework for safe host–device interaction with OpenCL.
   Compile-time session types prevent protocol misuse without runtime overhead.
 keywords:
   - rust
   - opencl
-  - session types
+  - type-state
   - zero-cost abstractions
   - gpu
+  - compile-time safety
 
-# If you have a paper, add this so users cite the article, not (only) the repo:
 preferred-citation:
-  type: article
-  title: "Zero-Cost Session Types for Host–Device APIs"
+  type: conference-paper
+  title: "Compile-Time Resource Safety for GPU APIs: A Low-Overhead Typestate Framework"
   authors:
-    - family-names: "Muster"
-      given-names: "Max"
-    - family-names: "Beispiel"
-      given-names: "Eva"
+    - family-names: "Bicanic"
+      given-names: "Tihomir Thomas"
   year: 2025
-  journal: "Proceedings of XYZ"
-  doi: "10.5281/zenodo.1234567"
+  conference:
+    name: "Herbsttreffen der GI-Fachgruppe Betriebssysteme"
+    abbreviation: "FGBS'25"
+    location: "Aachen, Germany"
+    date-start: "2025-09-25"
+    date-end: "2025-09-26"
+  # DOI wird später von der GI Digital Library vergeben
+  # doi: "10.18420/fgbs2025-xx"
